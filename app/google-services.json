@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "994921683479",
+    "project_id": "kaaoslab",
+    "storage_bucket": "kaaoslab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994921683479:android:3e8d77afe568c8182b1a52",
+        "android_client_info": {
+          "package_name": "com.afaryn.kaoslab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpN5bkvTvjdGx1vXOumdIT7pZ2SDc6h9w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
