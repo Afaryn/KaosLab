@@ -43,9 +43,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/ic_cart2" android:layout_margin="8dp"/>
-        <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/ic_heart" android:layout_margin="8dp"/>
-        <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/ic_chat" android:layout_margin="8dp"/>
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_cart2"
+            android:layout_margin="8dp"/>
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_heart"
+            android:layout_margin="8dp"/>
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_chat"
+            android:layout_margin="8dp"/>
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -82,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:dotsColor="@color/tertiary"
+            app:dotsColor="@color/chocoCream"
             app:dotsCornerRadius="8dp"
             app:dotsSize="6dp"
             app:dotsSpacing="2dp"
@@ -90,7 +102,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:selectedDotColor="@color/darkchoco"
+            app:selectedDotColor="@color/chocoCream"
             tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -102,7 +114,7 @@
         android:textStyle="bold"
         android:textSize="16sp"
         android:fontFamily="@font/pjs_bold"
-        android:textColor="@color/primary"
+        android:textColor="@color/darkBlue"
         app:layout_constraintTop_toBottomOf="@id/cs"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"
@@ -114,7 +126,7 @@
         android:layout_height="wrap_content"
         android:text="see all"
         android:textSize="14sp"
-        android:textColor="@color/darkchoco"
+        android:textColor="@color/chocoCream"
         app:layout_constraintTop_toTopOf="@id/categoryTitle"
         android:fontFamily="@font/pjs_bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -200,7 +212,7 @@
         android:text="Design for your Merchandise!"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="@color/primary"
+        android:textColor="@color/darkBlue"
         app:layout_constraintTop_toBottomOf="@id/categoryIcons"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
@@ -213,83 +225,30 @@
         android:layout_height="wrap_content"
         android:text="see all"
         android:textSize="14sp"
-        android:textColor="@color/darkchoco"
+        android:textColor="@color/chocoCream"
         android:fontFamily="@font/pjs_bold"
         app:layout_constraintTop_toTopOf="@id/merchTitle"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/viewRecommendation"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:contentDescription="@string/content_description"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/merchTitle">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/img_sample1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/pjs_bold"
-                android:text="Hand drawn streetwear"
-                android:textColor="@color/primary"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/pjs_medium"
-                android:text="by lionelhaaland123"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/img_sample3" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/pjs_bold"
-
-                android:text="Cartoon"
-                android:textColor="@color/primary"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/pjs_medium"
-                android:text="by Alexa298"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
+        app:layout_constraintTop_toBottomOf="@+id/merchTitle"
+        app:layout_constraintVertical_bias="0.0"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_product" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

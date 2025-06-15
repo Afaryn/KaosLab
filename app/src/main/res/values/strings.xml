@@ -7,4 +7,5 @@
     <string name="custom">Custom</string>
     <string name="notification">Notification</string>
     <string name="account">Account</string>
+    <string name="content_description">null</string>
 </resources>

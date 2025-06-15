@@ -36,7 +36,7 @@
                     android:id="@+id/searchEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/search_outline"
+                    android:background="@drawable/bg_search_outline"
                     android:drawableStart="@drawable/ic_search"
                     android:fontFamily="@font/pjs_medium"
                     android:hint="Search..."
@@ -50,12 +50,12 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/rounded_button"
+                android:background="@drawable/bg_rounded_button"
                 android:contentDescription="null"
                 android:src="@drawable/ic_setting"/>
         </LinearLayout>
 
-        <!-- RecyclerView -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvFeed"
             android:layout_width="match_parent"

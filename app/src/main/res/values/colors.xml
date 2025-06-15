@@ -3,10 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background">#FEFAF6</color>
-    <color name="tertiary">#EADBC8</color>
-    <color name="secondary">#DAC0A3</color>
-    <color name="darkchoco">#AE9982</color>
-    <color name="primary">#102C57</color>
+    <color name="cream">#EADBC8</color>
+    <color name="chocoTan">#DAC0A3</color>
+    <color name="chocoCream">#AE9982</color>
+    <color name="darkBlue">#102C57</color>
     <color name="textLine">#C8C6C6</color>
     <color name="textDisable">#66666E</color>
 </resources>
