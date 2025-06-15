@@ -14,20 +14,24 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.afaryn.kaoslab.ui_customer.feed.FeedFragment"
-        android:label="Feed" />
+        android:label="Feed"
+        tools:layout="@layout/fragment_feed"/>
 
     <fragment
         android:id="@+id/customFragment"
         android:name="com.afaryn.kaoslab.ui_customer.custome.CustomFragment"
-        android:label="Custom" />
+        android:label="Custom"
+        tools:layout="@layout/fragment_custom"/>
 
     <fragment
         android:id="@+id/NotificationFragment"
         android:name="com.afaryn.kaoslab.ui_customer.notification.NotificationFragment"
-        android:label="Notification" />
+        android:label="Notification"
+        tools:layout="@layout/fragment_notification"/>
 
     <fragment
         android:id="@+id/AccountFragment"
         android:name="com.afaryn.kaoslab.ui_customer.account.AccountFragment"
-        android:label="Account" />
+        android:label="Account"
+        tools:layout="@layout/fragment_account"/>
 </navigation>

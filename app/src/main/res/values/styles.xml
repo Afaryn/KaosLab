@@ -6,4 +6,18 @@
         <item name="android:textSize">12sp</item>
         <item name="android:layout_marginTop">1dp</item>
     </style>
+
+    <style name="CustomToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">@color/background</item>
+        <item name="android:elevation">10dp</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <!-- Title Text Appearance -->
+    <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/darkBlue</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/pjs_bold</item> <!-- jika ada custom font -->
+    </style>
 </resources>
