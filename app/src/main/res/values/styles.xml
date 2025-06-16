@@ -14,10 +14,20 @@
         <item name="titleTextAppearance">@style/ToolbarTitleText</item>
     </style>
 
-    <!-- Title Text Appearance -->
     <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textColor">@color/darkBlue</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:fontFamily">@font/pjs_bold</item> <!-- jika ada custom font -->
+        <item name="android:fontFamily">@font/pjs_bold</item>
     </style>
+
+<!--    <style name="BottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">-->
+<!--        <item name="elevation">8dp</item>-->
+<!--        <item name="backgroundTint">@color/background</item>-->
+
+<!--        <item name="itemRippleColor">@android:color/transparent</item>-->
+<!--        <item name="itemBackground">@android:color/transparent</item>-->
+
+<!--        <item name="itemIconTint">@android:color/transparent</item>-->
+<!--        <item name="itemTextColor">@android:color/transparent</item>-->
+<!--    </style>-->
 </resources>
