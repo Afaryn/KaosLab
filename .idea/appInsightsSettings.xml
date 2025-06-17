@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.afaryn.kaoslab" />
+                  <option name="mobileSdkAppId" value="1:994921683479:android:3e8d77afe568c8182b1a52" />
+                  <option name="projectId" value="kaaoslab" />
+                  <option name="projectNumber" value="994921683479" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

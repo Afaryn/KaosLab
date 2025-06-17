@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/CustomToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="10dp">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Notification"
+            android:textColor="@color/darkBlue"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/pjs_bold"/>
+    </androidx.appcompat.widget.Toolbar>
+    <!-- Konten -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- TODAY -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="TODAY"
+                    android:textStyle="bold"
+                    android:textColor="#4D4D4D" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="read all"
+                    android:textColor="@color/choco"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Today Items -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="8dp" />
+
+            <!-- YESTERDAY -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="YESTERDAY"
+                    android:textStyle="bold"
+                    android:textColor="#4D4D4D" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="read all"
+                    android:textColor="@color/choco"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Yesterday Items -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerYesterday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

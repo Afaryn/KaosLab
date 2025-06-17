@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/item_feed"
+        >
+
+        <ImageView
+            android:id="@+id/imagePost"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/contoh_feed"
+            android:contentDescription="Post Image" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/iconLike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_like_line"
+                android:contentDescription="Like" />
+
+            <ImageView
+                android:id="@+id/iconComment"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_comment_line"
+                android:contentDescription="Comment" />
+
+            <ImageView
+                android:id="@+id/iconShare"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_share_line"
+                android:contentDescription="Share" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textUsernameCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:lineSpacingExtra="2dp"
+            android:text="octagonsdesign Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec semper sapien. Mauris commodo diam vitae neque elementum, quis dictum nunc ultricies"/>
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Jan 29"
+            android:textColor="#888888"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+

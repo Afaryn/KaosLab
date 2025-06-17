@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BottomNavText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:fontFamily">@font/plusjakartasans</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_marginTop">1dp</item>
+    </style>
+
+    <style name="CustomToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">@color/background</item>
+        <item name="android:elevation">10dp</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/darkBlue</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/pjs_bold</item>
+    </style>
+
+<!--    <style name="BottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">-->
+<!--        <item name="elevation">8dp</item>-->
+<!--        <item name="backgroundTint">@color/background</item>-->
+
+<!--        <item name="itemRippleColor">@android:color/transparent</item>-->
+<!--        <item name="itemBackground">@android:color/transparent</item>-->
+
+<!--        <item name="itemIconTint">@android:color/transparent</item>-->
+<!--        <item name="itemTextColor">@android:color/transparent</item>-->
+<!--    </style>-->
+</resources>
