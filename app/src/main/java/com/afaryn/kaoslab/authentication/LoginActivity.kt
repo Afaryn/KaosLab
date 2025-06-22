@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.authentication
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.MotionEvent
@@ -8,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityLoginBinding
+import com.afaryn.kaoslab.ui_customer.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -42,10 +44,10 @@ class LoginActivity : AppCompatActivity() {
                     isPasswordVisible = !isPasswordVisible
                     if (isPasswordVisible) {
                         binding.edtPass.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                        binding.edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                        binding.edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
                     } else {
                         binding.edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        binding.edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                        binding.edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
                     }
 
                     binding.edtPass.setSelection(binding.edtPass.text?.length ?: 0)
@@ -55,7 +57,12 @@ class LoginActivity : AppCompatActivity() {
             false
         }
         binding.btnLogin.setOnClickListener{
-
+            val intent = Intent (this, MainActivity::class.java)
+            startActivity(intent)
+        }
+        binding.txtRegis.setOnClickListener {
+            val intent = Intent(this, RegistrationActivity::class.java)
+            startActivity(intent)
         }
 
     }
