@@ -132,6 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:fontFamily="@font/pjs_bold"
             android:text="Login"
             android:backgroundTint="@color/darkBlue"/>
 
@@ -152,6 +153,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/pjs_medium"
                 android:text="Or Login With"
                 android:paddingHorizontal="8dp"
                 android:textColor="@color/black"

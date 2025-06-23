@@ -28,6 +28,10 @@ class RegistrationActivity : AppCompatActivity() {
                 val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
                 startActivity(intent)
             }
+            btnRegis.setOnClickListener{
+                val intent = Intent (this@RegistrationActivity, VerificationActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 }
