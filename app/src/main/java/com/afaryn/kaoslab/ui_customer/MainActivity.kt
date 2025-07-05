@@ -3,6 +3,7 @@ package com.afaryn.kaoslab.ui_customer
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityMainBinding
+import com.afaryn.kaoslab.ui_customer.custome.CustomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,7 +53,38 @@ class MainActivity : AppCompatActivity() {
 
         createNotificationChannel()
         requestNotificationPermissionIfNeeded()
+
+        action()
     }
+
+    private fun action() {
+        binding.bottomNavigation.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.homeFragment -> {
+                    navController.navigate(R.id.homeFragment)
+                    true
+                }
+                R.id.feedFragment -> {
+                    navController.navigate(R.id.feedFragment)
+                    true
+                }
+                R.id.customFragment -> {
+                    startActivity(Intent(this, CustomeActivity::class.java))
+                    false
+                }
+                R.id.NotificationFragment -> {
+                    navController.navigate(R.id.NotificationFragment)
+                    true
+                }
+                R.id.AccountFragment -> {
+                    navController.navigate(R.id.AccountFragment)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
 
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
