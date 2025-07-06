@@ -9,6 +9,7 @@
     <color name="choco">#8a7359</color>
     <color name="darkBlue">#102C57</color>
     <color name="textLine">#C8C6C6</color>
+    <color name="dimgray">#66666E</color>
     <color name="textDisable">#66666E</color>
     <color name="line">#AA868689</color>
 </resources>
