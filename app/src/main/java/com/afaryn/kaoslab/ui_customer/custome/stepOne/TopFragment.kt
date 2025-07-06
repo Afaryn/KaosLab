@@ -1,60 +1,85 @@
 package com.afaryn.kaoslab.ui_customer.custome.stepOne
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.afaryn.kaoslab.R
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import com.afaryn.kaoslab.databinding.FragmentTopBinding
+import com.afaryn.kaoslab.ui_customer.custome.adapter.CustomProductAdapter
+import com.afaryn.kaoslab.ui_customer.custome.viewModel.CustomViewModel
+import com.afaryn.kaoslab.utils.UiState
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TopFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class TopFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentTopBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel by viewModels<CustomViewModel>()
+    private lateinit var adapter: CustomProductAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_top, container, false)
+    ): View {
+        _binding = FragmentTopBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TopFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TopFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        observeViewModel()
+        viewModel.fetchProducts()
+
+        binding.btnNext.setOnClickListener {
+            val selectedItem = adapter.getSelectedItem()
+            if (selectedItem != null) {
+                // Misalnya simpan ke ViewModel global atau navigasi
+                Toast.makeText(requireContext(), "Terpilih: ${selectedItem.name}", Toast.LENGTH_SHORT).show()
+                // TODO: Navigasi atau simpan data ke langkah berikutnya
+            }
+        }
+    }
+
+    private fun setupRecyclerView() {
+        adapter = CustomProductAdapter(onItemSelected = { updateNextButtonVisibility() })
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recyclerView.adapter = adapter
+    }
+
+    private fun observeViewModel() {
+        viewModel.productState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    binding.progressBar.visibility = if (state.isLoading == true) View.VISIBLE else View.GONE
+                }
+                is UiState.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    adapter.submitList(state.data)
+                    updateNextButtonVisibility()
+                }
+                is UiState.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    private fun updateNextButtonVisibility() {
+        val selectedItem = adapter.getSelectedItem()
+        binding.btnNext.visibility = if (selectedItem != null) View.VISIBLE else View.GONE
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

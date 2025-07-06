@@ -5,6 +5,7 @@ import android.Manifest
 object Constants {
 
     const val PRODUCT_COLLECTION = "product"
+    const val CUSTOM_PRODUCT_COLLECTION = "customproduct"
 
 
     val PERMISSIONS = arrayOf(
