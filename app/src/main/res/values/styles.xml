@@ -20,7 +20,19 @@
         <item name="android:fontFamily">@font/pjs_bold</item>
     </style>
 
-<!--    <style name="BottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">-->
+    <style name="OtpEditTextStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_otp_edit_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+    </style>
+
+
+    <!--    <style name="BottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">-->
 <!--        <item name="elevation">8dp</item>-->
 <!--        <item name="backgroundTint">@color/background</item>-->
 

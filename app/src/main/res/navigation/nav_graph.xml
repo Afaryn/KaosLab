@@ -19,9 +19,9 @@
 
     <fragment
         android:id="@+id/customFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.custome.CustomFragment"
+        android:name="com.afaryn.kaoslab.ui_customer.custome.StepOneFragment"
         android:label="Custom"
-        tools:layout="@layout/fragment_custom" />
+        tools:layout="@layout/fragment_step_one" />
 
     <fragment
         android:id="@+id/NotificationFragment"

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="3dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:id="@+id/linear_produk"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@drawable/bg_gradient_top">
+
+            <ImageView
+                android:id="@+id/image_product"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/content_description"
+                />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/text_product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Short sleeve t-shirt"
+                android:textColor="@color/darkBlue"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="@font/pjs_bold" />
+
+            <TextView
+                android:id="@+id/text_product_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rp 55.000 – 65.000"
+                android:textColor="@color/chocoCream"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/pjs_regular" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

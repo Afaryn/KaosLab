@@ -8,4 +8,5 @@
     <string name="notification">Notification</string>
     <string name="account">Account</string>
     <string name="content_description">null</string>
+    <string name="forgot_password">Forgot Password?</string>
 </resources>
