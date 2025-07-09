@@ -5,53 +5,89 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.afaryn.kaoslab.R
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import com.afaryn.kaoslab.databinding.FragmentHomeBinding
+import com.afaryn.kaoslab.model.Product
+import com.afaryn.kaoslab.ui_customer.home.adapter.ProductAdapter
+import com.afaryn.kaoslab.ui_customer.home.viewModel.HomeViewModel
+import com.afaryn.kaoslab.utils.UiState
+import com.afaryn.kaoslab.utils.hide
+import com.afaryn.kaoslab.utils.show
+import com.afaryn.kaoslab.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 
 class HomeFragment : Fragment() {
-    private  val ARG_PARAM1 = "param1"
-    private val ARG_PARAM2 = "param2"
 
+    private var _binding :FragmentHomeBinding?=null
+    private val binding get() = _binding!!
+    private val viewModel by viewModels<HomeViewModel>()
+    private lateinit var recyclerViewAdapter: ProductAdapter
 
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding = FragmentHomeBinding.inflate(layoutInflater)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observer()
+        action()
+
+    }
+
+    private fun observer(){
+        viewModel.product.observe(viewLifecycleOwner) { it ->
+            when (it) {
+                is UiState.Loading -> {
+                    if (it.isLoading == true) binding.progressBar.show()
+                    else binding.progressBar.hide()
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    setRvRekom(it.data!!)
+                }
+                is UiState.Error -> {
+                    binding.progressBar.hide()
+                    toast(it.error.toString())
+                }
+                else -> {
+
                 }
             }
+        }
     }
+
+    private fun action(){
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+    }
+
+    private fun setRvRekom(items: List<Product>) {
+        val limitedItems = items.take(4)
+        recyclerViewAdapter = ProductAdapter(limitedItems)
+        binding.viewRecommendation.adapter = recyclerViewAdapter
+        binding.viewRecommendation.layoutManager = GridLayoutManager(requireContext(), 2)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
 }
