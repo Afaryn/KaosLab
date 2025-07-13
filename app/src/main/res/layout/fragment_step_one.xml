@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background"
-    tools:context=".ui_customer.custome.StepOneFragment">
+    tools:context=".ui_customer.custome.stepOne.StepOneFragment">
 
     <LinearLayout
         android:id="@+id/card_container"

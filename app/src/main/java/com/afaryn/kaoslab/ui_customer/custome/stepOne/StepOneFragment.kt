@@ -1,4 +1,4 @@
-package com.afaryn.kaoslab.ui_customer.custome
+package com.afaryn.kaoslab.ui_customer.custome.stepOne
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentStepOneBinding
-import com.afaryn.kaoslab.ui_customer.custome.stepOne.BottomFragment
-import com.afaryn.kaoslab.ui_customer.custome.stepOne.HatFragment
-import com.afaryn.kaoslab.ui_customer.custome.stepOne.TopFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,22 +29,19 @@ class StepOneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setActiveCard(binding.cardTop, binding.textTitleTop)
+//        setActiveCard(binding.cardTop, binding.textTitleTop)
         loadChildFragment(TopFragment())
 
         binding.cardTop.setOnClickListener {
-            setActiveCard(binding.cardTop, binding.textTitleTop)
-            loadChildFragment(TopFragment())
+            setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
         }
 
         binding.cardBottom.setOnClickListener {
-            setActiveCard(binding.cardBottom, binding.textTitleBottom)
-            loadChildFragment(BottomFragment())
+            setActiveCard(binding.cardBottom, binding.textTitleBottom, BottomFragment())
         }
 
         binding.cardHat.setOnClickListener {
-            setActiveCard(binding.cardHat, binding.textTitleHat)
-            loadChildFragment(HatFragment())
+            setActiveCard(binding.cardHat, binding.textTitleHat, HatFragment())
         }
     }
 
@@ -57,10 +51,11 @@ class StepOneFragment : Fragment() {
             .commit()
     }
 
-    private fun setActiveCard(card: CardView, textView: TextView) {
+    private fun setActiveCard(card: CardView, textView: TextView, fragment: Fragment) {
         resetAllCards()
         card.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darkBlue))
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.cream))
+        loadChildFragment(fragment)
     }
 
     private fun resetAllCards() {

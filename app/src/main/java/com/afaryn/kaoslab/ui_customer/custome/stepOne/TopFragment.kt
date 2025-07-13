@@ -1,15 +1,20 @@
 package com.afaryn.kaoslab.ui_customer.custome.stepOne
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentTopBinding
+import com.afaryn.kaoslab.ui_customer.custome.CustomeActivity
 import com.afaryn.kaoslab.ui_customer.custome.adapter.CustomProductAdapter
+import com.afaryn.kaoslab.ui_customer.custome.stepTwo.StepTwoFragment
 import com.afaryn.kaoslab.ui_customer.custome.viewModel.CustomViewModel
 import com.afaryn.kaoslab.utils.UiState
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +25,7 @@ class TopFragment : Fragment() {
     private var _binding: FragmentTopBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<CustomViewModel>()
+    private val viewModel by activityViewModels<CustomViewModel>()
     private lateinit var adapter: CustomProductAdapter
 
     override fun onCreateView(
@@ -36,16 +41,18 @@ class TopFragment : Fragment() {
 
         setupRecyclerView()
         observeViewModel()
-        viewModel.fetchProducts()
+        viewModel.fetchTopProducts()
 
         binding.btnNext.setOnClickListener {
             val selectedItem = adapter.getSelectedItem()
             if (selectedItem != null) {
-                // Misalnya simpan ke ViewModel global atau navigasi
-                Toast.makeText(requireContext(), "Terpilih: ${selectedItem.name}", Toast.LENGTH_SHORT).show()
-                // TODO: Navigasi atau simpan data ke langkah berikutnya
+                viewModel.setSelectedProduct(selectedItem)
+                Log.d("STEP_ONE_SELECTION", "Item yang dikirim ke StepTwo: ${selectedItem.name}")
+
+                (activity as? CustomeActivity)?.goToStep(2)
             }
         }
+
     }
 
     private fun setupRecyclerView() {

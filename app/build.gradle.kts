@@ -116,4 +116,8 @@ dependencies {
     //Chart
 //    implementation ("com.github.AAChartModel:AAChartCore-Kotlin:+")
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    //flexbox
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
+    implementation ("androidx.gridlayout:gridlayout:1.0.0")
 }

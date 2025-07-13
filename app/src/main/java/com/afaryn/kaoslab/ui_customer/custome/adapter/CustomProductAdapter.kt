@@ -15,6 +15,8 @@ class CustomProductAdapter(
     private val onItemSelected: () -> Unit
 ) : ListAdapter<CustomProduct, CustomProductAdapter.ViewHolder>(DiffCallback()) {
 
+
+
     private var selectedPosition: Int? = null
 
     inner class ViewHolder(private val binding: ItemProductCustomBinding) :

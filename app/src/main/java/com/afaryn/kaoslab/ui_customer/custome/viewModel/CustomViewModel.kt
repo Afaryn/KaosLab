@@ -19,7 +19,19 @@ class CustomViewModel @Inject constructor(
     private val _productState = MutableLiveData<UiState<List<CustomProduct>>>()
     val productState: LiveData<UiState<List<CustomProduct>>> = _productState
 
-    fun fetchProducts() {
+    private var _selectedProduct: CustomProduct? = null
+    val selectedProduct: CustomProduct? get() = _selectedProduct
+
+    var selectedSizes: MutableSet<String> = mutableSetOf()
+    var selectedColor: String? = null
+
+
+    fun setSelectedProduct(product: CustomProduct) {
+        _selectedProduct = product
+        Log.d("SELECTED_PRODUCT", "Produk dipilih: ${product.name}")
+    }
+
+    fun fetchTopProducts() {
         _productState.value = UiState.Loading(true)
 
         firestore.collection(CUSTOM_PRODUCT_COLLECTION)
@@ -43,50 +55,53 @@ class CustomViewModel @Inject constructor(
             }
     }
 
+    fun fetchBottomProducts() {
+        _productState.value = UiState.Loading(true)
 
-//    fun submitMultipleProducts(products: List<CustomProduct>) {
-//        val collection = firestore.collection(CUSTOM_PRODUCT_COLLECTION)
-//
-//        products.forEach { product ->
-//            collection.add(product)
-//                .addOnSuccessListener {
-//                    Log.d("Firestore", "Produk ${product.name} berhasil ditambahkan")
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.e("Firestore", "Gagal tambah produk ${product.name}", e)
-//                }
-//        }
-//    }
+        firestore.collection(CUSTOM_PRODUCT_COLLECTION)
+            .whereEqualTo("type", "1")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val products = snapshot.toObjects(CustomProduct::class.java)
+
+                if (products.isNotEmpty()) {
+                    _productState.value = UiState.Success(products)
+                    Log.d("CUSTOM_PRODUCTS", "Berhasil ambil data: ${products.size} item")
+                    products.forEach { Log.d("CUSTOM_PRODUCT_ITEM", it.toString()) }
+                } else {
+                    _productState.value = UiState.Error("Tidak ada produk ditemukan.")
+                    Log.w("CUSTOM_PRODUCTS", "Data kosong.")
+                }
+            }
+            .addOnFailureListener { e ->
+                _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
+                Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
+            }
+    }
+
+    fun fetchHatProducts() {
+        _productState.value = UiState.Loading(true)
+
+        firestore.collection(CUSTOM_PRODUCT_COLLECTION)
+            .whereEqualTo("type", "2")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val products = snapshot.toObjects(CustomProduct::class.java)
+
+                if (products.isNotEmpty()) {
+                    _productState.value = UiState.Success(products)
+                    Log.d("CUSTOM_PRODUCTS", "Berhasil ambil data: ${products.size} item")
+                    products.forEach { Log.d("CUSTOM_PRODUCT_ITEM", it.toString()) }
+                } else {
+                    _productState.value = UiState.Error("Tidak ada produk ditemukan.")
+                    Log.w("CUSTOM_PRODUCTS", "Data kosong.")
+                }
+            }
+            .addOnFailureListener { e ->
+                _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
+                Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
+            }
+    }
+
 
 }
-
-//@HiltViewModel
-//class AddProductViewModel @Inject constructor(
-//    private val firestore: FirebaseFirestore,
-//    private val storage: FirebaseStorage
-//) : ViewModel() {
-//
-//    fun submitProduct(product: Product) {
-//        firestore.collection("products")
-//            .add(product)
-//            .addOnSuccessListener {
-//                Log.d("Product", "Berhasil tambah produk")
-//            }
-//            .addOnFailureListener {
-//                Log.e("Product", "Gagal tambah produk", it)
-//            }
-//    }
-//
-//    fun uploadImage(fileUri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
-//        val ref = storage.reference.child("products/${UUID.randomUUID()}.jpg")
-//        ref.putFile(fileUri)
-//            .continueWithTask { task ->
-//                if (!task.isSuccessful) throw task.exception ?: Exception("Upload gagal")
-//                ref.downloadUrl
-//            }.addOnSuccessListener { uri ->
-//                onSuccess(uri.toString())
-//            }.addOnFailureListener {
-//                onFailure(it)
-//            }
-//    }
-//}
