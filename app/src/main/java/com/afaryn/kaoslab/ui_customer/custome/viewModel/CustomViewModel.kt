@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afaryn.kaoslab.model.CustomProduct
+import com.afaryn.kaoslab.model.Product
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.afaryn.kaoslab.utils.Constants.CUSTOM_PRODUCT_COLLECTION
+import com.afaryn.kaoslab.utils.Constants.PRODUCT_COLLECTION
 import com.afaryn.kaoslab.utils.UiState
 
 @HiltViewModel
@@ -24,6 +26,9 @@ class CustomViewModel @Inject constructor(
 
     var selectedSizes: MutableSet<String> = mutableSetOf()
     var selectedColor: String? = null
+
+    private val _designsState = MutableLiveData<UiState<List<String>>>()
+    val designsState: LiveData<UiState<List<String>>> get() = _designsState
 
 
     fun setSelectedProduct(product: CustomProduct) {
@@ -102,6 +107,26 @@ class CustomViewModel @Inject constructor(
                 Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
             }
     }
+
+    fun fetchUserDesigns() {
+        _designsState.value = UiState.Loading(true)
+        firestore.collection(PRODUCT_COLLECTION)
+            .get()
+            .addOnSuccessListener { result ->
+                val products = result.toObjects(Product::class.java)
+                val designs = products.mapNotNull { it.imageUrl }
+
+                _designsState.value = UiState.Success(designs)
+            }
+            .addOnFailureListener { e ->
+                _designsState.value = UiState.Error(e.message ?: "Unknown error")
+            }
+            .addOnCompleteListener {
+                _designsState.value = UiState.Loading(false)
+            }
+    }
+
+
 
 
 }

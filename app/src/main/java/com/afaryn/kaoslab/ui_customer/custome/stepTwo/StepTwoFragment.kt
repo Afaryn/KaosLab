@@ -33,8 +33,6 @@ class StepTwoFragment : Fragment() {
     private val selectedSizes = mutableSetOf<String>()
     private var selectedColor: String? = null
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,7 +44,6 @@ class StepTwoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Ambil produk yang dipilih user (hanya satu)
         val selected = viewModel.selectedProduct
         Log.d("STEP_TWO_SELECTION", "Item yang dikirim ke StepTwo: ${selected?.name}")
 
@@ -56,7 +53,6 @@ class StepTwoFragment : Fragment() {
         }
 
         binding.btnNext.setOnClickListener {
-            // Simpan data ke ViewModel sekali lagi untuk jaga-jaga
             viewModel.selectedSizes = selectedSizes
             viewModel.selectedColor = selectedColor
 
@@ -65,16 +61,13 @@ class StepTwoFragment : Fragment() {
     }
 
     private fun populateProduct(product: CustomProduct) {
-        // Gambar
         Glide.with(requireContext())
             .load(product.imageUrl)
             .into(binding.imageProduct)
 
-        // Nama dan harga
         binding.productName.text = product.name
         binding.productPrice.text = "Rp ${product.basePrice} - ${product.maxPrice}"
 
-        // Ukuran
         binding.sizeOptions.removeAllViews()
         product.sizes.forEach { size ->
             val sizeView = createSizeChip(size.label)
@@ -144,7 +137,7 @@ class StepTwoFragment : Fragment() {
                 .setAllCornerSizes(size / 5f)
                 .build()
 
-            background = ContextCompat.getDrawable(context, R.drawable.circle_background) // Optional: ada ripple atau shadow
+            background = ContextCompat.getDrawable(context, R.drawable.circle_background)
             setBackgroundColor(Color.parseColor(hexColor))
             setPadding(12,12,12,12)
 

@@ -25,17 +25,14 @@ class CustomProductAdapter(
         fun bind(product: CustomProduct, isSelected: Boolean) {
             val context = binding.root.context
 
-            // Set nama & harga
             binding.textProductName.text = product.name
             binding.textProductPrice.text = "Rp ${product.basePrice} – ${product.maxPrice}"
 
-            // Load gambar
             Glide.with(context)
                 .load(product.imageUrl ?: R.drawable.img)
                 .placeholder(R.drawable.img)
                 .into(binding.imageProduct)
 
-            // Ubah tampilan saat dipilih
             if (isSelected) {
                 binding.linearProduk.setBackgroundColor(ContextCompat.getColor(context, R.color.darkBlue))
                 binding.textProductName.setTextColor(ContextCompat.getColor(context, R.color.cream))
@@ -44,7 +41,6 @@ class CustomProductAdapter(
                 binding.textProductName.setTextColor(ContextCompat.getColor(context, R.color.darkBlue))
             }
 
-            // OnClick toggle: hanya satu yang bisa dipilih
             binding.root.setOnClickListener {
                 val previousSelected = selectedPosition
                 val currentPosition = bindingAdapterPosition
