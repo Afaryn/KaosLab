@@ -12,7 +12,20 @@
           "package_name": "com.afaryn.kaoslab"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "994921683479-2r0lkdb7p80udhs8fhah3lrvo5h4uhgi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afaryn.kaoslab",
+            "certificate_hash": "2e52773ac3e7ded5e803c63e45d3fbd150f2b19a"
+          }
+        },
+        {
+          "client_id": "994921683479-ldueqet1rptio7evpq1amo1l8i9u3iel.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDpN5bkvTvjdGx1vXOumdIT7pZ2SDc6h9w"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994921683479-ldueqet1rptio7evpq1amo1l8i9u3iel.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

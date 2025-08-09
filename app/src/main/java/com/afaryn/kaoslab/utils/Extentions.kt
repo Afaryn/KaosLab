@@ -75,6 +75,8 @@ fun View.hide() {
 
 
 
+
+
 fun Int.toCurrencyFormat(): String {
     val numberFormat = NumberFormat.getNumberInstance(Locale("id", "ID"))
     return numberFormat.format(this)

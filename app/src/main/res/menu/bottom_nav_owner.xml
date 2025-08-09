@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeOwnerFragment"
+        android:icon="@drawable/ic_home_selector"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/chatOwnerFragment"
+        android:icon="@drawable/ic_chat"
+        android:title="Chat" />
+
+    <item
+        android:id="@+id/businessReportFragment"
+        android:icon="@drawable/ic_report"
+        android:title="Report"
+        />
+
+    <item
+        android:id="@+id/myShopOwnerFragment"
+        android:icon="@drawable/ic_myshop"
+        android:title="My Shop" />
+</menu>
