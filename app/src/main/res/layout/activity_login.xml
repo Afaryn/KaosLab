@@ -133,8 +133,17 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:fontFamily="@font/pjs_bold"
+            android:textColor="@color/white"
             android:text="Login"
             android:backgroundTint="@color/darkBlue"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

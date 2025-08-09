@@ -3,37 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/homeOwnerFragment">
 
-    <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.home.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
-
-    <fragment
-        android:id="@+id/feedFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.feed.FeedFragment"
-        android:label="Feed"
-        tools:layout="@layout/fragment_feed" />
-
-    <fragment
-        android:id="@+id/customFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.custome.stepOne.StepOneFragment"
-        android:label="Custom"
-        tools:layout="@layout/fragment_step_one" />
-
-    <fragment
-        android:id="@+id/NotificationFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.notification.NotificationFragment"
-        android:label="Notification"
-        tools:layout="@layout/fragment_notification" />
-
-    <fragment
-        android:id="@+id/AccountFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.account.AccountFragment"
-        android:label="Account"
-        tools:layout="@layout/fragment_account" />
     <fragment
         android:id="@+id/myShopOwnerFragment"
         android:name="com.afaryn.kaoslab.ui_owner.my_shop.MyShopOwnerFragment"
@@ -54,5 +25,10 @@
         android:name="com.afaryn.kaoslab.ui_owner.sales.SalesRevenueOwnerFragment"
         android:label="fragment_sales_revenue_owner"
         tools:layout="@layout/fragment_sales_revenue_owner" />
+    <fragment
+        android:id="@+id/businessReportFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.report.BusinessReportFragment"
+        android:label="fragment_business_report"
+        tools:layout="@layout/fragment_business_report" />
 
 </navigation>

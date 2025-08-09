@@ -12,4 +12,8 @@ object Constants {
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
+
+    const val CUSTOMER = "customer"
+    const val OWNER = "owner"
+    const val DESIGNER = "designer"
 }
