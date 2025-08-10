@@ -2,6 +2,7 @@ package com.afaryn.kaoslab.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
@@ -15,7 +16,12 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
+import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.ui_owner.OwnerActivity
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -73,8 +79,44 @@ fun View.hide() {
     this.visibility = View.GONE
 }
 
+fun confirmDialog(
+    context: Context,
+    title: String,
+    message: String,
+    positiveButton: String,
+    negativeButton: String,
+    positiveAction: () -> Unit = { },
+) {
+    AlertDialog.Builder(context).apply {
+        setTitle(title)
+        setMessage(message)
+        setPositiveButton(positiveButton) { _, _ ->
+            positiveAction()
+        }
+        setNegativeButton(negativeButton) { dialog, _ ->
+            dialog.dismiss()
+        }
+        create()
+        show()
+    }
+}
 
 
+fun Fragment.hideBottomNavOwner() {
+    val appBar: BottomAppBar = (activity as OwnerActivity).findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView = (activity as OwnerActivity).findViewById(R.id.bottom_navigation)
+
+    appBar.visibility = View.GONE
+    bottomNavView.visibility = View.GONE
+}
+
+fun Fragment.showBottomNavOwner() {
+    val appBar: BottomAppBar = (activity as OwnerActivity).findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView = (activity as OwnerActivity).findViewById(R.id.bottom_navigation)
+
+    appBar.visibility = View.VISIBLE
+    bottomNavView.visibility = View.VISIBLE
+}
 
 
 fun Int.toCurrencyFormat(): String {

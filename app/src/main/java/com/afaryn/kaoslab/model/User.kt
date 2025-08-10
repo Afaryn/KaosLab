@@ -11,6 +11,7 @@ import java.util.UUID
 data class User(
     var id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 10),
     val name: String? = null,
+    val email: String? = null,
     val profilePicture: String = "",
     val role: String = CUSTOMER,
     val phone: String = "",

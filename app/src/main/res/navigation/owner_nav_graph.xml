@@ -9,7 +9,18 @@
         android:id="@+id/myShopOwnerFragment"
         android:name="com.afaryn.kaoslab.ui_owner.my_shop.MyShopOwnerFragment"
         android:label="fragment_my_shop_owner"
-        tools:layout="@layout/fragment_my_shop_owner" />
+        tools:layout="@layout/fragment_my_shop_owner" >
+        <action
+            android:id="@+id/action_myShopOwnerFragment_to_productTemplateFragment"
+            app:destination="@id/productTemplateFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productTemplateFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.my_shop.product_template.ProductTemplateFragment"
+        android:label="fragment_product_template"
+        tools:layout="@layout/fragment_product_template" />
+
     <fragment
         android:id="@+id/chatOwnerFragment"
         android:name="com.afaryn.kaoslab.ui_owner.chat.ChatOwnerFragment"

@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentMyShopOwnerBinding
+import com.afaryn.kaoslab.utils.showBottomNavOwner
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +24,7 @@ class MyShopOwnerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        showBottomNavOwner()
         // Inflate the layout for this fragment
         _binding = FragmentMyShopOwnerBinding.inflate(inflater, container, false)
         return binding.root
@@ -42,6 +45,15 @@ class MyShopOwnerFragment : Fragment() {
                 }
             )
         }
+
+        // Add navigation to Product Template
+        binding.btnProductTemplate.setOnClickListener {
+            findNavController().navigate(R.id.action_myShopOwnerFragment_to_productTemplateFragment)
+        }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
