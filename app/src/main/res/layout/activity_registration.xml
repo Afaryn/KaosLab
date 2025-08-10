@@ -152,6 +152,14 @@
             android:text="Registration"
             android:backgroundTint="@color/darkBlue"/>
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

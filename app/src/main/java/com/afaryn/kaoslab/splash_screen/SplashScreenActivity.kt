@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.authentication.AuthViewModel
+import com.afaryn.kaoslab.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.ActivitySplashScreenBinding
 import com.afaryn.kaoslab.ui_customer.MainActivity
 import com.afaryn.kaoslab.ui_owner.OwnerActivity
@@ -68,6 +69,10 @@ class SplashScreenActivity : AppCompatActivity() {
                             }
                         }
                     }
+                } else {
+                    val intent = Intent(this, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
             }
         }

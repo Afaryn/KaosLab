@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.utils.showBottomNavOwner
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,6 +35,7 @@ class ChatOwnerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        showBottomNavOwner()
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_chat_owner, container, false)
     }

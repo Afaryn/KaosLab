@@ -743,6 +743,16 @@
                     android:background="@color/line" />
 
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/red"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="60dp"
+                android:text="Logout"/>
         </LinearLayout>
     </ScrollView>
 
