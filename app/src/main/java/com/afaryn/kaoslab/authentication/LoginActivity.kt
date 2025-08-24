@@ -94,6 +94,10 @@ class LoginActivity : AppCompatActivity() {
                             binding.btnLogin.isEnabled = true
                             toast(resource.message)
                         }
+                        else -> {
+                            binding.progressBar.hide()
+                            binding.btnLogin.isEnabled = true
+                        }
                     }
                 }
             } else {

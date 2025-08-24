@@ -73,6 +73,11 @@ class RegistrationActivity : AppCompatActivity() {
                                 binding.btnRegis.isEnabled = true
                                 toast(resource.message ?: "Registration failed")
                             }
+                            else -> {
+                                binding.progressBar.hide()
+                                binding.btnRegis.isEnabled = true
+                                toast("Unknown error occurred")
+                            }
                         }
                     }
                 }
