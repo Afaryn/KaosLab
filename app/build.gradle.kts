@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("kotlin-parcelize")
 }
 
@@ -82,10 +82,12 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
-    kapt("com.google.dagger:hilt-android-compiler:2.52")
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
@@ -124,6 +126,6 @@ dependencies {
 
     implementation ("de.hdodenhof:circleimageview:3.1.0")
 }
-kapt {
-    correctErrorTypes = true
-}
+//kapt {
+//    correctErrorTypes = true
+//}
