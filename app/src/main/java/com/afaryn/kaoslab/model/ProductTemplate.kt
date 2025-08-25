@@ -1,9 +1,10 @@
 package com.afaryn.kaoslab.model
 
 import com.google.firebase.Timestamp
+import java.util.UUID
 
 data class ProductTemplate(
-    val id: String = "",
+    val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 20),
     val name: String = "",
     val imageUrl: String = "",
     val basePrice: Int = 0,

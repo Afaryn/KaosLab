@@ -2,6 +2,7 @@ package com.afaryn.kaoslab.data
 
 import com.afaryn.kaoslab.model.ProductTemplate
 import com.afaryn.kaoslab.model.SizeOption
+import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -63,15 +64,25 @@ class OwnerRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override suspend fun addProductTemplate(productTemplate: ProductTemplate): Result<String> {
-        return try {
-            val document = firestore.collection(COLLECTION_CUSTOM_PRODUCTS)
-                .add(productTemplate)
-                .await()
-            Result.success(document.id)
+    override fun addProductTemplate(productTemplate: ProductTemplate): Flow<Response<String>> = callbackFlow {
+        trySend(Response.Loading)
+        try {
+            firestore.collection(COLLECTION_CUSTOM_PRODUCTS)
+                .document(productTemplate.id)
+                .set(productTemplate)
+                .addOnSuccessListener {
+                    trySend(Response.Success(productTemplate.id))
+                    close()
+                }
+                .addOnFailureListener { e ->
+                    trySend(Response.Error(e.message ?: "Unknown error"))
+                    close()
+                }
         } catch (e: Exception) {
-            Result.failure(e)
+            trySend(Response.Error(e.message ?: "Unknown error"))
+            close()
         }
+        awaitClose { }
     }
 
     override suspend fun updateProductTemplate(productTemplate: ProductTemplate): Result<Unit> {

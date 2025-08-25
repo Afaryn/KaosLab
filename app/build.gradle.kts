@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
+    id ("androidx.navigation.safeargs")
+    kotlin("kapt")
     id("kotlin-parcelize")
 }
 
@@ -126,6 +127,6 @@ dependencies {
 
     implementation ("de.hdodenhof:circleimageview:3.1.0")
 }
-//kapt {
-//    correctErrorTypes = true
-//}
+kapt {
+    correctErrorTypes = true
+}

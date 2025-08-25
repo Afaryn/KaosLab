@@ -19,7 +19,31 @@
         android:id="@+id/productTemplateFragment"
         android:name="com.afaryn.kaoslab.ui_owner.my_shop.product_template.ProductTemplateFragment"
         android:label="fragment_product_template"
-        tools:layout="@layout/fragment_product_template" />
+        tools:layout="@layout/fragment_product_template" >
+        <action
+            android:id="@+id/action_productTemplateFragment_to_addTemplateCategoryFragment"
+            app:destination="@id/addTemplateCategoryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addTemplateCategoryFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.my_shop.add_template.AddTemplateCategoryFragment"
+        android:label="Upload Template"
+        tools:layout="@layout/fragment_add_template_category" >
+        <action
+            android:id="@+id/action_addTemplateCategoryFragment_to_addTemplateDetailsFragment"
+            app:destination="@id/addTemplateDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addTemplateDetailsFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.my_shop.add_template.AddTemplateDetailsFragment"
+        android:label="Upload Template"
+        tools:layout="@layout/fragment_add_template_details" >
+        <argument
+            android:name="selectedCategory"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/chatOwnerFragment"

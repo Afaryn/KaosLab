@@ -67,6 +67,10 @@ class SplashScreenActivity : AppCompatActivity() {
                             is Response.Loading -> {
                                 binding.loadingIndicator.show()
                             }
+                            else -> {
+                                // Handle other states if necessary
+                                binding.loadingIndicator.show()
+                            }
                         }
                     }
                 } else {

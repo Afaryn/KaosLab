@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentProductTemplateBinding
 import com.afaryn.kaoslab.model.ProductTemplate
 import com.afaryn.kaoslab.model.ProductType
@@ -92,9 +93,8 @@ class ProductTemplateFragment : Fragment() {
             }
 
             btnAddNewTemplate.setOnClickListener {
-                viewModel.addNewTemplate()
-                // TODO: Navigate to add new template screen
-                Toast.makeText(requireContext(), "Add new template functionality will be implemented", Toast.LENGTH_SHORT).show()
+                // Navigate to add template category selection using resource ID
+                findNavController().navigate(R.id.action_productTemplateFragment_to_addTemplateCategoryFragment)
             }
         }
     }

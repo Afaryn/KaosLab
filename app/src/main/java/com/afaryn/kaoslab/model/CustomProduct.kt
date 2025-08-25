@@ -1,6 +1,5 @@
 package com.afaryn.kaoslab.model
 
-import java.util.Date
 import java.util.UUID
 
 data class CustomProduct(
