@@ -6,6 +6,34 @@
     app:startDestination="@id/homeOwnerFragment">
 
     <fragment
+        android:id="@+id/homeOwnerFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.home.HomeOwnerFragment"
+        android:label="fragment_home_owner"
+        tools:layout="@layout/fragment_home_owner">
+        <action
+            android:id="@+id/action_homeOwnerFragment_to_businessReportFragment"
+            app:destination="@id/businessReportFragment" />
+        <action
+            android:id="@+id/action_homeOwnerFragment_to_mySalesFragment"
+            app:destination="@id/mySalesFragment" />
+        <action
+            android:id="@+id/action_homeOwnerFragment_to_salesRevenueOwnerFragment"
+            app:destination="@id/salesRevenueOwnerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/businessReportFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.report.BusinessReportFragment"
+        android:label="fragment_business_report"
+        tools:layout="@layout/fragment_business_report" />
+
+    <fragment
+        android:id="@+id/mySalesFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.sales.my_sales.MySalesFragment"
+        android:label="fragment_my_sales"
+        tools:layout="@layout/fragment_my_sales" />
+
+    <fragment
         android:id="@+id/myShopOwnerFragment"
         android:name="com.afaryn.kaoslab.ui_owner.my_shop.MyShopOwnerFragment"
         android:label="fragment_my_shop_owner"
@@ -50,20 +78,11 @@
         android:name="com.afaryn.kaoslab.ui_owner.chat.ChatOwnerFragment"
         android:label="fragment_chat_owner"
         tools:layout="@layout/fragment_chat_owner" />
-    <fragment
-        android:id="@+id/homeOwnerFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.home.HomeOwnerFragment"
-        android:label="fragment_home_owner"
-        tools:layout="@layout/fragment_home_owner" />
+
     <fragment
         android:id="@+id/salesRevenueOwnerFragment"
         android:name="com.afaryn.kaoslab.ui_owner.sales.SalesRevenueOwnerFragment"
         android:label="fragment_sales_revenue_owner"
         tools:layout="@layout/fragment_sales_revenue_owner" />
-    <fragment
-        android:id="@+id/businessReportFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.report.BusinessReportFragment"
-        android:label="fragment_business_report"
-        tools:layout="@layout/fragment_business_report" />
 
 </navigation>

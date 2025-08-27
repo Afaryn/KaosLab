@@ -5,12 +5,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class SalesPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
-    private val tabTitles = arrayOf("Unpaid", "To Deliver", "Shipping", "Completed")
-
-    override fun getItemCount(): Int = tabTitles.size
+    override fun getItemCount(): Int = 4
 
     override fun createFragment(position: Int): Fragment {
-        val status = tabTitles[position]
-        return SalesListFragment.newInstance(status)
+        return when (position) {
+            0 -> SalesTabFragment.newInstance("unpaid")
+            1 -> SalesTabFragment.newInstance("to_deliver")
+            2 -> SalesTabFragment.newInstance("shipping")
+            3 -> SalesTabFragment.newInstance("completed")
+            else -> throw IllegalArgumentException("Invalid position: $position")
+        }
     }
 }

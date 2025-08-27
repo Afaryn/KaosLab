@@ -2,20 +2,12 @@ package com.afaryn.kaoslab.authentication
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.fragment.findNavController
-import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityRegistrationBinding
 import com.afaryn.kaoslab.model.User
 import com.afaryn.kaoslab.ui_customer.MainActivity
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.confirmDialog
 import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.afaryn.kaoslab.utils.toast

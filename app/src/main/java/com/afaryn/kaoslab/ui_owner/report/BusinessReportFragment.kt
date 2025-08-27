@@ -1,62 +1,190 @@
 package com.afaryn.kaoslab.ui_owner.report
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.databinding.FragmentBusinessReportBinding
+import com.afaryn.kaoslab.model.BusinessInsights
+import com.afaryn.kaoslab.model.ChartData
+import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [BusinessReportFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class BusinessReportFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentBusinessReportBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: BusinessReportViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        _binding = FragmentBusinessReportBinding.inflate(inflater, container, false)
         showBottomNavOwner()
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_business_report, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BusinessReportFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BusinessReportFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupUI()
+        observeData()
+    }
+
+    private fun setupUI() {
+        binding.backArrow.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        binding.thisWeekDropdown.setOnClickListener {
+            // TODO: Implement period selection dropdown
+            when (viewModel.selectedPeriod.value) {
+                "week" -> {
+                    binding.thisWeekDropdown.text = "This Month"
+                    viewModel.loadSellingProductData("month")
+                }
+                "month" -> {
+                    binding.thisWeekDropdown.text = "This Week"
+                    viewModel.loadSellingProductData("week")
                 }
             }
+        }
+    }
+
+    private fun observeData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.businessInsights.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state
+                    }
+                    is Response.Success -> {
+                        updateBusinessInsights(response.data)
+                    }
+                    is Response.Error -> {
+                        // Handle error
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.sellingProductData.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state for chart
+                    }
+                    is Response.Success -> {
+                        updateChart(response.data)
+                    }
+                    is Response.Error -> {
+                        // Handle error
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.selectedPeriod.collect { period ->
+                binding.thisWeekDropdown.text = when (period) {
+                    "week" -> "This Week"
+                    "month" -> "This Month"
+                    else -> "This Week"
+                }
+            }
+        }
+    }
+
+    private fun updateBusinessInsights(insights: BusinessInsights) {
+        val numberFormat = NumberFormat.getNumberInstance(Locale.US)
+
+        // Update card values using the new IDs
+        binding.tvOrdersValue.text = numberFormat.format(insights.totalOrders)
+        binding.tvSalesValue.text = "Rp\n${numberFormat.format(insights.totalSales)}"
+        binding.tvVisitorsValue.text = numberFormat.format(insights.totalVisitors)
+        binding.tvBuyersValue.text = numberFormat.format(insights.totalBuyers)
+        binding.tvTotalStockValue.text = numberFormat.format(insights.totalStock)
+
+        // Update selling product amount
+        binding.sellingProductAmount.text = "Rp ${numberFormat.format(insights.totalSales)}"
+    }
+
+    private fun updateChart(chartData: List<ChartData>) {
+        val entries = chartData.mapIndexed { index, data ->
+            BarEntry(index.toFloat(), data.value)
+        }
+
+        val dataSet = BarDataSet(entries, "Sales").apply {
+            colors = listOf(
+                Color.parseColor("#FF6B9D"),
+                Color.parseColor("#4ECDC4"),
+                Color.parseColor("#45B7D1"),
+                Color.parseColor("#96CEB4"),
+                Color.parseColor("#FFEAA7"),
+                Color.parseColor("#DDA0DD"),
+                Color.parseColor("#98D8C8")
+            )
+            valueTextSize = 12f
+            valueTextColor = Color.BLACK
+        }
+
+        val barData = BarData(dataSet)
+
+        binding.barChart.apply {
+            data = barData
+            description.isEnabled = false
+            legend.isEnabled = false
+
+            // Configure X-axis
+            xAxis.apply {
+                valueFormatter = IndexAxisValueFormatter(chartData.map { it.label })
+                position = com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM
+                granularity = 1f
+                setDrawGridLines(false)
+            }
+
+            // Configure Y-axis
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = Color.LTGRAY
+                axisMinimum = 0f
+            }
+            axisRight.isEnabled = false
+
+            // Refresh chart
+            animateY(1000)
+            invalidate()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

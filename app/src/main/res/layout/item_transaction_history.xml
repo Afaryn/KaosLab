@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp">
+
+    <!-- Transaction Icon -->
+    <ImageView
+        android:id="@+id/transactionIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/circle_background_gray"
+        android:padding="8dp"
+        android:contentDescription="Transaction icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Transaction Details Layout -->
+    <LinearLayout
+        android:id="@+id/transactionDetailsLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/transactionIcon"
+        app:layout_constraintTop_toTopOf="@id/transactionIcon"
+        app:layout_constraintBottom_toBottomOf="@id/transactionIcon"
+        app:layout_constraintEnd_toStartOf="@id/transactionAmountLayout">
+
+        <TextView
+            android:id="@+id/transactionDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transaction description"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/plusjakartasans" />
+
+        <TextView
+            android:id="@+id/transactionDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transaction date"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
+    <!-- Transaction Amount Layout -->
+    <LinearLayout
+        android:id="@+id/transactionAmountLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/transactionIcon"
+        app:layout_constraintBottom_toBottomOf="@id/transactionIcon">
+
+        <TextView
+            android:id="@+id/transactionAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/chocoTan"
+            android:fontFamily="@font/plusjakartasans" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,60 +1,226 @@
 package com.afaryn.kaoslab.ui_owner.sales
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.afaryn.kaoslab.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.afaryn.kaoslab.databinding.FragmentSalesRevenueOwnerBinding
+import com.afaryn.kaoslab.model.TransactionType
+import com.afaryn.kaoslab.ui_owner.sales.adapter.TransactionHistoryAdapter
+import com.afaryn.kaoslab.utils.Response
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Timestamp
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SalesRevenueOwnerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class SalesRevenueOwnerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentSalesRevenueOwnerBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: SalesRevenueViewModel by viewModels()
+    private lateinit var transactionAdapter: TransactionHistoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sales_revenue_owner, container, false)
+    ): View {
+        _binding = FragmentSalesRevenueOwnerBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SalesRevenueOwnerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SalesRevenueOwnerFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        setupClickListeners()
+        observeViewModel()
+    }
+
+    private fun setupRecyclerView() {
+        transactionAdapter = TransactionHistoryAdapter()
+        binding.transactionRecyclerView.apply {
+            adapter = transactionAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.backArrow.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
+
+        binding.selectTypeButton.setOnClickListener {
+            showTransactionTypeDialog()
+        }
+
+        binding.selectDateButton.setOnClickListener {
+            showDateRangeDialog()
+        }
+
+        binding.withdrawButton.setOnClickListener {
+            // Implement withdrawal functionality
+            showWithdrawalDialog()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.totalBalance.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state if needed
+                    }
+                    is Response.Success -> {
+                        updateBalanceDisplay(response.data)
+                    }
+                    is Response.Error -> {
+                        // Handle error
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
                 }
             }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.transactionHistory.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state
+                    }
+                    is Response.Success -> {
+                        transactionAdapter.submitList(response.data)
+                    }
+                    is Response.Error -> {
+                        // Handle error
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.selectedTransactionType.collect { type ->
+                updateTypeButtonText(type)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.selectedDateRange.collect { dateRange ->
+                updateDateButtonText(dateRange)
+            }
+        }
+    }
+
+    private fun updateBalanceDisplay(balance: Double) {
+        val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+        formatter.currency = Currency.getInstance("IDR")
+        binding.totalBalanceAmount.text = formatter.format(balance).replace("IDR", "Rp")
+    }
+
+    private fun updateTypeButtonText(type: TransactionType?) {
+        binding.selectTypeButton.text = when (type) {
+            TransactionType.PAYMENT -> "Payment"
+            TransactionType.WITHDRAWAL -> "Withdrawal"
+            null -> "Select type"
+        }
+    }
+
+    private fun updateDateButtonText(dateRange: Pair<Timestamp?, Timestamp?>) {
+        if (dateRange.first != null && dateRange.second != null) {
+            val sdf = SimpleDateFormat("dd/MM", Locale.getDefault())
+            val startDate = sdf.format(dateRange.first!!.toDate())
+            val endDate = sdf.format(dateRange.second!!.toDate())
+            binding.selectDateButton.text = "$startDate - $endDate"
+        } else {
+            binding.selectDateButton.text = "Select Date"
+        }
+    }
+
+    private fun showTransactionTypeDialog() {
+        val options = arrayOf("All", "Payment", "Withdrawal")
+        val currentSelection = when (viewModel.selectedTransactionType.value) {
+            null -> 0
+            TransactionType.PAYMENT -> 1
+            TransactionType.WITHDRAWAL -> 2
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Select Transaction Type")
+            .setSingleChoiceItems(options, currentSelection) { dialog, which ->
+                val selectedType = when (which) {
+                    0 -> null
+                    1 -> TransactionType.PAYMENT
+                    2 -> TransactionType.WITHDRAWAL
+                    else -> null
+                }
+                viewModel.setTransactionTypeFilter(selectedType)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showDateRangeDialog() {
+        val calendar = Calendar.getInstance()
+
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                val startDate = Calendar.getInstance()
+                startDate.set(year, month, dayOfMonth, 0, 0, 0)
+
+                // Show end date picker
+                DatePickerDialog(
+                    requireContext(),
+                    { _, endYear, endMonth, endDayOfMonth ->
+                        val endDate = Calendar.getInstance()
+                        endDate.set(endYear, endMonth, endDayOfMonth, 23, 59, 59)
+
+                        viewModel.setDateRangeFilter(
+                            Timestamp(startDate.time),
+                            Timestamp(endDate.time)
+                        )
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                ).apply {
+                    setTitle("Select End Date")
+                }.show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            setTitle("Select Start Date")
+        }.show()
+    }
+
+    private fun showWithdrawalDialog() {
+        // Basic withdrawal dialog - you can enhance this with amount input
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Withdrawal")
+            .setMessage("Withdrawal functionality will be implemented here")
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
