@@ -13,4 +13,8 @@
     <color name="dimgray">#66666E</color>
     <color name="textDisable">#66666E</color>
     <color name="line">#AA868689</color>
+
+    <!-- Additional colors for business report -->
+    <color name="colorPrimary">#102C57</color>
+    <color name="lightGray">#F5F5F5</color>
 </resources>

@@ -5,58 +5,151 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.databinding.FragmentHomeOwnerBinding
+import com.afaryn.kaoslab.ui_owner.home.adapter.LastOrderAdapter
+import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeOwnerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class HomeOwnerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentHomeOwnerBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: HomeOwnerViewModel by viewModels()
+    private lateinit var lastOrderAdapter: LastOrderAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        _binding = FragmentHomeOwnerBinding.inflate(inflater, container, false)
         showBottomNavOwner()
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_owner, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeOwnerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeOwnerFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        setupClickListeners()
+        observeData()
+    }
+
+    private fun setupRecyclerView() {
+        lastOrderAdapter = LastOrderAdapter { orderItem ->
+            // Handle order item click - navigate to order details
+            // You can implement navigation to order details here
+        }
+
+        binding.salesRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = lastOrderAdapter
+        }
+    }
+
+    private fun setupClickListeners() {
+        // Navigate to Business Reports when clicking "See Details"
+        binding.btnSeeDetail.setOnClickListener {
+            findNavController().navigate(R.id.action_homeOwnerFragment_to_salesRevenueOwnerFragment)
+        }
+
+        // Navigate to My Sales when clicking "Sales Details" or "see all"
+        binding.btnSeeDetailSales.setOnClickListener {
+            findNavController().navigate(R.id.action_homeOwnerFragment_to_mySalesFragment)
+        }
+
+        binding.lastOrderSeeAll.setOnClickListener {
+            findNavController().navigate(R.id.action_homeOwnerFragment_to_mySalesFragment)
+        }
+    }
+
+    private fun observeData() {
+        val numberFormat = NumberFormat.getNumberInstance(Locale.US)
+        val currencyFormat = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+
+        // Observe sales revenue
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.salesRevenue.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state
+                    }
+                    is Response.Success -> {
+                        val formattedRevenue = currencyFormat.format(response.data).replace("IDR", "Rp")
+                        binding.tvSalesRevenue.text = formattedRevenue
+                    }
+                    is Response.Error -> {
+                        binding.tvSalesRevenue.text = "Rp0"
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
                 }
             }
+        }
+
+        // Observe order status counts
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.orderStatusCounts.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state
+                    }
+                    is Response.Success -> {
+                        val counts = response.data
+                        binding.toShipCount.text = counts.toShip.toString()
+                        binding.canceledCount.text = counts.cancelled.toString()
+                        binding.returnCount.text = counts.returned.toString()
+                        binding.reviewCount.text = counts.review.toString()
+                    }
+                    is Response.Error -> {
+                        // Set default values
+                        binding.toShipCount.text = "0"
+                        binding.canceledCount.text = "0"
+                        binding.returnCount.text = "0"
+                        binding.reviewCount.text = "0"
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+                }
+            }
+        }
+
+        // Observe last orders
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.lastOrders.collect { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        // Show loading state
+                    }
+                    is Response.Success -> {
+                        lastOrderAdapter.submitList(response.data)
+                    }
+                    is Response.Error -> {
+                        // Handle error - show empty list
+                        lastOrderAdapter.submitList(emptyList())
+                    }
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

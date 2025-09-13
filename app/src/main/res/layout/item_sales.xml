@@ -108,6 +108,48 @@
             app:layout_constraintTop_toTopOf="@id/productName"
             app:layout_constraintBottom_toBottomOf="@id/productDetails" />
 
+        <!-- Courier Info Section (visible for to_deliver and shipping status) -->
+        <LinearLayout
+            android:id="@+id/courierInfoSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/courierLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Courier:"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/courierName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="J&amp;T Express"
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+
+            <ImageView
+                android:id="@+id/courierLogo"
+                android:layout_width="40dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Courier Logo"
+                android:src="@drawable/ic_jnt_logo" />
+
+        </LinearLayout>
+
         <!-- Total and Button -->
         <TextView
             android:id="@+id/totalLabel"
@@ -118,7 +160,7 @@
             android:textColor="@android:color/black"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/productImage" />
+            app:layout_constraintTop_toBottomOf="@id/courierInfoSection" />
 
         <TextView
             android:id="@+id/totalAmount"
@@ -133,20 +175,50 @@
             app:layout_constraintTop_toTopOf="@id/totalLabel"
             app:layout_constraintBottom_toBottomOf="@id/totalLabel" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/contactCustomerButton"
-            android:layout_width="wrap_content"
+        <!-- Buttons Section -->
+        <LinearLayout
+            android:id="@+id/buttonsContainer"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Contact Customer"
-            android:textAllCaps="false"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/darkBlue"
-            android:textColor="@android:color/white"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
+            android:orientation="horizontal"
+            android:gravity="end"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/totalLabel"
-            app:layout_constraintBottom_toBottomOf="@id/totalAmount" />
+            app:layout_constraintBottom_toBottomOf="@id/totalAmount">
+
+            <!-- Primary Button (Contact Customer, Arrange Shipment, See Details, Beri Review) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/primaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contact Customer"
+                android:textAllCaps="false"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@color/darkBlue"
+                android:textColor="@android:color/white"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:textSize="12sp" />
+
+            <!-- Secondary Button (See Details for to_deliver status) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/secondaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="See Details"
+                android:textAllCaps="false"
+                app:cornerRadius="8dp"
+                android:backgroundTint="@android:color/transparent"
+                android:textColor="@color/darkBlue"
+                app:strokeColor="@color/darkBlue"
+                app:strokeWidth="1dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
