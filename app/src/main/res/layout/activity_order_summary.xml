@@ -114,7 +114,7 @@
                         android:id="@+id/viewColor"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:background="@drawable/color_circle_white" />
+                        android:background="@drawable/color_circle" />
 
                     <TextView
                         android:id="@+id/tvColorName"
@@ -244,7 +244,7 @@
                 android:id="@+id/btnSave"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_save"
+                android:src="@drawable/ic_save_or_download"
                 android:background="@null"
                 android:layout_marginStart="8dp" />
         </LinearLayout>

@@ -83,12 +83,12 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    ksp(libs.androidx.hilt.compiler)
+    kapt(libs.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
