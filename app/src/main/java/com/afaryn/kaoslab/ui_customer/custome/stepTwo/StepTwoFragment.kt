@@ -1,3 +1,4 @@
+// StepTwoFragment.kt
 package com.afaryn.kaoslab.ui_customer.custome.stepTwo
 
 import android.graphics.Color
@@ -9,18 +10,14 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.gridlayout.widget.GridLayout
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentStepTwoBinding
 import com.afaryn.kaoslab.model.CustomProduct
 import com.afaryn.kaoslab.ui_customer.custome.CustomeActivity
-import com.afaryn.kaoslab.ui_customer.custome.stepThree.StepThreeFragment
 import com.afaryn.kaoslab.ui_customer.custome.viewModel.CustomViewModel
 import com.bumptech.glide.Glide
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.flexbox.FlexboxLayout
-import com.google.android.flexbox.FlexboxLayout.LayoutParams
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +27,9 @@ class StepTwoFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by activityViewModels<CustomViewModel>()
-    private val selectedSizes = mutableSetOf<String>()
+
+    // Gunakan LiveData dari ViewModel, tidak lagi variabel lokal
+    private var selectedSizes = mutableSetOf<String>()
     private var selectedColor: String? = null
 
     override fun onCreateView(
@@ -44,20 +43,26 @@ class StepTwoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val selected = viewModel.selectedProduct
-        Log.d("STEP_TWO_SELECTION", "Item yang dikirim ke StepTwo: ${selected?.name}")
+        // Ambil data dari ViewModel
+        val selectedProduct = viewModel.selectedProduct
+        selectedSizes = viewModel.selectedSizes.value?.toMutableSet() ?: mutableSetOf()
+        selectedColor = viewModel.selectedColor.value
 
-        if (selected != null) {
-            populateProduct(selected)
-            validateSelections()
+        Log.d("STEP_TWO_SELECTION", "Item yang dikirim ke StepTwo: ${selectedProduct?.name}")
+
+        if (selectedProduct != null) {
+            populateProduct(selectedProduct)
         }
 
         binding.btnNext.setOnClickListener {
-            viewModel.selectedSizes = selectedSizes
-            viewModel.selectedColor = selectedColor
-
+            // Kita sudah update ViewModel di validateSelections, jadi tinggal navigasi
             (activity as? CustomeActivity)?.goToStep(3)
         }
+
+        // Periksa seleksi awal saat fragment dibuat ulang
+        updateSizeSelectionUI()
+        updateColorSelectionUI()
+        validateSelections()
     }
 
     private fun populateProduct(product: CustomProduct) {
@@ -74,7 +79,6 @@ class StepTwoFragment : Fragment() {
             binding.sizeOptions.addView(sizeView)
         }
 
-        // Warna
         binding.colorOptions.removeAllViews()
         product.colors.forEach { colorHex ->
             val colorCircle = createColorCircle(colorHex)
@@ -101,10 +105,10 @@ class StepTwoFragment : Fragment() {
                 } else {
                     selectedSizes.add(size)
                 }
+                viewModel.updateSelectedSizes(selectedSizes) // Update ViewModel
                 updateSizeSelectionUI()
-                validateSelections() // <-- panggil ini
+                validateSelections()
             }
-
         }
         return tv
     }
@@ -125,11 +129,10 @@ class StepTwoFragment : Fragment() {
         }
     }
 
-
     private fun createColorCircle(hexColor: String): View {
         val context = requireContext()
         val circle = ShapeableImageView(context).apply {
-            val size = resources.getDimensionPixelSize(R.dimen.color_circle_size) // Ukuran dari dimens.xml
+            val size = resources.getDimensionPixelSize(R.dimen.color_circle_size)
 
             layoutParams = ViewGroup.LayoutParams(size, size)
             shapeAppearanceModel = shapeAppearanceModel
@@ -145,18 +148,19 @@ class StepTwoFragment : Fragment() {
 
             setOnClickListener {
                 selectedColor = hexColor
+                viewModel.updateSelectedColor(hexColor) // Update ViewModel
                 updateColorSelectionUI()
-                validateSelections() // <-- panggil ini
+                validateSelections()
             }
         }
         return circle
     }
 
-
     private fun updateColorSelectionUI() {
         for (i in 0 until binding.colorOptions.childCount) {
             val circle = binding.colorOptions.getChildAt(i) as ShapeableImageView
-            val bgColor = (circle.background as? ColorDrawable)?.color
+            val colorDrawable = circle.background as? ColorDrawable
+            val bgColor = colorDrawable?.color
 
             val isSelected = try {
                 Color.parseColor(selectedColor) == bgColor
@@ -182,15 +186,7 @@ class StepTwoFragment : Fragment() {
                 if (isValid) R.color.darkBlue else R.color.textDisable
             )
         )
-        if (isValid) {
-            viewModel.selectedSizes = selectedSizes
-            viewModel.selectedColor = selectedColor
-        }
-
     }
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

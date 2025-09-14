@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 
 class YourDesignAdapter(
     private var designs: List<String>,
-    private val onDesignSelected: () -> Unit,
+    private val onDesignSelected: () -> Unit, // Callback tanpa parameter designUrl
     private val onEmptyClick: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -46,8 +46,20 @@ class YourDesignAdapter(
 
     fun updateData(newDesigns: List<String>) {
         this.designs = newDesigns
-        selectedPosition = RecyclerView.NO_POSITION
+        // selectedPosition = RecyclerView.NO_POSITION // Jangan langsung reset di sini
         notifyDataSetChanged()
+    }
+
+    // --- Fungsi baru untuk mengatur posisi yang dipilih dari luar ---
+    fun setSelectedPosition(position: Int) {
+        val previousSelected = selectedPosition
+        selectedPosition = position
+        if (previousSelected != RecyclerView.NO_POSITION) {
+            notifyItemChanged(previousSelected)
+        }
+        if (selectedPosition != RecyclerView.NO_POSITION) {
+            notifyItemChanged(selectedPosition)
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -75,13 +87,13 @@ class YourDesignAdapter(
                 notifyItemChanged(previousSelected)
                 notifyItemChanged(selectedPosition)
 
-                onDesignSelected()
+                onDesignSelected() // Panggil callback tanpa parameter
             }
         }
     }
 
     fun getSelectedDesign(): String? {
-        return if (selectedPosition in designs.indices) designs[selectedPosition] else null
+        return if (selectedPosition != RecyclerView.NO_POSITION && selectedPosition in designs.indices) designs[selectedPosition] else null
     }
 
     inner class EmptyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -95,4 +107,3 @@ class YourDesignAdapter(
         }
     }
 }
-

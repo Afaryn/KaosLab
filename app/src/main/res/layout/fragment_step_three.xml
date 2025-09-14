@@ -154,7 +154,6 @@
                             android:visibility="gone" />
                     </LinearLayout>
 
-                    <!-- Add Text Section -->
                     <EditText
                         android:id="@+id/customTextInput"
                         android:layout_width="match_parent"

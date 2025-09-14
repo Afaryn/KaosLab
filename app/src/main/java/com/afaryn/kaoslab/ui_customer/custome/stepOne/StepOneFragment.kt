@@ -1,3 +1,4 @@
+// StepOneFragment.kt
 package com.afaryn.kaoslab.ui_customer.custome.stepOne
 
 import android.os.Bundle
@@ -8,8 +9,10 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentStepOneBinding
+import com.afaryn.kaoslab.ui_customer.custome.viewModel.CustomViewModel // Tambahkan import
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,6 +20,9 @@ class StepOneFragment : Fragment() {
 
     private var _binding: FragmentStepOneBinding? = null
     private val binding get() = _binding!!
+
+    // Tambahkan view model di sini untuk mengaksesnya
+    private val viewModel by activityViewModels<CustomViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,8 +35,8 @@ class StepOneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        setActiveCard(binding.cardTop, binding.textTitleTop)
-        loadChildFragment(TopFragment())
+        // Asumsi awal, tampilkan TopFragment dan set status aktifnya
+        setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
 
         binding.cardTop.setOnClickListener {
             setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
@@ -69,7 +75,6 @@ class StepOneFragment : Fragment() {
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.darkBlue))
         textView.text = title
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

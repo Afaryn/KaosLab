@@ -16,18 +16,24 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentStepThreeBinding
 import com.afaryn.kaoslab.model.CustomProduct
+import com.afaryn.kaoslab.model.Order // Import data class Order
+import com.afaryn.kaoslab.model.SizeOption
+import com.afaryn.kaoslab.ui_customer.custome.OrderSummaryActivity
 import com.afaryn.kaoslab.ui_customer.custome.adapter.YourDesignAdapter
 import com.afaryn.kaoslab.ui_customer.custome.viewModel.CustomViewModel
 import com.afaryn.kaoslab.utils.UiState
 import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class StepThreeFragment : Fragment() {
@@ -38,6 +44,8 @@ class StepThreeFragment : Fragment() {
     private var designSelected: Boolean = false
     private var inputTextValid: Boolean = false
     private var yourDesignAdapter: YourDesignAdapter? = null
+
+    private var activeTab: TabType = TabType.YOUR_DESIGN
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +64,7 @@ class StepThreeFragment : Fragment() {
         observeDesignState()
         updateNextButtonState()
 
-        showYourDesignTab() // Tampilkan tab desain langsung
+        binding.tabYourDesign.performClick()
 
         viewModel.selectedProduct?.let {
             populateProduct(it)
@@ -65,6 +73,10 @@ class StepThreeFragment : Fragment() {
         binding.btnChooseImage.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
+        binding.btnNext.setOnClickListener {
+            navigateToOrderSummary()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -72,7 +84,12 @@ class StepThreeFragment : Fragment() {
         yourDesignAdapter = YourDesignAdapter(
             designs = listOf(),
             onDesignSelected = {
+                val selectedDesignUrl = yourDesignAdapter?.getSelectedDesign()
+                viewModel.setSelectedYourDesign(selectedDesignUrl)
                 designSelected = true
+                inputTextValid = false // Reset text input validity
+                binding.imagePreview.visibility = View.GONE // Hide image preview if switching
+                binding.customTextInput.text?.clear() // Clear text input
                 updateNextButtonState()
             },
             onEmptyClick = {
@@ -89,19 +106,28 @@ class StepThreeFragment : Fragment() {
     }
 
     private fun setupTabListeners() {
-        val tabs = listOf(
-            binding.tabUpload to ::showUploadTab,
-            binding.tabYourDesign to ::showYourDesignTab,
-            binding.tabAddText to ::showAddTextTab
-        )
+        binding.tabUpload.setOnClickListener {
+            resetTabStyles()
+            binding.tabUpload.setBackgroundResource(R.drawable.tab_selected)
+            binding.tabUpload.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            activeTab = TabType.UPLOAD
+            showUploadTab()
+        }
 
-        tabs.forEach { (tabView, action) ->
-            tabView.setOnClickListener {
-                resetTabStyles()
-                tabView.setBackgroundResource(R.drawable.tab_selected)
-                tabView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                action()
-            }
+        binding.tabYourDesign.setOnClickListener {
+            resetTabStyles()
+            binding.tabYourDesign.setBackgroundResource(R.drawable.tab_selected)
+            binding.tabYourDesign.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            activeTab = TabType.YOUR_DESIGN
+            showYourDesignTab()
+        }
+
+        binding.tabAddText.setOnClickListener {
+            resetTabStyles()
+            binding.tabAddText.setBackgroundResource(R.drawable.tab_selected)
+            binding.tabAddText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            activeTab = TabType.ADD_TEXT
+            showAddTextTab()
         }
     }
 
@@ -115,10 +141,16 @@ class StepThreeFragment : Fragment() {
     private fun showUploadTab() {
         binding.customTextInput.visibility = View.GONE
         binding.designRecyclerView.visibility = View.GONE
-        binding.uploadSection.visibility = View.VISIBLE // tampilkan upload
+        binding.uploadSection.visibility = View.VISIBLE
 
-        designSelected = false
+        viewModel.setCustomDesign(null) // Reset other custom types
+        viewModel.updateCustomText(null)
+        viewModel.setSelectedYourDesign(null)
+
+        // Keep image preview visible if an image was already selected/cropped
+        designSelected = binding.imagePreview.visibility == View.VISIBLE && viewModel.selectedCustomDesignUri != null
         inputTextValid = false
+        binding.customTextInput.text?.clear() // Clear text input
         updateNextButtonState()
     }
 
@@ -127,7 +159,13 @@ class StepThreeFragment : Fragment() {
         binding.uploadSection.visibility = View.GONE
         binding.designRecyclerView.visibility = View.VISIBLE
 
-        designSelected = false
+        viewModel.setCustomDesign(null) // Reset other custom types
+        viewModel.updateCustomText(null)
+        binding.imagePreview.visibility = View.GONE // Hide image preview
+        binding.customTextInput.text?.clear() // Clear text input
+
+        designSelected = viewModel.selectedYourDesignUrl != null
+        inputTextValid = false
         updateNextButtonState()
         viewModel.fetchUserDesigns()
     }
@@ -137,14 +175,27 @@ class StepThreeFragment : Fragment() {
         binding.uploadSection.visibility = View.GONE
         binding.customTextInput.visibility = View.VISIBLE
 
+        viewModel.setCustomDesign(null) // Reset other custom types
+        viewModel.setSelectedYourDesign(null)
+        binding.imagePreview.visibility = View.GONE // Hide image preview
+
         inputTextValid = binding.customTextInput.text.toString().isNotBlank()
+        designSelected = false
         updateNextButtonState()
     }
 
     private fun setupTextWatcher() {
         binding.customTextInput.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                inputTextValid = s?.isNotBlank() == true
+                val currentText = s.toString()
+                inputTextValid = currentText.isNotBlank()
+                if (inputTextValid) {
+                    viewModel.updateCustomText(currentText)
+                    viewModel.setCustomDesign(null)
+                    viewModel.setSelectedYourDesign(null)
+                } else {
+                    viewModel.updateCustomText(null)
+                }
                 updateNextButtonState()
             }
 
@@ -154,7 +205,12 @@ class StepThreeFragment : Fragment() {
     }
 
     private fun updateNextButtonState() {
-        val isValid = designSelected || inputTextValid
+        val isValid = when (activeTab) {
+            TabType.UPLOAD -> designSelected
+            TabType.YOUR_DESIGN -> designSelected
+            TabType.ADD_TEXT -> inputTextValid
+        }
+
         binding.btnNext.isEnabled = isValid
         binding.btnNext.setBackgroundTintList(
             ContextCompat.getColorStateList(
@@ -186,6 +242,15 @@ class StepThreeFragment : Fragment() {
                     }
 
                     yourDesignAdapter?.updateData(designs)
+
+                    viewModel.selectedYourDesignUrl?.let { url ->
+                        val position = designs.indexOf(url)
+                        if (position != RecyclerView.NO_POSITION) {
+                            yourDesignAdapter?.setSelectedPosition(position)
+                            designSelected = true
+                            updateNextButtonState()
+                        }
+                    }
 
                     binding.designRecyclerView.post {
                         binding.designRecyclerView.invalidate()
@@ -228,18 +293,106 @@ class StepThreeFragment : Fragment() {
         if (resultUri != null) {
             binding.imagePreview.setImageURI(resultUri)
             binding.imagePreview.visibility = View.VISIBLE
+            viewModel.setCustomDesign(resultUri)
             designSelected = true
+            inputTextValid = false // Reset text input validity
+            binding.customTextInput.text?.clear() // Clear text input
             updateNextButtonState()
-            // TODO: Upload gambar ke Firestore / Storage jika perlu
         } else {
             Toast.makeText(requireContext(), "Gagal crop gambar", Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun navigateToOrderSummary() {
+        val selectedProduct = viewModel.selectedProduct
+        val selectedSizeLabels = viewModel.selectedSizes.value // Ini adalah Set<String>
+        val selectedColor = viewModel.selectedColor.value
+
+        if (selectedProduct == null || selectedSizeLabels.isNullOrEmpty() || selectedColor == null) {
+            Toast.makeText(requireContext(), "Mohon lengkapi pilihan produk, ukuran, dan warna.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // --- Logic: Menghitung total harga dan total unit berdasarkan semua ukuran yang dipilih ---
+        val totalPieces = selectedSizeLabels.size // Jumlah total kaos yang dipesan
+        var basePricePerUnit = selectedProduct.basePrice // Harga dasar produk
+
+        // Kita akan mengambil harga tambahan dari ukuran PERTAMA yang dipilih sebagai representasi
+        // atau Anda bisa menghitung rata-rata atau total dari semua tambahan harga ukuran
+        // Untuk kesederhanaan, kita akan menghitung harga per unit dari ukuran pertama
+        val firstSizeLabel = selectedSizeLabels.first()
+        val sizeOptionDetail: SizeOption? = selectedProduct.sizes.find { it.label == firstSizeLabel }
+        sizeOptionDetail?.let {
+            basePricePerUnit += it.additionalPrice
+        } ?: run {
+            Log.e("StepThreeFragment", "Ukuran '$firstSizeLabel' tidak ditemukan di produk ${selectedProduct.name}")
+            Toast.makeText(requireContext(), "Ukuran yang dipilih tidak valid.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val totalAmount = basePricePerUnit * totalPieces
+
+        // Siapkan detail kustomisasi berdasarkan activeTab
+        val designId: String // Digunakan untuk mengidentifikasi jenis kustomisasi
+        var designImageUrl: String? = null // URL untuk gambar desain atau Uri string
+        var customText: String? = null // Teks kustom
+
+        when (activeTab) {
+            TabType.UPLOAD -> {
+                designId = "image_upload"
+                designImageUrl = viewModel.selectedCustomDesignUri.toString()
+            }
+            TabType.YOUR_DESIGN -> {
+                designId = "image_your_design"
+                designImageUrl = viewModel.selectedYourDesignUrl
+            }
+            TabType.ADD_TEXT -> {
+                designId = "text"
+                customText = viewModel.customText
+            }
+            else -> { // Default "none" jika tidak ada kustomisasi
+                designId = "none"
+            }
+        }
+
+        // Buat objek Order tunggal
+        val order = Order(
+            orderId = "", // Akan diisi di backend/saat pesanan dibuat
+            customerId = "dummy_customer_id", // Ganti dengan ID user sebenarnya
+            customerName = "dummy_customer_name", // Ganti dengan nama user
+            customerAvatarUrl = "", // Ganti dengan avatar user
+            designId = designId, // Mengidentifikasi jenis kustomisasi
+            status = "unpaid",
+            totalAmount = totalAmount.toDouble(),
+            totalPieces = totalPieces,
+            size = selectedSizeLabels.joinToString(", "), // Menampilkan semua ukuran yang dipilih
+            title = selectedProduct.name,
+            designImageUrl = designImageUrl ?: "", // URL gambar kustom atau kosong
+            courierInfo = null,
+            courierLogo = null,
+            trackingNumber = null,
+            createdAt = Timestamp.now()
+        )
+
+        val intent = Intent(requireContext(), OrderSummaryActivity::class.java).apply {
+            putExtra("ORDER_DATA", order) // Mengirim objek Order sebagai Parcelable
+            // Kirim juga warna secara terpisah karena tidak ada di model Order
+            putExtra("SELECTED_COLOR", selectedColor)
+            // Kirim teks kustom secara terpisah jika designImageUrl tidak dipakai untuk itu
+            // (karena designImageUrl bisa jadi URL/URI untuk gambar)
+            if (activeTab == TabType.ADD_TEXT) {
+                putExtra("CUSTOM_TEXT_CONTENT", customText) // Mengirim konten teks kustom
+            }
+        }
+        startActivity(intent)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-}
 
+    enum class TabType {
+        UPLOAD, YOUR_DESIGN, ADD_TEXT
+    }
+}

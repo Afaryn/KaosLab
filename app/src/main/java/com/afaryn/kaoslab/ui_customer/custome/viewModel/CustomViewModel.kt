@@ -1,5 +1,7 @@
+// CustomViewModel.kt
 package com.afaryn.kaoslab.ui_customer.custome.viewModel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,8 +26,16 @@ class CustomViewModel @Inject constructor(
     private var _selectedProduct: CustomProduct? = null
     val selectedProduct: CustomProduct? get() = _selectedProduct
 
-    var selectedSizes: MutableSet<String> = mutableSetOf()
-    var selectedColor: String? = null
+    // Tetap Set<String> karena kita akan membuat OrderItem per setiap label ukuran
+    private val _selectedSizes = MutableLiveData<MutableSet<String>>()
+    val selectedSizes: LiveData<MutableSet<String>> = _selectedSizes
+
+    private val _selectedColor = MutableLiveData<String?>()
+    val selectedColor: LiveData<String?> = _selectedColor
+
+    var selectedCustomDesignUri: Uri? = null
+    var customText: String? = null
+    var selectedYourDesignUrl: String? = null
 
     private val _designsState = MutableLiveData<UiState<List<String>>>()
     val designsState: LiveData<UiState<List<String>>> get() = _designsState
@@ -33,100 +43,103 @@ class CustomViewModel @Inject constructor(
 
     fun setSelectedProduct(product: CustomProduct) {
         _selectedProduct = product
-        Log.d("SELECTED_PRODUCT", "Produk dipilih: ${product.name}")
+        Log.d("CustomViewModel", "Produk dipilih: ${product.name}")
+        _selectedSizes.value = mutableSetOf()
+        _selectedColor.value = null
     }
 
+    // Fungsi untuk mengatur ukuran yang dipilih dari StepTwo
+    fun updateSelectedSizes(sizes: Set<String>) {
+        _selectedSizes.value = sizes.toMutableSet()
+        Log.d("CustomViewModel", "Ukuran dipilih: ${sizes.joinToString()}")
+    }
+
+    // Fungsi untuk mengatur warna yang dipilih dari StepTwo
+    fun updateSelectedColor(color: String?) {
+        _selectedColor.value = color
+        Log.d("CustomViewModel", "Warna dipilih: $color")
+    }
+
+    // Fungsi untuk mengatur data kustomisasi (dari StepThree)
+    fun setCustomDesign(uri: Uri?) {
+        selectedCustomDesignUri = uri
+        customText = null
+        selectedYourDesignUrl = null
+        Log.d("CustomViewModel", "Gambar kustom diatur: $uri")
+    }
+
+    // ✅ Rename biar tidak bentrok dengan properti "customText"
+    fun updateCustomText(text: String?) {
+        customText = text
+        selectedCustomDesignUri = null
+        selectedYourDesignUrl = null
+        Log.d("CustomViewModel", "Teks kustom diatur: $text")
+    }
+
+    fun setSelectedYourDesign(url: String?) {
+        selectedYourDesignUrl = url
+        selectedCustomDesignUri = null
+        customText = null
+        Log.d("CustomViewModel", "Desain Anda dipilih: $url")
+    }
+
+    // ----------------------------
+    // Fetch Produk dari Firestore
+    // ----------------------------
     fun fetchTopProducts() {
-        _productState.value = UiState.Loading(true)
-
-        firestore.collection(CUSTOM_PRODUCT_COLLECTION)
-            .whereEqualTo("type", "0")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val products = snapshot.toObjects(CustomProduct::class.java)
-
-                if (products.isNotEmpty()) {
-                    _productState.value = UiState.Success(products)
-                    Log.d("CUSTOM_PRODUCTS", "Berhasil ambil data: ${products.size} item")
-                    products.forEach { Log.d("CUSTOM_PRODUCT_ITEM", it.toString()) }
-                } else {
-                    _productState.value = UiState.Error("Tidak ada produk ditemukan.")
-                    Log.w("CUSTOM_PRODUCTS", "Data kosong.")
-                }
-            }
-            .addOnFailureListener { e ->
-                _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
-                Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
-            }
+        fetchProductsByType("0")
     }
 
     fun fetchBottomProducts() {
-        _productState.value = UiState.Loading(true)
-
-        firestore.collection(CUSTOM_PRODUCT_COLLECTION)
-            .whereEqualTo("type", "1")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val products = snapshot.toObjects(CustomProduct::class.java)
-
-                if (products.isNotEmpty()) {
-                    _productState.value = UiState.Success(products)
-                    Log.d("CUSTOM_PRODUCTS", "Berhasil ambil data: ${products.size} item")
-                    products.forEach { Log.d("CUSTOM_PRODUCT_ITEM", it.toString()) }
-                } else {
-                    _productState.value = UiState.Error("Tidak ada produk ditemukan.")
-                    Log.w("CUSTOM_PRODUCTS", "Data kosong.")
-                }
-            }
-            .addOnFailureListener { e ->
-                _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
-                Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
-            }
+        fetchProductsByType("1")
     }
 
     fun fetchHatProducts() {
+        fetchProductsByType("2")
+    }
+
+    private fun fetchProductsByType(type: String) {
         _productState.value = UiState.Loading(true)
 
         firestore.collection(CUSTOM_PRODUCT_COLLECTION)
-            .whereEqualTo("type", "2")
+            .whereEqualTo("type", type)
             .get()
             .addOnSuccessListener { snapshot ->
                 val products = snapshot.toObjects(CustomProduct::class.java)
 
                 if (products.isNotEmpty()) {
                     _productState.value = UiState.Success(products)
-                    Log.d("CUSTOM_PRODUCTS", "Berhasil ambil data: ${products.size} item")
-                    products.forEach { Log.d("CUSTOM_PRODUCT_ITEM", it.toString()) }
                 } else {
                     _productState.value = UiState.Error("Tidak ada produk ditemukan.")
-                    Log.w("CUSTOM_PRODUCTS", "Data kosong.")
                 }
             }
             .addOnFailureListener { e ->
+                Log.e("CustomViewModel", "fetchProductsByType error", e)
                 _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
-                Log.e("CUSTOM_PRODUCTS", "Error ambil data", e)
             }
     }
 
+    // ----------------------------
+    // Fetch desain user (StepThree)
+    // ----------------------------
     fun fetchUserDesigns() {
         _designsState.value = UiState.Loading(true)
+
         firestore.collection(PRODUCT_COLLECTION)
             .get()
             .addOnSuccessListener { result ->
                 val products = result.toObjects(Product::class.java)
                 val designs = products.mapNotNull { it.imageUrl }
 
-                _designsState.value = UiState.Success(designs)
+                if (designs.isNotEmpty()) {
+                    _designsState.value = UiState.Success(designs)
+                } else {
+                    _designsState.value = UiState.Error("Tidak ada desain ditemukan.")
+                }
             }
             .addOnFailureListener { e ->
+                Log.e("CustomViewModel", "fetchUserDesigns error", e)
                 _designsState.value = UiState.Error(e.message ?: "Unknown error")
             }
-            .addOnCompleteListener {
-                _designsState.value = UiState.Loading(false)
-            }
     }
-
-
-
-
 }
