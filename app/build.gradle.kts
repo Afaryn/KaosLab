@@ -83,10 +83,12 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
-    kapt("com.google.dagger:hilt-android-compiler:2.52")
+    kapt(libs.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
@@ -115,6 +117,10 @@ dependencies {
     //Chart
 //    implementation ("com.github.AAChartModel:AAChartCore-Kotlin:+")
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    //flexbox
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
+    implementation ("androidx.gridlayout:gridlayout:1.0.0")
 
     // ViewPager2
     implementation ("androidx.viewpager2:viewpager2:1.1.0")

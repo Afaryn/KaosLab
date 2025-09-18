@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/customFragment"
-        android:name="com.afaryn.kaoslab.ui_customer.custome.StepOneFragment"
+        android:name="com.afaryn.kaoslab.ui_customer.custome.stepOne.StepOneFragment"
         android:label="Custom"
         tools:layout="@layout/fragment_step_one" />
 

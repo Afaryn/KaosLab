@@ -25,11 +25,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KaosLab"
+        android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
+        <activity
+            android:name=".ui_customer.desain.DetailDesainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui_customer.custome.OrderSummaryActivity"
+            android:exported="false" />
         <activity
             android:name=".splash_screen.SplashScreenActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,7 +56,13 @@
             android:exported="false" />
         <activity
             android:name=".authentication.LoginActivity"
-            android:exported="false"/>
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".authentication.RegistrationActivity"
             android:exported="false" />
@@ -65,6 +77,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".ui_customer.MainActivity"
             android:exported="false" />
