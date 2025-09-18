@@ -40,6 +40,9 @@
             android:name=".ui_owner.OwnerActivity"
             android:exported="false" />
         <activity
+            android:name=".ui_designer.DesignerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui_customer.custome.CustomeActivity"
             android:exported="false" />
         <activity

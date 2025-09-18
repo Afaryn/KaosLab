@@ -11,12 +11,16 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.ui_owner.OwnerActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -113,6 +117,22 @@ fun Fragment.hideBottomNavOwner() {
 fun Fragment.showBottomNavOwner() {
     val appBar: BottomAppBar = (activity as OwnerActivity).findViewById(R.id.menuBottom)
     val bottomNavView: BottomNavigationView = (activity as OwnerActivity).findViewById(R.id.bottom_navigation)
+
+    appBar.visibility = View.VISIBLE
+    bottomNavView.visibility = View.VISIBLE
+}
+
+fun Fragment.hideBottomNavDesigner() {
+    val appBar: BottomAppBar = (activity as DesignerActivity).findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView = (activity as DesignerActivity).findViewById(R.id.bottom_navigation)
+
+    appBar.visibility = View.GONE
+    bottomNavView.visibility = View.GONE
+}
+
+fun Fragment.showBottomNavDesigner() {
+    val appBar: BottomAppBar = (activity as DesignerActivity).findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView = (activity as DesignerActivity).findViewById(R.id.bottom_navigation)
 
     appBar.visibility = View.VISIBLE
     bottomNavView.visibility = View.VISIBLE
@@ -328,4 +348,66 @@ fun reduceFileImage(bitmap: Bitmap, file: File): File {
         bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, outputStream)
     }
     return file
+}
+
+fun successDialog(
+    context: Context,
+    title: String,
+    message: String,
+    positiveAction: () -> Unit = { },
+) {
+    val dialog = AlertDialog.Builder(context).create()
+    val view = LayoutInflater.from(context).inflate(R.layout.dialog_success, null)
+    dialog.setView(view)
+    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    dialog.setCancelable(false)
+
+    val tvTitle = view.findViewById<TextView>(R.id.tv_success_title)
+    val tvMessage = view.findViewById<TextView>(R.id.tv_success_message)
+    val btnOk = view.findViewById<Button>(R.id.btn_ok)
+    val ivSpinner = view.findViewById<ImageView>(R.id.iv_spinner)
+    val ivCheckmark = view.findViewById<ImageView>(R.id.iv_checkmark)
+
+    tvTitle.text = title
+    tvMessage.text = message
+
+    // Start spinner animation
+    val rotateAnimation = android.view.animation.RotateAnimation(
+        0f, 360f,
+        android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f,
+        android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f
+    ).apply {
+        duration = 1000
+        repeatCount = android.view.animation.Animation.INFINITE
+        interpolator = android.view.animation.LinearInterpolator()
+    }
+    ivSpinner.startAnimation(rotateAnimation)
+
+    // Show checkmark after animation completes and enable button
+    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+        ivSpinner.clearAnimation()
+        ivSpinner.visibility = View.GONE
+        ivCheckmark.visibility = View.VISIBLE
+
+        // Animate checkmark scale
+        val scaleAnimation = android.view.animation.ScaleAnimation(
+            0f, 1f, 0f, 1f,
+            android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f,
+            android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f
+        ).apply {
+            duration = 300
+            interpolator = android.view.animation.OvershootInterpolator()
+        }
+        ivCheckmark.startAnimation(scaleAnimation)
+
+        btnOk.isEnabled = true
+        btnOk.alpha = 1f
+    }, 1500)
+
+    btnOk.setOnClickListener {
+        positiveAction()
+        dialog.dismiss()
+    }
+
+    dialog.show()
 }

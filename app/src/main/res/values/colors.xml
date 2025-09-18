@@ -12,6 +12,7 @@
     <color name="textLine">#C8C6C6</color>
     <color name="dimgray">#66666E</color>
     <color name="textDisable">#66666E</color>
+    <color name="textGray">#999999</color>
     <color name="line">#AA868689</color>
 
     <!-- Additional colors for business report -->

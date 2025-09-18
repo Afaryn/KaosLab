@@ -13,7 +13,9 @@ import com.afaryn.kaoslab.authentication.AuthViewModel
 import com.afaryn.kaoslab.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.ActivitySplashScreenBinding
 import com.afaryn.kaoslab.ui_customer.MainActivity
+import com.afaryn.kaoslab.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.ui_owner.OwnerActivity
+import com.afaryn.kaoslab.utils.Constants.DESIGNER
 import com.afaryn.kaoslab.utils.Constants.OWNER
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.show
@@ -52,6 +54,8 @@ class SplashScreenActivity : AppCompatActivity() {
                             is Response.Success -> {
                                 val intent = if (resource.data.role == OWNER) {
                                     Intent(this, OwnerActivity::class.java)
+                                } else if (resource.data.role == DESIGNER) {
+                                    Intent(this, DesignerActivity::class.java)
                                 } else {
                                     Intent(this, MainActivity::class.java)
                                 }

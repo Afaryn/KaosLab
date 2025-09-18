@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Design Management Strings -->
+    <string name="manage_design_products">Manage Design Products</string>
+    <string name="portfolio">Portfolio</string>
+    <string name="navigate">Navigate</string>
+    <string name="no_designs">No Designs</string>
+    <string name="design_thumbnail">Design Thumbnail</string>
+    <string name="more_options">More Options</string>
+    <string name="upload_file">Upload File</string>
+    <string name="delete_license">Delete License</string>
+</resources>
+
