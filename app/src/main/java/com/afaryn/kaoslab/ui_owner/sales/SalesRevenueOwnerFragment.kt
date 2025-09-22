@@ -13,6 +13,7 @@ import com.afaryn.kaoslab.databinding.FragmentSalesRevenueOwnerBinding
 import com.afaryn.kaoslab.model.TransactionType
 import com.afaryn.kaoslab.ui_owner.sales.adapter.TransactionHistoryAdapter
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.hideBottomNavOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +35,7 @@ class SalesRevenueOwnerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        hideBottomNavOwner()
         _binding = FragmentSalesRevenueOwnerBinding.inflate(inflater, container, false)
         return binding.root
     }

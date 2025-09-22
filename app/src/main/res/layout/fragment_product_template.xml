@@ -82,6 +82,7 @@
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Hat Section -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBottomTemplates"
                 android:layout_width="match_parent"
@@ -89,7 +90,6 @@
                 android:layout_marginBottom="24dp"
                 tools:listitem="@layout/item_product_template" />
 
-            <!-- Hat Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -101,6 +101,22 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvHatTemplates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_product_template" />
+
+            <!-- Others Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Others"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="12dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvOthersTemplates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="100dp"
@@ -116,16 +132,17 @@
         android:padding="16dp"
         android:background="@android:color/white">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnAddNewTemplate"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Add new template"
+            android:text="Add New Template"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"
             android:background="@drawable/bg_rounded_button"
-            android:backgroundTint="#1E3A8A" />
+            android:backgroundTint="@color/colorPrimary"/>
     </LinearLayout>
 
     <!-- Loading Progress -->

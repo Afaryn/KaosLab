@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentMySalesBinding
+import com.afaryn.kaoslab.utils.hideBottomNavOwner
 import com.afaryn.kaoslab.utils.showBottomNavOwner
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +27,7 @@ class MySalesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMySalesBinding.inflate(inflater, container, false)
-        showBottomNavOwner()
+        hideBottomNavOwner()
         return binding.root
     }
 

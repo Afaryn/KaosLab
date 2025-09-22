@@ -173,7 +173,7 @@ class DesignListFragment : Fragment() {
             .setTitle("Delete Design")
             .setMessage("Are you sure you want to delete this design?")
             .setPositiveButton("Delete") { _, _ ->
-                viewModel.deleteDesign(design.id)
+                viewModel.deleteDesign(design)
             }
             .setNegativeButton("Cancel", null)
             .show()

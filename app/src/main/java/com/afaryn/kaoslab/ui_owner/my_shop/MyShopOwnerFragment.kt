@@ -11,7 +11,9 @@ import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentMyShopOwnerBinding
+import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,6 +36,7 @@ class MyShopOwnerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
+        observers()
     }
 
     private fun setupToolbar() {
@@ -49,6 +52,41 @@ class MyShopOwnerFragment : Fragment() {
         // Add navigation to Product Template
         binding.btnProductTemplate.setOnClickListener {
             findNavController().navigate(R.id.action_myShopOwnerFragment_to_productTemplateFragment)
+        }
+
+        binding.btnDelivery.setOnClickListener {
+            findNavController().navigate(R.id.action_myShopOwnerFragment_to_ekspedisiFragment)
+        }
+
+        binding.btnCustomer.setOnClickListener {
+            findNavController().navigate(R.id.action_myShopOwnerFragment_to_listCustomersFragment)
+        }
+    }
+
+    private fun observers() {
+        viewModel.getCurrentUser().observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Response.Loading -> {
+                    // Show loading state if needed
+                }
+
+                is Response.Success -> {
+                    val user = resource.data
+                    binding.txtName.text = user.name
+                    if (user.profilePicture.isNotEmpty()) {
+                        Glide.with(this)
+                            .load(user.profilePicture)
+                            .circleCrop()
+                            .into(binding.imgProfile)
+                    }
+                }
+
+                is Response.Error -> {
+                    // Handle error state if needed
+                }
+
+                else -> {}
+            }
         }
     }
 

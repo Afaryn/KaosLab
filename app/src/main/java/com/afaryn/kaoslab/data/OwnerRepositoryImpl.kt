@@ -7,13 +7,18 @@ import com.afaryn.kaoslab.model.BusinessInsights
 import com.afaryn.kaoslab.model.ChartData
 import com.afaryn.kaoslab.model.OrderStatusCounts
 import com.afaryn.kaoslab.model.CustomDesign
+import com.afaryn.kaoslab.model.Kurir
 import com.afaryn.kaoslab.model.TransactionFilter
+import com.afaryn.kaoslab.model.User
 import com.afaryn.kaoslab.utils.Response
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
@@ -21,14 +26,40 @@ import javax.inject.Singleton
 
 @Singleton
 class OwnerRepositoryImpl @Inject constructor(
+    private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) : OwnerRepository {
-
     companion object {
         private const val COLLECTION_CUSTOM_PRODUCTS = "customproduct"
         private const val COLLECTION_ORDERS = "orders"
         private const val COLLECTION_USERS = "users"
         private const val COLLECTION_CUSTOM_DESIGNS = "customDesigns"
+        private const val COLLECTION_EKSPEDISI = "masterEkspedisi"
+    }
+
+    override fun getCurrentUser(): Flow<Response<User>> = flow {
+        try {
+            emit(Response.Loading)
+            val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+
+            val snapshot = firestore.collection("users")
+                .document(currentUserId)
+                .get()
+                .await()
+
+            if (snapshot.exists()) {
+                val user = snapshot.toObject(User::class.java)
+                if (user != null) {
+                    emit(Response.Success(user))
+                } else {
+                    emit(Response.Error("User data is corrupted"))
+                }
+            } else {
+                emit(Response.Error("User not found"))
+            }
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: "Failed to get user profile"))
+        }
     }
 
     override fun getProductTemplates(): Flow<List<ProductTemplate>> = callbackFlow {
@@ -72,6 +103,22 @@ class OwnerRepositoryImpl @Inject constructor(
         }
 
         awaitClose { }
+    }
+
+    override fun getMasterKurir(): Flow<Response<List<Kurir>>> = flow {
+        try {
+            val snapshot = firestore.collection(COLLECTION_EKSPEDISI)
+                .get()
+                .await()
+            if(snapshot != null) {
+                val kurirData = snapshot.toObjects(Kurir::class.java) ?: throw Exception("No courier data found")
+                emit(Response.Success(kurirData))
+            } else {
+                emit(Response.Error("No courier data found"))
+            }
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: "Failed to fetch courier data"))
+        }
     }
 
     override fun addProductTemplate(productTemplate: ProductTemplate): Flow<Response<String>> = callbackFlow {
@@ -648,6 +695,51 @@ class OwnerRepositoryImpl @Inject constructor(
                 }
         } catch (e: Exception) {
             trySend(Response.Error(e.message ?: "Failed to fetch total balance"))
+            close()
+        }
+        awaitClose { }
+    }
+
+    override fun getCustomers(searchQuery: String): Flow<Response<List<User>>> = callbackFlow {
+        trySend(Response.Loading)
+        try {
+            var query = firestore.collection(COLLECTION_USERS)
+                .whereEqualTo("role", "customer")
+
+            val snapshot = query.get().await()
+
+            val customers = snapshot.documents.mapNotNull { document ->
+                try {
+                    val data = document.data ?: return@mapNotNull null
+                    User(
+                        id = document.id,
+                        name = data["name"] as? String ?: data["fullName"] as? String ?: "",
+                        email = data["email"] as? String ?: "",
+                        profilePicture = data["profilePicture"] as? String ?: "",
+                        role = data["role"] as? String ?: "customer",
+                        phone = data["phone"] as? String ?: "",
+                        createdAt = data["createdAt"] as? com.google.firebase.Timestamp ?: com.google.firebase.Timestamp.now()
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // Apply search filter if provided
+            val filteredCustomers = if (searchQuery.isNotEmpty()) {
+                customers.filter { customer ->
+                    customer.name?.contains(searchQuery, ignoreCase = true) == true ||
+                    customer.email?.contains(searchQuery, ignoreCase = true) == true ||
+                    customer.phone.contains(searchQuery, ignoreCase = true)
+                }
+            } else {
+                customers
+            }
+
+            trySend(Response.Success(filteredCustomers))
+            close()
+        } catch (e: Exception) {
+            trySend(Response.Error(e.message ?: "Failed to fetch customers"))
             close()
         }
         awaitClose { }

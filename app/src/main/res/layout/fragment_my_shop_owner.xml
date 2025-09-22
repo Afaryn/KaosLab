@@ -36,16 +36,7 @@
                     android:layout_marginTop="25dp"
                     android:layout_marginEnd="16dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="8dp"
-                        android:src="@drawable/ic_back"
-                        app:tint="@color/white" />
-                </LinearLayout>
+                    android:orientation="horizontal"/>
 
 
                 <!-- Foto dan Nama -->
@@ -75,13 +66,14 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintVertical_bias="0.0" />
 
-                        <de.hdodenhof.circleimageview.CircleImageView
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/iv_take_picture"
                             android:layout_width="28dp"
                             android:layout_height="28dp"
                             android:layout_marginBottom="8dp"
                             android:baselineAlignBottom="true"
-                            android:src="@drawable/ic_edit"
+                            android:backgroundTint="@color/white"
+                            android:src="@drawable/ic_edit_yellow"
                             app:layout_constraintBaseline_toBottomOf="@id/imgProfile"
                             app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
                             app:layout_constraintEnd_toEndOf="@+id/imgProfile" />

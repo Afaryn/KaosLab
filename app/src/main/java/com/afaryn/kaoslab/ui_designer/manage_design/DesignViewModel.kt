@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.ui_designer.manage_design
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afaryn.kaoslab.data.DesignerRepository
@@ -40,24 +41,87 @@ class DesignViewModel @Inject constructor(
         }
     }
 
-    fun addDesign(design: Design) {
+    fun addDesign(design: Design, imageUri: Uri? = null) {
         viewModelScope.launch {
-            repository.addDesign(design).collect { response ->
-                _addDesignState.value = response
-                if (response is Response.Success) {
-                    getDesigns() // Refresh the list
+            try {
+                _addDesignState.value = Response.Loading
+
+                // Generate design ID for Firebase Storage naming
+                val designId = java.util.UUID.randomUUID().toString()
+
+                val imageUrl = if (imageUri != null) {
+                    // Upload image to Firebase Storage
+                    repository.uploadDesignImage(imageUri, designId)
+                } else {
+                    design.fileUrl // Keep existing URL if no new image
                 }
+
+                val designWithImage = design.copy(
+                    id = designId,
+                    fileUrl = imageUrl
+                )
+
+                repository.addDesign(designWithImage).collect { response ->
+                    _addDesignState.value = response
+                    if (response is Response.Success) {
+                        getDesigns() // Refresh the list
+                    }
+                }
+            } catch (e: Exception) {
+                _addDesignState.value = Response.Error(e.message ?: "Failed to add design")
             }
         }
     }
 
-    fun deleteDesign(designId: String) {
+    fun updateDesign(design: Design, newImageUri: Uri? = null) {
         viewModelScope.launch {
-            repository.deleteDesign(designId).collect { response ->
-                _deleteDesignState.value = response
-                if (response is Response.Success) {
-                    getDesigns() // Refresh the list
+            try {
+                _editDesignState.value = Response.Loading
+
+                val updatedDesign = if (newImageUri != null) {
+                    // Delete old image if exists
+                    if (design.fileUrl.isNotEmpty()) {
+                        repository.deleteImageFromStorage(design.fileUrl)
+                    }
+
+                    // Upload new image
+                    val newImageUrl = repository.uploadDesignImage(newImageUri, design.id)
+                    design.copy(fileUrl = newImageUrl)
+                } else {
+                    design
                 }
+
+                repository.updateDesign(updatedDesign).collect { response ->
+                    _editDesignState.value = response
+                    if (response is Response.Success) {
+                        getDesigns() // Refresh the list
+                    }
+                }
+            } catch (e: Exception) {
+                _editDesignState.value = Response.Error(e.message ?: "Failed to update design")
+            }
+        }
+    }
+
+    fun deleteDesign(design: Design) {
+        viewModelScope.launch {
+            try {
+                _deleteDesignState.value = Response.Loading
+
+                // Delete image from storage first
+                if (design.fileUrl.isNotEmpty()) {
+                    repository.deleteImageFromStorage(design.fileUrl)
+                }
+
+                // Then delete design document
+                repository.deleteDesign(design.id).collect { response ->
+                    _deleteDesignState.value = response
+                    if (response is Response.Success) {
+                        getDesigns() // Refresh the list
+                    }
+                }
+            } catch (e: Exception) {
+                _deleteDesignState.value = Response.Error(e.message ?: "Failed to delete design")
             }
         }
     }
@@ -66,17 +130,6 @@ class DesignViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getDesignById(designId).collect { response ->
                 _singleDesignState.value = response
-            }
-        }
-    }
-
-    fun updateDesign(design: Design) {
-        viewModelScope.launch {
-            repository.updateDesign(design).collect { response ->
-                _editDesignState.value = response
-                if (response is Response.Success) {
-                    getDesigns() // Refresh the list
-                }
             }
         }
     }

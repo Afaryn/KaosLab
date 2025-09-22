@@ -2,19 +2,26 @@ package com.afaryn.kaoslab.di
 
 import com.afaryn.kaoslab.data.DesignerRepository
 import com.afaryn.kaoslab.data.DesignerRepositoryImpl
-import dagger.Binds
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DesignerModule {
+object DesignerModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun provideDesignerRepository(
-        designerRepositoryImpl: DesignerRepositoryImpl
-    ): DesignerRepository
+    fun provideDesignerRepository(
+        auth: FirebaseAuth,
+        firestore: FirebaseFirestore,
+        storage: FirebaseStorage
+    ): DesignerRepository {
+        return DesignerRepositoryImpl(auth, firestore, storage)
+    }
 }

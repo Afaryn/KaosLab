@@ -7,13 +7,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentAccountDesignerBinding
+import com.afaryn.kaoslab.model.User
+import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.confirmDialog
 import com.afaryn.kaoslab.utils.showBottomNavDesigner
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -21,6 +28,8 @@ class AccountDesignerFragment : Fragment() {
 
     private var _binding: FragmentAccountDesignerBinding? = null
     private val binding get() = _binding!!
+
+    private var currentUser: User? = null
     private val viewModel: AccountDesignerViewModel by viewModels()
 
     override fun onCreateView(
@@ -38,6 +47,7 @@ class AccountDesignerFragment : Fragment() {
 
         setupToolbar()
         setupActions()
+        setupObservers()
     }
 
     private fun setupToolbar() {
@@ -61,6 +71,48 @@ class AccountDesignerFragment : Fragment() {
         binding.btnSellerCentre.setOnClickListener {
             findNavController().navigate(R.id.action_accountDesignerFragment_to_sellerCentreFragment)
         }
+        binding.btnUserSecurity.setOnClickListener {
+            findNavController().navigate(R.id.action_accountDesignerFragment_to_editProfileFragment)
+        }
+    }
+
+    private fun setupObservers() {
+        lifecycleScope.launch {
+            viewModel.userProfileState.collect { state ->
+                when (state) {
+                    is Response.Idle -> {
+                        // Initial state
+                    }
+
+                    is Response.Loading -> {
+//                        showLoading()
+                    }
+
+                    is Response.Success -> {
+//                        hideLoading()
+                        currentUser = state.data
+                        populateUserData(state.data)
+                    }
+
+                    is Response.Error -> {
+//                        hideLoading()
+//                        showError(state.message)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun populateUserData(user: User) {
+        binding.txtName.setText(user.name)
+        // Load profile picture
+        if (user.profilePicture.isNotEmpty()) {
+            Glide.with(this)
+                .load(user.profilePicture)
+                .circleCrop()
+                .into(binding.imgProfile)
+        }
+
     }
 
     override fun onDestroyView() {

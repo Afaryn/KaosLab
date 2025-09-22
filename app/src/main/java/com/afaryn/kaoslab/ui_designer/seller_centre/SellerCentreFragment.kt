@@ -42,8 +42,8 @@ class SellerCentreFragment : Fragment() {
             findNavController().navigate(R.id.action_sellerCentreFragment_to_designListFragment)
         }
 
-        binding.btnDesignService.setOnClickListener {
-            // Navigate to portfolio (to be implemented later)
+        binding.btnPortfolio.setOnClickListener {
+            findNavController().navigate(R.id.action_sellerCentreFragment_to_portfolioListFragment)
         }
     }
 

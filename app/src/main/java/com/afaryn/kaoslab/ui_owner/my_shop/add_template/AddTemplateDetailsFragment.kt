@@ -23,6 +23,7 @@ import com.afaryn.kaoslab.databinding.ItemSizeInputBinding
 import com.afaryn.kaoslab.model.ProductTemplate
 import com.afaryn.kaoslab.model.SizeOption
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.successDialog
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -300,11 +301,14 @@ class AddTemplateDetailsFragment : Fragment() {
     }
 
     private fun showSuccessDialog() {
-        val dialog = SuccessDialogFragment {
-            // Navigate back to template list
-            findNavController().popBackStack(com.afaryn.kaoslab.R.id.productTemplateFragment, false)
-        }
-        dialog.show(parentFragmentManager, "success_dialog")
+        successDialog(
+            requireContext(),
+            title = "Success!",
+            message = "Product template has been added successfully",
+            positiveAction = {
+                findNavController().popBackStack()
+            }
+        )
     }
 
     override fun onDestroyView() {

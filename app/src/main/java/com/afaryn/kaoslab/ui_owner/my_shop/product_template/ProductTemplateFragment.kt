@@ -29,6 +29,7 @@ class ProductTemplateFragment : Fragment() {
     private lateinit var topAdapter: ProductTemplateAdapter
     private lateinit var bottomAdapter: ProductTemplateAdapter
     private lateinit var hatAdapter: ProductTemplateAdapter
+    private lateinit var othersAdapter: ProductTemplateAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +65,11 @@ class ProductTemplateFragment : Fragment() {
             onTemplateClick(template)
         }
 
+        // Setup Others products adapter
+        othersAdapter = ProductTemplateAdapter { template ->
+            onTemplateClick(template)
+        }
+
         binding.apply {
             // Setup RecyclerViews with regular LinearLayoutManager
             rvTopTemplates.apply {
@@ -81,6 +87,12 @@ class ProductTemplateFragment : Fragment() {
             rvHatTemplates.apply {
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = hatAdapter
+                setHasFixedSize(false)
+            }
+
+            rvOthersTemplates.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = othersAdapter
                 setHasFixedSize(false)
             }
         }
@@ -130,15 +142,12 @@ class ProductTemplateFragment : Fragment() {
         val topTemplates = templates.filter { it.type == ProductType.TOP.value }
         val bottomTemplates = templates.filter { it.type == ProductType.BOTTOM.value }
         val hatTemplates = templates.filter { it.type == ProductType.HAT.value }
-
-
-        bottomTemplates.forEach { template ->
-            android.util.Log.d("ProductTemplate", "Bottom item: ${template.name}, type: ${template.type}")
-        }
+        val othersTemplates = templates.filter { it.type == ProductType.OTHERS.value }
 
         topAdapter.submitList(topTemplates)
         bottomAdapter.submitList(bottomTemplates)
         hatAdapter.submitList(hatTemplates)
+        othersAdapter.submitList(othersTemplates)
     }
 
     private fun onTemplateClick(template: ProductTemplate) {

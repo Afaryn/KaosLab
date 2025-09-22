@@ -61,7 +61,7 @@ class AddTemplateCategoryFragment : Fragment() {
             R.id.radioTop -> ProductType.TOP.value
             R.id.radioBottom -> ProductType.BOTTOM.value
             R.id.radioHat -> ProductType.HAT.value
-            R.id.radioOthers -> "3" // Others category
+            R.id.radioOthers -> ProductType.OTHERS.value
             else -> null
         }
     }
