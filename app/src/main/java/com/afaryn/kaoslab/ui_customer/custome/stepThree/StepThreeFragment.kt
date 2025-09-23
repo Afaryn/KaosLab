@@ -30,6 +30,7 @@ import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -355,22 +356,23 @@ class StepThreeFragment : Fragment() {
             }
         }
 
+        // Get current authenticated user ID
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId == null) {
+            Toast.makeText(requireContext(), "User not authenticated. Please login first.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         // Buat objek Order tunggal
         val order = Order(
-            orderId = "", // Akan diisi di backend/saat pesanan dibuat
-            customerId = "dummy_customer_id", // Ganti dengan ID user sebenarnya
-            customerName = "dummy_customer_name", // Ganti dengan nama user
-            customerAvatarUrl = "", // Ganti dengan avatar user
+            customerId = currentUserId, // Use current authenticated user ID
             designId = designId, // Mengidentifikasi jenis kustomisasi
-            status = "unpaid",
+            status = "pending", // Use Firebase collection status values
             totalAmount = totalAmount.toDouble(),
             totalPieces = totalPieces,
             size = selectedSizeLabels.joinToString(", "), // Menampilkan semua ukuran yang dipilih
-            title = selectedProduct.name,
-            designImageUrl = designImageUrl ?: "", // URL gambar kustom atau kosong
-            courierInfo = null,
-            courierLogo = null,
-            trackingNumber = null,
+            courierId = null, // Will be set when courier is selected
+            noResi = null, // Will be set when package is shipped
             createdAt = Timestamp.now()
         )
 

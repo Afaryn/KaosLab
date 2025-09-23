@@ -40,11 +40,11 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun setupButtons() {
-        binding.arrangeShipmentButton.setOnClickListener {
+        binding.buttonsContainer.setOnClickListener {
             // Logika untuk mengelola pengiriman
         }
 
-        binding.downloadButton.setOnClickListener {
+        binding.secondaryButton.setOnClickListener {
             // Logika untuk mengunduh detail pesanan atau invoice
         }
     }

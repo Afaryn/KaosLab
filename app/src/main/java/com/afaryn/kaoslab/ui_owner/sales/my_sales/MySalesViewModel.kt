@@ -1,9 +1,11 @@
 package com.afaryn.kaoslab.ui_owner.sales.my_sales
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.afaryn.kaoslab.data.OwnerRepository
 import com.afaryn.kaoslab.model.Order
+import com.afaryn.kaoslab.utils.Constants
 import com.afaryn.kaoslab.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +33,16 @@ class MySalesViewModel @Inject constructor(
 
     fun loadOrdersByStatus(status: String) {
         viewModelScope.launch {
-            ownerRepository.getOrdersByStatus(status).collect { response ->
+            // Map tab status to Firebase collection status
+            val firebaseStatus = when (status) {
+                "unpaid" -> "pending"
+                "to_deliver" -> "processing"
+                "shipping" -> "shipped"
+                "completed" -> "delivered"
+                else -> status
+            }
+
+            ownerRepository.getOrdersByStatus(firebaseStatus).collect { response ->
                 when (status) {
                     "unpaid" -> _unpaidOrders.value = response
                     "to_deliver" -> _toDeliverOrders.value = response
@@ -41,6 +52,8 @@ class MySalesViewModel @Inject constructor(
             }
         }
     }
+
+    fun getUserById(userId: String) = ownerRepository.getUserById(userId).asLiveData()
 
     fun loadAllOrders() {
         loadOrdersByStatus("unpaid")

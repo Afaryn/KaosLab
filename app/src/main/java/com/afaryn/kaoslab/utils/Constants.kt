@@ -16,4 +16,9 @@ object Constants {
     const val CUSTOMER = "customer"
     const val OWNER = "owner"
     const val DESIGNER = "designer"
+
+    const val PENDING_STATUS = "pending"
+    const val PROCESSING_STATUS = "processing"
+    const val SHIPPED_STATUS = "shipped"
+    const val DELIVERED_STATUS = "delivered"
 }

@@ -1,5 +1,7 @@
 package com.afaryn.kaoslab.ui_owner.sales.my_sales
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,10 +9,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.databinding.FragmentSalesTabBinding
 import com.afaryn.kaoslab.model.Order
+import com.afaryn.kaoslab.utils.Constants.DELIVERED_STATUS
+import com.afaryn.kaoslab.utils.Constants.PENDING_STATUS
+import com.afaryn.kaoslab.utils.Constants.PROCESSING_STATUS
+import com.afaryn.kaoslab.utils.Constants.SHIPPED_STATUS
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -61,11 +69,14 @@ class SalesTabFragment : Fragment() {
 
     private fun setupRecyclerView() {
         salesAdapter = SalesAdapter(
-            onPrimaryButtonClick = { orderItem ->
-                handlePrimaryButtonClick(orderItem)
+            onArrangeShipment = { order ->
+                navigateToChooseCourier(order.orderId)
             },
-            onSecondaryButtonClick = { orderItem ->
-                handleSecondaryButtonClick(orderItem)
+            onSeeDetails = { order ->
+                navigateToOrderDetails(order.orderId)
+            },
+            onContactCustomer = { order, phone ->
+                contactCustomerViaWhatsApp(order)
             }
         )
 
@@ -102,7 +113,7 @@ class SalesTabFragment : Fragment() {
         }
     }
 
-    private fun handleResponse(response: Response<List<com.afaryn.kaoslab.model.Order>>) {
+    private fun handleResponse(response: Response<List<Order>>) {
         when (response) {
             is Response.Loading -> {
                 binding.progressBar.visibility = View.VISIBLE
@@ -132,32 +143,41 @@ class SalesTabFragment : Fragment() {
         }
     }
 
-    private fun handlePrimaryButtonClick(orderItem: Order) {
-        when (orderItem.status) {
-            "unpaid" -> {
-                // Handle contact customer action
-                // TODO: Implement contact customer functionality
-            }
-            "to_deliver" -> {
-                // Handle arrange shipment action
-                // TODO: Implement arrange shipment functionality
-            }
-            "shipping" -> {
-                // Handle see details action
-                // TODO: Navigate to order details
-            }
-            "completed" -> {
-                // Handle beri review action
-                // TODO: Navigate to review screen
-            }
-        }
+    private fun navigateToChooseCourier(orderId: String) {
+        val action = MySalesFragmentDirections
+            .actionMySalesFragmentToChooseCourierFragment(orderId)
+        findNavController().navigate(action)
     }
 
-    private fun handleSecondaryButtonClick(orderItem: Order) {
-        when (orderItem.status) {
-            "to_deliver" -> {
-                // Handle see details action for to_deliver status
-                // TODO: Navigate to order details
+    private fun navigateToOrderDetails(orderId: String) {
+        val action = MySalesFragmentDirections
+            .actionMySalesFragmentToOrderDetailsFragment(orderId)
+        findNavController().navigate(action)
+    }
+
+    private fun contactCustomerViaWhatsApp(order: Order) {
+        // Get customer phone number from the order's customer data
+        viewModel.getUserById(order.customerId).observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Success -> {
+                    val customerPhone = response.data.phone
+                    if (customerPhone.isNotEmpty()) {
+                        val message = "Hello ${order.customerName}, regarding your order ${order.orderId}..."
+                        val uri = Uri.parse("https://wa.me/$customerPhone?text=${Uri.encode(message)}")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        try {
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            toast("WhatsApp is not installed")
+                        }
+                    } else {
+                        toast("Customer phone number not available")
+                    }
+                }
+                is Response.Error -> {
+                    toast("Unable to get customer information")
+                }
+                else -> {}
             }
         }
     }

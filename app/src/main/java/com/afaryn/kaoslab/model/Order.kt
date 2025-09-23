@@ -3,24 +3,27 @@ package com.afaryn.kaoslab.model
 import android.os.Parcelable
 import com.google.firebase.Timestamp
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 data class Order(
-    val orderId: String = "",
+    val orderId: String = UUID.randomUUID().toString().replace("-", "").substring(0, 20),
     val customerId: String = "",
-    val customerName: String = "",
-    val customerAvatarUrl: String = "",
     val designId: String = "",
     val status: String = "",
     val totalAmount: Double = 0.0,
     val totalPieces: Int = 0,
     val size: String = "",
-    val title: String = "",
-    val designImageUrl: String = "",
-    val courierInfo: String? = null,
-    val courierLogo: String? = null,
-    val trackingNumber: String? = null,
-    val createdAt: Timestamp? = null
+    val courierId: String? = null,
+    val noResi: String? = null,
+    val createdAt: Timestamp? = null,
+    // Transient fields - fetched dynamically in UI
+    @Transient val customerName: String = "",
+    @Transient val customerAvatarUrl: String = "",
+    @Transient val courierInfo: String? = null,
+    @Transient val courierLogo: String? = null,
+    @Transient val designImageUrl: String = "",
+    @Transient val title: String = ""
 ):Parcelable
 
 data class BusinessInsights(

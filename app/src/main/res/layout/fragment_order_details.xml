@@ -1,316 +1,503 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui_owner.order.OrderDetailsFragment">
+    android:layout_height="match_parent">
 
+    <!-- Toolbar -->
     <LinearLayout
-        android:id="@+id/topBar"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="16dp"
-        android:orientation="horizontal">
+        android:layout_height="56dp"
+        android:background="@color/fui_transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/backArrow"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_back"
-            app:tint="@color/darkBlue" />
+            android:contentDescription="Back" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:text="Order Details"
-            android:textColor="@color/darkBlue"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:layout_marginStart="16dp"
             android:layout_weight="1"
-            android:fontFamily="@font/plusjakartasans"/>
+            android:text="Order Details"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/lightGray"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    <!-- Content Layout -->
     <ScrollView
+        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@id/bottomButtonsLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintBottom_toTopOf="@id/buttonsContainer">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/customerInfoCard"
+            <!-- Customer Info -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:padding="16dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/customerAvatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:contentDescription="Customer Avatar"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintBottom_toBottomOf="@id/customerAddress"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/customerName"
                     tools:src="@tools:sample/avatars" />
 
-                <TextView
-                    android:id="@+id/customerName"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="12dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="John Doe"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    app:layout_constraintStart_toEndOf="@id/customerAvatar"
-                    app:layout_constraintTop_toTopOf="@id/customerAvatar"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/customerAddress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Jl. Arief Rahman Hakim No.103-B, Surabaya, Jawa Timur"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    app:layout_constraintStart_toEndOf="@id/customerAvatar"
-                    app:layout_constraintTop_toBottomOf="@id/customerName"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    <TextView
+                        android:id="@+id/customerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="John Doe"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/customerAddress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Jl. Arief Rahman Hakim No.103-B, Surabaya, Jawa Timur"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:layout_marginTop="4dp" />
 
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Product Image and Info -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/productImageCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:layout_constraintTop_toBottomOf="@id/customerInfoCard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="16dp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/mainProductImage"
+                        android:id="@+id/productImage"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
+                        android:layout_height="200dp"
                         android:scaleType="centerCrop"
-                        android:contentDescription="Main Product Image"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:contentDescription="Product Image"
                         tools:src="@tools:sample/backgrounds/scenic" />
 
+                    <!-- Color Variations (small thumbnails) -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        app:layout_constraintTop_toBottomOf="@id/mainProductImage"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp">
 
                         <ImageView
-                            android:id="@+id/thumbnail1"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Product Thumbnail 1"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@color/lightGray"
                             android:layout_marginEnd="8dp"
-                            tools:src="@tools:sample/backgrounds/scenic" />
+                            android:contentDescription="Color variant" />
 
                         <ImageView
-                            android:id="@+id/thumbnail2"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Product Thumbnail 2"
-                            tools:src="@tools:sample/backgrounds/scenic" />
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@color/lightGray"
+                            android:contentDescription="Color variant" />
+
                     </LinearLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Product Details -->
             <TextView
-                android:id="@+id/productName"
-                android:layout_width="0dp"
+                android:id="@+id/productTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="24dp"
                 android:text="Regular Cut Short Sleeve T-Shirt"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
-                app:layout_constraintTop_toBottomOf="@id/productImageCard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="16dp" />
 
-            <TextView
-                android:id="@+id/colorLabel"
-                android:layout_width="wrap_content"
+            <!-- Color and Size -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Color"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/productName"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
 
-            <RadioGroup
-                android:id="@+id/colorRadioGroup"
-                android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Color"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/colorValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="White"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Size"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/sizeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="L: 5pcs    XL: 5pcs"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Courier Info Section -->
+            <LinearLayout
+                android:id="@+id/courierInfoSection"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                app:layout_constraintTop_toBottomOf="@id/colorLabel"
-                app:layout_constraintStart_toStartOf="parent">
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
 
-                <RadioButton
-                    android:id="@+id/radioWhite"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="White"
-                    android:checked="true"
-                    android:buttonTint="@color/dimgray"
-                    android:textColor="@android:color/black"
-                    android:fontFamily="@font/plusjakartasans" />
-            </RadioGroup>
+                    android:text="Shipping Information"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/sizeLabel"
-                android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Courier:"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/courierLogo"
+                        android:layout_width="40dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:scaleType="centerInside"
+                        android:contentDescription="Courier Logo" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tracking Number:"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/trackingNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="JT123456789"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Order Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Size"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/colorRadioGroup"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
 
-            <TextView
-                android:id="@+id/sizeDetails"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="4dp"
-                android:text="L: 5pcs    XL: 5pcs"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:fontFamily="@font/plusjakartasans"
-                app:layout_constraintTop_toBottomOf="@id/sizeLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Order Status:"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/statusIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_check_circle"
+                        android:visibility="gone"
+                        android:contentDescription="Status complete" />
+
+                    <TextView
+                        android:id="@+id/statusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="To Deliver"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/chocoTan"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Status Progress -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:id="@+id/unpaidStatus"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/circle_background"
+                        android:backgroundTint="#CCCCCC" />
+
+                    <View
+                        android:id="@+id/progressLine1"
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_weight="1"
+                        android:background="#CCCCCC"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <View
+                        android:id="@+id/processingStatus"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/circle_background"
+                        android:backgroundTint="#CCCCCC" />
+
+                    <View
+                        android:id="@+id/progressLine2"
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_weight="1"
+                        android:background="#CCCCCC"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <View
+                        android:id="@+id/shippedStatus"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/circle_background"
+                        android:backgroundTint="#CCCCCC" />
+
+                    <View
+                        android:id="@+id/progressLine3"
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_weight="1"
+                        android:background="#CCCCCC"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <View
+                        android:id="@+id/deliveredStatus"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/circle_background"
+                        android:backgroundTint="#CCCCCC" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Note Section -->
             <TextView
-                android:id="@+id/noteLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Note"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/sizeDetails"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="8dp" />
 
-            <EditText
-                android:id="@+id/noteEditText"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/edittext_rounded_background"
-                android:gravity="top|start"
-                android:hint="Tambahkan catatan..."
+                android:layout_height="80dp"
+                android:background="@drawable/bg_text_box_outline"
                 android:padding="12dp"
+                android:text=""
+                android:hint="No additional notes"
                 android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:textColorHint="@android:color/darker_gray"
-                app:layout_constraintTop_toBottomOf="@id/noteLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:importantForAutofill="no"
-                android:inputType="textMultiLine" />
+                android:gravity="top"
+                android:layout_marginBottom="24dp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Total Amount -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total:"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/totalAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rp375.000"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/chocoTan" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </ScrollView>
 
+    <!-- Bottom Buttons -->
     <LinearLayout
-        android:id="@+id/bottomButtonsLayout"
+        android:id="@+id/buttonsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
         android:background="@android:color/white"
-        android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/arrangeShipmentButton"
+            android:id="@+id/primaryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Arrange Shipment"
             android:textAllCaps="false"
-            android:paddingVertical="12dp"
-            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:cornerRadius="8dp"
-            android:fontFamily="@font/plusjakartasans"
             android:backgroundTint="@color/darkBlue"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="8dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/downloadButton"
+            android:id="@+id/secondaryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Download"
             android:textAllCaps="false"
-            android:paddingVertical="12dp"
-            android:layout_marginStart="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:cornerRadius="8dp"
-            android:fontFamily="@font/plusjakartasans"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:backgroundTint="@android:color/transparent"
+            android:textColor="@color/darkBlue"
             app:strokeColor="@color/darkBlue"
             app:strokeWidth="1dp"
-            android:textColor="@color/darkBlue"
-            android:backgroundTint="@android:color/white" />
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

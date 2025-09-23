@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
-    id ("androidx.navigation.safeargs")
+    id("androidx.navigation.safeargs.kotlin")
     kotlin("kapt")
     id("kotlin-parcelize")
 }

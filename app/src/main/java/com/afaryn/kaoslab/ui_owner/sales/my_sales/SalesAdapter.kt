@@ -1,5 +1,7 @@
 package com.afaryn.kaoslab.ui_owner.sales.my_sales
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,18 +12,17 @@ import com.afaryn.kaoslab.databinding.ItemSalesBinding
 import com.afaryn.kaoslab.model.Order
 import com.bumptech.glide.Glide
 import java.text.NumberFormat
-import java.util.Locale
+import java.util.*
 
 class SalesAdapter(
-    private val onPrimaryButtonClick: (Order) -> Unit,
-    private val onSecondaryButtonClick: (Order) -> Unit = {}
-) : ListAdapter<Order, SalesAdapter.SalesViewHolder>(DiffCallback()) {
+    private val onArrangeShipment: (Order) -> Unit,
+    private val onSeeDetails: (Order) -> Unit,
+    private val onContactCustomer: (Order, String) -> Unit
+) : ListAdapter<Order, SalesAdapter.SalesViewHolder>(SalesDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SalesViewHolder {
         val binding = ItemSalesBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+            LayoutInflater.from(parent.context), parent, false
         )
         return SalesViewHolder(binding)
     }
@@ -35,112 +36,98 @@ class SalesAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(order: Order) {
-            with(binding) {
-                // Set customer info
+            binding.apply {
+                // User info
                 userName.text = order.customerName
+                Glide.with(itemView.context)
+                    .load(order.customerAvatarUrl)
+                    .into(userAvatar)
 
-                // Load customer avatar
-                if (order.customerAvatarUrl.isNotEmpty()) {
-                    Glide.with(userAvatar.context)
-                        .load(order.customerAvatarUrl)
-                        .into(userAvatar)
-                }
+                // Status tag
+                salesStatusTag.text = getStatusDisplayText(order.status)
 
-                // Set status tag
-                salesStatusTag.text = when (order.status) {
-                    "unpaid" -> "Unpaid"
-                    "to_deliver" -> "To Deliver"
-                    "shipping" -> "Shipping"
-                    "completed" -> "Completed"
-                    else -> order.status
-                }
-
-                // Set product info
+                // Product info
                 productName.text = order.title
-                productQuantity.text = "x${order.totalPieces}"
                 productDetails.text = "Size: ${order.size}"
+                productQuantity.text = "x${order.totalPieces}"
 
-                // Load product image
-                if (order.designImageUrl.isNotEmpty()) {
-                    Glide.with(productImage.context)
-                        .load(order.designImageUrl)
-                        .into(productImage)
-                }
+                Glide.with(itemView.context)
+                    .load(order.designImageUrl)
+                    .into(productImage)
 
-                // Set total amount
+                // Total amount
                 val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
                 totalAmount.text = formatter.format(order.totalAmount)
 
-                // Configure courier info based on status
-                when (order.status) {
-                    "to_deliver", "shipping" -> {
-                        courierInfoSection.visibility = View.VISIBLE
-                        order.courierInfo?.let { courierName.text = it }
-
-                        // Load courier logo if available
-                        order.courierLogo?.let { logoUrl ->
-                            if (logoUrl.isNotEmpty()) {
-                                Glide.with(courierLogo.context)
-                                    .load(logoUrl)
-                                    .into(courierLogo)
-                            }
-                        }
+                // Courier info section - show only for to_deliver and shipping status
+                if (order.status == "processing" || order.status == "shipped") {
+                    courierInfoSection.visibility = View.VISIBLE
+                    if (order.courierInfo != null && order.courierLogo != null) {
+                        Glide.with(itemView.context)
+                            .load(order.courierLogo)
+                            .into(courierLogo)
                     }
-                    else -> {
-                        courierInfoSection.visibility = View.GONE
-                    }
+                } else {
+                    courierInfoSection.visibility = View.GONE
                 }
 
-                // Configure buttons based on status
-                configureButtons(order)
+                // Setup buttons based on status
+                setupButtonsForStatus(order)
             }
         }
 
-        private fun configureButtons(order: Order) {
-            with(binding) {
+        private fun getStatusDisplayText(status: String): String {
+            return when (status) {
+                "pending" -> "Unpaid"
+                "processing" -> "To Deliver"
+                "shipped" -> "Shipping"
+                "delivered" -> "Completed"
+                else -> status.capitalize()
+            }
+        }
+
+        private fun setupButtonsForStatus(order: Order) {
+            binding.apply {
                 when (order.status) {
-                    "unpaid" -> {
+                    "pending" -> {
                         primaryButton.text = "Contact Customer"
                         primaryButton.visibility = View.VISIBLE
                         secondaryButton.visibility = View.GONE
 
                         primaryButton.setOnClickListener {
-                            onPrimaryButtonClick(order)
+                            onContactCustomer(order, "")
                         }
                     }
-
-                    "to_deliver" -> {
+                    "processing" -> {
                         primaryButton.text = "Arrange Shipment"
                         secondaryButton.text = "See Details"
                         primaryButton.visibility = View.VISIBLE
                         secondaryButton.visibility = View.VISIBLE
 
                         primaryButton.setOnClickListener {
-                            onPrimaryButtonClick(order)
+                            onArrangeShipment(order)
                         }
 
                         secondaryButton.setOnClickListener {
-                            onSecondaryButtonClick(order)
+                            onSeeDetails(order)
                         }
                     }
-
-                    "shipping" -> {
+                    "shipped" -> {
                         primaryButton.text = "See Details"
                         primaryButton.visibility = View.VISIBLE
                         secondaryButton.visibility = View.GONE
 
                         primaryButton.setOnClickListener {
-                            onPrimaryButtonClick(order)
+                            onSeeDetails(order)
                         }
                     }
-
-                    "completed" -> {
-                        primaryButton.text = "Beri Review"
+                    "delivered" -> {
+                        primaryButton.text = "See Details"
                         primaryButton.visibility = View.VISIBLE
                         secondaryButton.visibility = View.GONE
 
                         primaryButton.setOnClickListener {
-                            onPrimaryButtonClick(order)
+                            onSeeDetails(order)
                         }
                     }
                 }
@@ -148,7 +135,7 @@ class SalesAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Order>() {
+    private class SalesDiffCallback : DiffUtil.ItemCallback<Order>() {
         override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean {
             return oldItem.orderId == newItem.orderId
         }

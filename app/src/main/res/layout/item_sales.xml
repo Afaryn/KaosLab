@@ -35,7 +35,7 @@
             android:text="John Doe"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toEndOf="@id/userAvatar"
             app:layout_constraintTop_toTopOf="@id/userAvatar"
             app:layout_constraintEnd_toStartOf="@id/salesStatusTag" />
@@ -77,7 +77,7 @@
             android:text="Short sleeve t-shirt"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toEndOf="@id/productImage"
             app:layout_constraintTop_toTopOf="@id/productImage"
             app:layout_constraintEnd_toStartOf="@id/productQuantity" />
@@ -103,7 +103,7 @@
             android:text="x5"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/textGray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/productName"
             app:layout_constraintBottom_toBottomOf="@id/productDetails" />
@@ -130,23 +130,13 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/courierName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="J&amp;T Express"
-                android:textSize="16sp"
-                android:textColor="@android:color/black" />
-
             <ImageView
                 android:id="@+id/courierLogo"
                 android:layout_width="40dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="8dp"
                 android:scaleType="centerInside"
-                android:contentDescription="Courier Logo"
-                android:src="@drawable/ic_jnt_logo" />
+                android:contentDescription="Courier Logo" />
 
         </LinearLayout>
 
@@ -156,24 +146,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total:"
-            android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/courierInfoSection" />
 
         <TextView
             android:id="@+id/totalAmount"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="Rp375.000"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:textColor="@color/chocoTan"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="24dp"
+            app:layout_constraintBottom_toBottomOf="@id/totalLabel"
             app:layout_constraintStart_toEndOf="@id/totalLabel"
-            app:layout_constraintTop_toTopOf="@id/totalLabel"
-            app:layout_constraintBottom_toBottomOf="@id/totalLabel" />
+            app:layout_constraintTop_toTopOf="@id/totalLabel" />
 
         <!-- Buttons Section -->
         <LinearLayout
@@ -182,9 +173,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/totalLabel"
-            app:layout_constraintBottom_toBottomOf="@id/totalAmount">
+            app:layout_constraintTop_toBottomOf="@id/totalLabel">
 
             <!-- Primary Button (Contact Customer, Arrange Shipment, See Details, Beri Review) -->
             <com.google.android.material.button.MaterialButton

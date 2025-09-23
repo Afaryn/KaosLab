@@ -31,7 +31,14 @@
         android:id="@+id/mySalesFragment"
         android:name="com.afaryn.kaoslab.ui_owner.sales.my_sales.MySalesFragment"
         android:label="fragment_my_sales"
-        tools:layout="@layout/fragment_my_sales" />
+        tools:layout="@layout/fragment_my_sales">
+        <action
+            android:id="@+id/action_mySalesFragment_to_chooseCourierFragment"
+            app:destination="@id/chooseCourierFragment" />
+        <action
+            android:id="@+id/action_mySalesFragment_to_orderDetailsFragment"
+            app:destination="@id/orderDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/myShopOwnerFragment"
@@ -102,5 +109,48 @@
         android:name="com.afaryn.kaoslab.ui_owner.customers.ListCustomersFragment"
         android:label="List Customers"
         tools:layout="@layout/fragment_list_customers" />
+
+    <!-- Arrange Shipment Flow -->
+    <fragment
+        android:id="@+id/chooseCourierFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.sales.arrange_shipment.ChooseCourierFragment"
+        android:label="fragment_choose_courier"
+        tools:layout="@layout/fragment_choose_courier">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_chooseCourierFragment_to_trackingNumberFragment"
+            app:destination="@id/trackingNumberFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/trackingNumberFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.sales.arrange_shipment.TrackingNumberFragment"
+        android:label="fragment_tracking_number"
+        tools:layout="@layout/fragment_tracking_number">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+        <argument
+            android:name="courierId"
+            app:argType="string" />
+        <argument
+            android:name="courierName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderDetailsFragment"
+        android:name="com.afaryn.kaoslab.ui_owner.sales.order_details.OrderDetailsFragment"
+        android:label="fragment_order_details"
+        tools:layout="@layout/fragment_order_details">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_orderDetailsFragment_to_chooseCourierFragment"
+            app:destination="@id/chooseCourierFragment" />
+    </fragment>
 
 </navigation>

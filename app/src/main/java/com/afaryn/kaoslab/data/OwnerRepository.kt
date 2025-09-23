@@ -33,6 +33,11 @@ interface OwnerRepository {
     fun getLastOrders(limit: Int = 5): Flow<Response<List<Order>>>
     fun getOrdersByStatus(status: String): Flow<Response<List<Order>>>
 
+    // Arrange Shipment methods
+    fun updateOrderStatus(orderId: String, status: String, courierId: String? = null, noResi: String? = null): Flow<Response<String>>
+    fun getOrderById(orderId: String): Flow<Response<Order>>
+    fun getUserById(userId: String): Flow<Response<User>>
+
     // Transaction methods
     fun getTransactionHistory(filter: TransactionFilter? = null): Flow<Response<List<Transaction>>>
     fun getTotalBalance(): Flow<Response<Double>>
