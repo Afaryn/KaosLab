@@ -5,11 +5,6 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/chatOwnerFragment"
-        android:icon="@drawable/ic_chat"
-        android:title="Chat" />
-
-    <item
         android:id="@+id/businessReportFragment"
         android:icon="@drawable/ic_report"
         android:title="Report"

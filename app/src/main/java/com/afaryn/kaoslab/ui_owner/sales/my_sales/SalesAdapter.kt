@@ -92,10 +92,14 @@ class SalesAdapter(
                     "pending" -> {
                         primaryButton.text = "Contact Customer"
                         primaryButton.visibility = View.VISIBLE
-                        secondaryButton.visibility = View.GONE
+                        secondaryButton.visibility = View.VISIBLE
+                        secondaryButton.text = "See Details"
 
                         primaryButton.setOnClickListener {
                             onContactCustomer(order, "")
+                        }
+                        secondaryButton.setOnClickListener {
+                            onSeeDetails(order)
                         }
                     }
                     "processing" -> {

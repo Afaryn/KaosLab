@@ -66,14 +66,16 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintVertical_bias="0.0" />
 
-                        <androidx.appcompat.widget.AppCompatImageButton
+                        <ImageView
                             android:id="@+id/iv_take_picture"
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_marginBottom="8dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginBottom="4dp"
                             android:baselineAlignBottom="true"
                             android:backgroundTint="@color/white"
-                            android:src="@drawable/ic_edit_yellow"
+                            android:background="@color/fui_transparent"
+                            android:src="@drawable/ic_edit"
+                            app:tint="@color/white"
                             app:layout_constraintBaseline_toBottomOf="@id/imgProfile"
                             app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
                             app:layout_constraintEnd_toEndOf="@+id/imgProfile" />
@@ -276,47 +278,6 @@
                     android:layout_height="1dp"
                     android:background="@color/line" />
 
-                <LinearLayout
-                    android:id="@+id/btn_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="15dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:contentDescription="@string/content_description"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_map_line" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/pjs_medium"
-                        android:text="My Addresses"
-                        android:textColor="@color/darkBlue"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:padding="8dp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_navigate_next" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/line" />
             </LinearLayout>
 
             <LinearLayout

@@ -175,7 +175,7 @@
                         android:gravity="center">
 
                         <TextView
-                            android:id="@+id/toShip_count"
+                            android:id="@+id/unpaid_count"
                             android:text="1"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -187,7 +187,7 @@
                         <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:text="To Ship"
+                            android:text="Unpaid"
                             android:textSize="14sp"
                             android:textColor="@color/darkBlue"/>
                     </LinearLayout>
@@ -203,7 +203,7 @@
                         android:gravity="center">
 
                         <TextView
-                            android:id="@+id/canceled_count"
+                            android:id="@+id/toShip_count"
                             android:text="0"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -215,7 +215,7 @@
                         <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:text="Canceled"
+                            android:text="To Ship"
                             android:textSize="14sp"
                             android:textColor="@color/darkBlue"/>
                     </LinearLayout>
@@ -231,7 +231,7 @@
                         android:gravity="center">
 
                         <TextView
-                            android:id="@+id/return_count"
+                            android:id="@+id/cancelled_count"
                             android:text="1"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -243,7 +243,7 @@
                         <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:text="Return"
+                            android:text="Shipped"
                             android:textSize="14sp"
                             android:textColor="@color/darkBlue"/>
                     </LinearLayout>
@@ -259,7 +259,7 @@
                         android:gravity="center">
 
                         <TextView
-                            android:id="@+id/review_count"
+                            android:id="@+id/success_count"
                             android:text="0"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -271,7 +271,7 @@
                         <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:text="Review"
+                            android:text="Success"
                             android:textSize="14sp"
                             android:textColor="@color/darkBlue"/>
                     </LinearLayout>

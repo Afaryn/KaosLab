@@ -282,7 +282,7 @@ class OwnerRepositoryImpl @Inject constructor(
         trySend(Response.Loading)
         try {
             val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
-                .whereIn("status", listOf("processing", "completed"))
+                .whereIn("status", listOf("delivered"))
                 .get()
                 .await()
 
@@ -311,13 +311,13 @@ class OwnerRepositoryImpl @Inject constructor(
                 toShip = ordersSnapshot.documents.count { doc ->
                     (doc.data?.get("status") as? String) in listOf("processing")
                 },
-                cancelled = ordersSnapshot.documents.count { doc ->
-                    (doc.data?.get("status") as? String) == "cancelled"
+                shipped = ordersSnapshot.documents.count { doc ->
+                    (doc.data?.get("status") as? String) == "shipped"
                 },
-                returned = ordersSnapshot.documents.count { doc ->
-                    (doc.data?.get("status") as? String) == "returned"
+                unpaid = ordersSnapshot.documents.count { doc ->
+                    (doc.data?.get("status") as? String) == "pending"
                 },
-                review = ordersSnapshot.documents.count { doc ->
+                success = ordersSnapshot.documents.count { doc ->
                     (doc.data?.get("status") as? String) == "delivered"
                 }
             )

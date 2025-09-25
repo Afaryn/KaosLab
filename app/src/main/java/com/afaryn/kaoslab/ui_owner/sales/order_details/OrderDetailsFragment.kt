@@ -239,9 +239,9 @@ class OrderDetailsFragment : Fragment() {
     private fun updateProgressLines(status: String) {
         binding.apply {
             // Set all progress lines to inactive (gray) initially
-            progressLine1.setBackgroundColor(android.graphics.Color.parseColor("#CCCCCC"))
-            progressLine2.setBackgroundColor(android.graphics.Color.parseColor("#CCCCCC"))
-            progressLine3.setBackgroundColor(android.graphics.Color.parseColor("#CCCCCC"))
+            progressLine1.setBackgroundColor("#CCCCCC".toColorInt())
+            progressLine2.setBackgroundColor("#CCCCCC".toColorInt())
+            progressLine3.setBackgroundColor("#CCCCCC".toColorInt())
 
             // Update progress lines based on status
             when (status) {
@@ -291,8 +291,7 @@ class OrderDetailsFragment : Fragment() {
                     primaryButton.setOnClickListener { setToDelivered() }
                 }
                 "delivered" -> {
-                    primaryButton.text = "Give Review"
-                    primaryButton.visibility = View.VISIBLE
+                    primaryButton.visibility = View.GONE
                     secondaryButton.visibility = View.GONE
                     primaryButton.setOnClickListener { giveReview() }
                 }

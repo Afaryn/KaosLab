@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentHomeOwnerBinding
 import com.afaryn.kaoslab.ui_owner.home.adapter.LastOrderAdapter
+import com.afaryn.kaoslab.ui_owner.sales.my_sales.MySalesFragmentDirections
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,8 +48,7 @@ class HomeOwnerFragment : Fragment() {
 
     private fun setupRecyclerView() {
         lastOrderAdapter = LastOrderAdapter { orderItem ->
-            // Handle order item click - navigate to order details
-            // You can implement navigation to order details here
+            navigateToOrderDetails(orderItem.orderId)
         }
 
         binding.salesRecyclerView.apply {
@@ -108,16 +108,16 @@ class HomeOwnerFragment : Fragment() {
                     is Response.Success -> {
                         val counts = response.data
                         binding.toShipCount.text = counts.toShip.toString()
-                        binding.canceledCount.text = counts.cancelled.toString()
-                        binding.returnCount.text = counts.returned.toString()
-                        binding.reviewCount.text = counts.review.toString()
+                        binding.unpaidCount.text = counts.unpaid.toString()
+                        binding.cancelledCount.text = counts.shipped.toString()
+                        binding.successCount.text = counts.success.toString()
                     }
                     is Response.Error -> {
                         // Set default values
                         binding.toShipCount.text = "0"
-                        binding.canceledCount.text = "0"
-                        binding.returnCount.text = "0"
-                        binding.reviewCount.text = "0"
+                        binding.unpaidCount.text = "0"
+                        binding.cancelledCount.text = "0"
+                        binding.successCount.text = "0"
                     }
                     is Response.Idle -> {
                         // Initial state
@@ -146,6 +146,11 @@ class HomeOwnerFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun navigateToOrderDetails(orderId: String) {
+        val action = HomeOwnerFragmentDirections.actionHomeOwnerFragmentToOrderDetailsFragment(orderId)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

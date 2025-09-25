@@ -31,8 +31,8 @@ data class OrderItem(
 )
 
 data class OrderStatusCounts(
+    val unpaid: Int = 0,
     val toShip: Int = 0,
-    val cancelled: Int = 0,
-    val returned: Int = 0,
-    val review: Int = 0
+    val shipped: Int = 0,
+    val success: Int = 0
 )

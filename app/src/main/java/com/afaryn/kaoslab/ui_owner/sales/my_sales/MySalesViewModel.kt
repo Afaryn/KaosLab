@@ -5,7 +5,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.afaryn.kaoslab.data.OwnerRepository
 import com.afaryn.kaoslab.model.Order
-import com.afaryn.kaoslab.utils.Constants
 import com.afaryn.kaoslab.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +36,7 @@ class MySalesViewModel @Inject constructor(
             val firebaseStatus = when (status) {
                 "unpaid" -> "pending"
                 "to_deliver" -> "processing"
-                "shipping" -> "shipped"
+                "shipped" -> "shipped"
                 "completed" -> "delivered"
                 else -> status
             }
@@ -46,7 +45,7 @@ class MySalesViewModel @Inject constructor(
                 when (status) {
                     "unpaid" -> _unpaidOrders.value = response
                     "to_deliver" -> _toDeliverOrders.value = response
-                    "shipping" -> _shippingOrders.value = response
+                    "shipped" -> _shippingOrders.value = response
                     "completed" -> _completedOrders.value = response
                 }
             }
@@ -58,7 +57,7 @@ class MySalesViewModel @Inject constructor(
     fun loadAllOrders() {
         loadOrdersByStatus("unpaid")
         loadOrdersByStatus("to_deliver")
-        loadOrdersByStatus("shipping")
+        loadOrdersByStatus("shipped")
         loadOrdersByStatus("completed")
     }
 
