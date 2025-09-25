@@ -63,21 +63,72 @@
                 android:layout_marginBottom="16dp"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#F5F5E0">
-                    <ImageView
-                        android:id="@+id/product_main_image"
-                        android:layout_width="0dp"
-                        android:layout_height="300dp"
-                        android:scaleType="fitCenter"
-                        android:padding="32dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:src="@tools:sample/avatars"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <FrameLayout
+                        android:id="@+id/mockupContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+
+                        <ImageView
+                            android:id="@+id/tshirtBackground"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/bg_gradient_top" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <!-- Shirt base -->
+                            <ImageView
+                                android:id="@+id/tshirtImage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:maxHeight="300dp"
+                                android:adjustViewBounds="true"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/img"
+                                app:layout_constraintVertical_bias="1"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"/>
+
+                            <!-- Overlay design -->
+                            <ImageView
+                                android:id="@+id/designOverlay"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:scaleType="fitCenter"
+                                android:layout_marginTop="30dp"
+                                app:layout_constraintTop_toTopOf="@id/tshirtImage"
+                                app:layout_constraintBottom_toBottomOf="@id/tshirtImage"
+                                app:layout_constraintStart_toStartOf="@id/tshirtImage"
+                                app:layout_constraintEnd_toEndOf="@id/tshirtImage"/>
+
+                            <TextView
+                                android:id="@+id/tv_overlay"
+                                android:layout_width="100dp"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="120dp"
+                                android:layout_marginBottom="20dp"
+                                android:textSize="11sp"
+                                android:ellipsize="none"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="6sp"
+                                app:autoSizeMaxTextSize="11sp"
+                                android:fontFamily="@font/pjs_regular"
+                                app:autoSizeStepGranularity="1sp"
+                                android:background="@android:color/transparent"
+                                app:layout_constraintVertical_bias="1"
+                                app:layout_constraintTop_toTopOf="@id/tshirtImage"
+                                app:layout_constraintBottom_toBottomOf="@id/tshirtImage"
+                                app:layout_constraintStart_toStartOf="@id/tshirtImage"
+                                app:layout_constraintEnd_toEndOf="@id/tshirtImage"/>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </FrameLayout>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -111,6 +162,7 @@
                 android:layout_height="wrap_content"
                 android:text="make another"
                 android:textColor="#3F51B5"
+                android:visibility="gone"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/product_title"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -134,6 +186,20 @@
                 android:gravity="center_vertical"
                 app:layout_constraintTop_toBottomOf="@id/color_label"
                 app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_color"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/darkBlue"
+                    android:textSize="16sp"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civ_color"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@android:color/transparent"/>
             </LinearLayout>
 
             <LinearLayout

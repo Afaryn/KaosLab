@@ -34,7 +34,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.util.ArrayList
+import androidx.core.view.isVisible
+import com.afaryn.kaoslab.model.DesignType
+import com.afaryn.kaoslab.model.DesignUplType
 
 @AndroidEntryPoint
 class StepThreeFragment : Fragment() {
@@ -44,7 +46,7 @@ class StepThreeFragment : Fragment() {
     private val viewModel by activityViewModels<CustomViewModel>()
     private var designSelected: Boolean = false
     private var inputTextValid: Boolean = false
-    private var yourDesignAdapter: YourDesignAdapter? = null
+    private val yourDesignAdapter by lazy { YourDesignAdapter() }
 
     private var activeTab: TabType = TabType.YOUR_DESIGN
 
@@ -82,21 +84,22 @@ class StepThreeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.designRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-        yourDesignAdapter = YourDesignAdapter(
-            designs = listOf(),
-            onDesignSelected = {
-                val selectedDesignUrl = yourDesignAdapter?.getSelectedDesign()
-                viewModel.setSelectedYourDesign(selectedDesignUrl)
-                designSelected = true
-                inputTextValid = false // Reset text input validity
-                binding.imagePreview.visibility = View.GONE // Hide image preview if switching
-                binding.customTextInput.text?.clear() // Clear text input
-                updateNextButtonState()
-            },
-            onEmptyClick = {
-                Toast.makeText(requireContext(), "Arahkan ke halaman pembelian desain", Toast.LENGTH_SHORT).show()
-            }
-        )
+        yourDesignAdapter.onDesignSelected = { design ->
+            viewModel.setSelectedYourDesign(design)
+            designSelected = true
+            inputTextValid = false // Reset text input validity
+            binding.imagePreview.visibility = View.GONE // Hide image preview if switching
+            binding.customTextInput.text?.clear() // Clear text input
+
+            Glide.with(requireContext())
+                .load(design)
+                .into(binding.designOverlay)
+
+            updateNextButtonState()
+        }
+        yourDesignAdapter.onEmptyClick = {
+            Toast.makeText(requireContext(), "Arahkan ke halaman pembelian desain", Toast.LENGTH_SHORT).show()
+        }
         binding.designRecyclerView.adapter = yourDesignAdapter
     }
 
@@ -143,13 +146,13 @@ class StepThreeFragment : Fragment() {
         binding.customTextInput.visibility = View.GONE
         binding.designRecyclerView.visibility = View.GONE
         binding.uploadSection.visibility = View.VISIBLE
+        binding.tvOverlay.text = ""
 
         viewModel.setCustomDesign(null) // Reset other custom types
-        viewModel.updateCustomText(null)
         viewModel.setSelectedYourDesign(null)
 
         // Keep image preview visible if an image was already selected/cropped
-        designSelected = binding.imagePreview.visibility == View.VISIBLE && viewModel.selectedCustomDesignUri != null
+        designSelected = binding.imagePreview.isVisible && viewModel.selectedCustomDesignUri != null
         inputTextValid = false
         binding.customTextInput.text?.clear() // Clear text input
         updateNextButtonState()
@@ -159,9 +162,9 @@ class StepThreeFragment : Fragment() {
         binding.customTextInput.visibility = View.GONE
         binding.uploadSection.visibility = View.GONE
         binding.designRecyclerView.visibility = View.VISIBLE
+        binding.tvOverlay.text = ""
 
         viewModel.setCustomDesign(null) // Reset other custom types
-        viewModel.updateCustomText(null)
         binding.imagePreview.visibility = View.GONE // Hide image preview
         binding.customTextInput.text?.clear() // Clear text input
 
@@ -179,6 +182,7 @@ class StepThreeFragment : Fragment() {
         viewModel.setCustomDesign(null) // Reset other custom types
         viewModel.setSelectedYourDesign(null)
         binding.imagePreview.visibility = View.GONE // Hide image preview
+        binding.designOverlay.setImageDrawable(null)
 
         inputTextValid = binding.customTextInput.text.toString().isNotBlank()
         designSelected = false
@@ -191,11 +195,11 @@ class StepThreeFragment : Fragment() {
                 val currentText = s.toString()
                 inputTextValid = currentText.isNotBlank()
                 if (inputTextValid) {
-                    viewModel.updateCustomText(currentText)
                     viewModel.setCustomDesign(null)
                     viewModel.setSelectedYourDesign(null)
+                    binding.tvOverlay.text = currentText
                 } else {
-                    viewModel.updateCustomText(null)
+                    binding.tvOverlay.text = ""
                 }
                 updateNextButtonState()
             }
@@ -242,12 +246,12 @@ class StepThreeFragment : Fragment() {
                         Toast.makeText(requireContext(), "Belum ada desain", Toast.LENGTH_SHORT).show()
                     }
 
-                    yourDesignAdapter?.updateData(designs)
+                    yourDesignAdapter.differ.submitList(designs)
 
                     viewModel.selectedYourDesignUrl?.let { url ->
                         val position = designs.indexOf(url)
                         if (position != RecyclerView.NO_POSITION) {
-                            yourDesignAdapter?.setSelectedPosition(position)
+                            yourDesignAdapter.setSelectedPosition(position)
                             designSelected = true
                             updateNextButtonState()
                         }
@@ -298,6 +302,9 @@ class StepThreeFragment : Fragment() {
             designSelected = true
             inputTextValid = false // Reset text input validity
             binding.customTextInput.text?.clear() // Clear text input
+
+            binding.designOverlay.setImageURI(resultUri)
+
             updateNextButtonState()
         } else {
             Toast.makeText(requireContext(), "Gagal crop gambar", Toast.LENGTH_SHORT).show()
@@ -335,24 +342,29 @@ class StepThreeFragment : Fragment() {
 
         // Siapkan detail kustomisasi berdasarkan activeTab
         val designId: String // Digunakan untuk mengidentifikasi jenis kustomisasi
-        var designImageUrl: String? = null // URL untuk gambar desain atau Uri string
-        var customText: String? = null // Teks kustom
+        var designType: DesignType?  // URL untuk gambar desain atau Uri string
 
         when (activeTab) {
             TabType.UPLOAD -> {
-                designId = "image_upload"
-                designImageUrl = viewModel.selectedCustomDesignUri.toString()
+                designId = DesignUplType.Upload.value
+                designType = DesignType(
+                    type = DesignUplType.Upload.value,
+                    overlay = viewModel.selectedCustomDesignUri?.toString(),
+                )
             }
             TabType.YOUR_DESIGN -> {
-                designId = "image_your_design"
-                designImageUrl = viewModel.selectedYourDesignUrl
+                designId = DesignUplType.URL.value
+                designType = DesignType(
+                    type = DesignUplType.URL.value,
+                    overlay = viewModel.selectedYourDesignUrl,
+                )
             }
             TabType.ADD_TEXT -> {
-                designId = "text"
-                customText = viewModel.customText
-            }
-            else -> { // Default "none" jika tidak ada kustomisasi
-                designId = "none"
+                designId = DesignUplType.Text.value
+                designType = DesignType(
+                    type = DesignUplType.Text.value,
+                    text = binding.customTextInput.text.toString(),
+                )
             }
         }
 
@@ -366,7 +378,8 @@ class StepThreeFragment : Fragment() {
         // Buat objek Order tunggal
         val order = Order(
             customerId = currentUserId, // Use current authenticated user ID
-            designId = designId, // Mengidentifikasi jenis kustomisasi
+            designId = designId, // Mengidentifikasi jenis kustomisasi,
+            designType = designType.copy(product = viewModel.selectedProduct?.imageUrl),
             status = "pending", // Use Firebase collection status values
             totalAmount = totalAmount.toDouble(),
             totalPieces = totalPieces,
@@ -377,14 +390,8 @@ class StepThreeFragment : Fragment() {
         )
 
         val intent = Intent(requireContext(), OrderSummaryActivity::class.java).apply {
-            putExtra("ORDER_DATA", order) // Mengirim objek Order sebagai Parcelable
-            // Kirim juga warna secara terpisah karena tidak ada di model Order
+            putExtra("ORDER_DATA", order)
             putExtra("SELECTED_COLOR", selectedColor)
-            // Kirim teks kustom secara terpisah jika designImageUrl tidak dipakai untuk itu
-            // (karena designImageUrl bisa jadi URL/URI untuk gambar)
-            if (activeTab == TabType.ADD_TEXT) {
-                putExtra("CUSTOM_TEXT_CONTENT", customText) // Mengirim konten teks kustom
-            }
         }
         startActivity(intent)
     }

@@ -54,7 +54,6 @@ class CustomeActivity : AppCompatActivity() {
         updateStepIndicator(step)
     }
 
-
     private fun updateStepIndicator(step: Int) {
         when (step) {
             1 -> {

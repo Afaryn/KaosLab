@@ -21,7 +21,6 @@ class StepOneFragment : Fragment() {
     private var _binding: FragmentStepOneBinding? = null
     private val binding get() = _binding!!
 
-    // Tambahkan view model di sini untuk mengaksesnya
     private val viewModel by activityViewModels<CustomViewModel>()
 
     override fun onCreateView(

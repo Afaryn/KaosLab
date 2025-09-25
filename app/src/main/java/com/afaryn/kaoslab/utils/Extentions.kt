@@ -5,11 +5,14 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.os.Parcelable
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +26,7 @@ import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.ui_owner.OwnerActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -291,7 +295,13 @@ fun isSameDay(date: Date): Boolean {
 
 
 fun ImageView.glide(url: String) {
-    Glide.with(this.context).load(url).into(this)
+    Glide.with(this.context).load(url)
+        .transition(DrawableTransitionOptions.withCrossFade()).into(this)
+}
+
+fun ImageView.glide(uri: Uri) {
+    Glide.with(this.context).load(uri)
+        .transition(DrawableTransitionOptions.withCrossFade()).into(this)
 }
 
 private const val FILENAME_FORMAT = "dd-MMM-yyyy"
@@ -410,4 +420,13 @@ fun successDialog(
     }
 
     dialog.show()
+}
+
+inline fun <reified T : Parcelable> Intent?.getParcelable(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this?.getParcelableExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        (this?.getParcelableExtra(key))
+    }
 }

@@ -10,6 +10,7 @@ data class Order(
     val orderId: String = UUID.randomUUID().toString().replace("-", "").substring(0, 20),
     val customerId: String = "",
     val designId: String = "",
+    val designType: DesignType? = null,
     val status: String = "",
     val totalAmount: Double = 0.0,
     val totalPieces: Int = 0,
@@ -25,6 +26,20 @@ data class Order(
     @Transient val designImageUrl: String = "",
     @Transient val title: String = ""
 ):Parcelable
+
+@Parcelize
+data class DesignType(
+    val type: String? = null,
+    val product: String? = null,
+    val overlay: String? = null,
+    val text: String? = null
+): Parcelable
+
+sealed class DesignUplType(val value: String) {
+    object Upload : DesignUplType("image_upload")
+    object URL : DesignUplType("image_your_design")
+    object Text : DesignUplType("text")
+}
 
 data class BusinessInsights(
     val totalOrders: Int = 0,

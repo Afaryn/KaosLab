@@ -8,12 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afaryn.kaoslab.model.CustomProduct
 import com.afaryn.kaoslab.model.Product
-import com.google.firebase.firestore.FirebaseFirestore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import com.afaryn.kaoslab.utils.Constants.CUSTOM_PRODUCT_COLLECTION
 import com.afaryn.kaoslab.utils.Constants.PRODUCT_COLLECTION
 import com.afaryn.kaoslab.utils.UiState
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
 class CustomViewModel @Inject constructor(
@@ -34,7 +34,7 @@ class CustomViewModel @Inject constructor(
     val selectedColor: LiveData<String?> = _selectedColor
 
     var selectedCustomDesignUri: Uri? = null
-    var customText: String? = null
+
     var selectedYourDesignUrl: String? = null
 
     private val _designsState = MutableLiveData<UiState<List<String>>>()
@@ -63,23 +63,13 @@ class CustomViewModel @Inject constructor(
     // Fungsi untuk mengatur data kustomisasi (dari StepThree)
     fun setCustomDesign(uri: Uri?) {
         selectedCustomDesignUri = uri
-        customText = null
         selectedYourDesignUrl = null
         Log.d("CustomViewModel", "Gambar kustom diatur: $uri")
-    }
-
-    // ✅ Rename biar tidak bentrok dengan properti "customText"
-    fun updateCustomText(text: String?) {
-        customText = text
-        selectedCustomDesignUri = null
-        selectedYourDesignUrl = null
-        Log.d("CustomViewModel", "Teks kustom diatur: $text")
     }
 
     fun setSelectedYourDesign(url: String?) {
         selectedYourDesignUrl = url
         selectedCustomDesignUri = null
-        customText = null
         Log.d("CustomViewModel", "Desain Anda dipilih: $url")
     }
 
@@ -128,6 +118,7 @@ class CustomViewModel @Inject constructor(
         firestore.collection(PRODUCT_COLLECTION)
             .get()
             .addOnSuccessListener { result ->
+                _designsState.value = UiState.Loading(false)
                 val products = result.toObjects(Product::class.java)
                 val designs = products.mapNotNull { it.imageUrl }
 
@@ -139,6 +130,7 @@ class CustomViewModel @Inject constructor(
             }
             .addOnFailureListener { e ->
                 Log.e("CustomViewModel", "fetchUserDesigns error", e)
+                _designsState.value = UiState.Loading(false)
                 _designsState.value = UiState.Error(e.message ?: "Unknown error")
             }
     }
