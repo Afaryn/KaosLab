@@ -30,6 +30,35 @@
             app:layout_constraintBottom_toTopOf="@+id/line"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <ImageView
+            android:id="@+id/designOverlay"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_overlay"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@android:color/transparent"
+            android:ellipsize="none"
+            android:fontFamily="@font/pjs_regular"
+            android:textSize="11sp"
+            app:autoSizeMaxTextSize="11sp"
+            app:autoSizeMinTextSize="6sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
         <TextView
             android:id="@+id/tvProductCartName"
             android:layout_width="180dp"
@@ -97,7 +126,7 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_marginTop="5dp"
-            android:src="@color/colorPrimary"
+            android:src="@android:color/transparent"
             app:layout_constraintStart_toStartOf="@id/tvProductCartPrice"
             app:layout_constraintTop_toBottomOf="@id/tvProductCartPrice" />
 

@@ -1,4 +1,4 @@
-package com.afaryn.kaoslab.data
+package com.afaryn.kaoslab.data.repository
 
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.repository.AuthRepository

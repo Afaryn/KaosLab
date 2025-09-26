@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun addToCart(cartProduct: CartProduct): Flow<Resource<Unit>>
+    fun getCartProducts(): Flow<Resource<List<CartProduct>>>
+    fun deleteCartProduct(id: String): Flow<Resource<Unit>>
 }

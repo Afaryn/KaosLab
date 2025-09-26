@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    android:orientation="vertical"
+    tools:context=".presentation.ui_customer.cart.checkout.CheckOutActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/background"
+            android:elevation="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/background"
+                android:src="@drawable/ic_left_line" />
+
+            <TextView
+                android:id="@+id/title_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="@font/pjs_bold"
+                android:gravity="center"
+                android:text="Checkout"
+                android:textColor="@color/darkBlue"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/tv_address_holder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/pjs_bold"
+            android:text="Shipping Address"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+        <ImageView
+            android:id="@+id/ic_pin"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_pin"
+            app:layout_constraintStart_toStartOf="@id/tv_address_holder"
+            app:layout_constraintTop_toBottomOf="@id/tv_address_holder" />
+
+        <TextView
+            android:id="@+id/tv_address_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/pjs_medium"
+            android:maxLines="1"
+            android:text="Home | John Doe"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_sm"
+            app:layout_constraintBottom_toBottomOf="@id/ic_pin"
+            app:layout_constraintEnd_toStartOf="@id/btn_change_address"
+            app:layout_constraintStart_toEndOf="@id/ic_pin"
+            app:layout_constraintTop_toTopOf="@id/ic_pin" />
+
+        <TextView
+            android:id="@+id/tv_address_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/plusjakartasans"
+            android:maxLines="3"
+            android:text="Jl. Arief Rahman Hakim No.103-B, Surabaya, Jawa Timur"
+            android:textColor="@color/dimgray"
+            android:textSize="@dimen/text_sm"
+            app:layout_constraintEnd_toStartOf="@id/btn_change_address"
+            app:layout_constraintStart_toEndOf="@id/ic_pin"
+            app:layout_constraintTop_toBottomOf="@id/tv_address_name" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_change_address"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="20dp"
+            android:insetLeft="10dp"
+            android:insetTop="5dp"
+            android:insetRight="10dp"
+            android:insetBottom="5dp"
+            android:padding="0dp"
+            android:text="Change"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_xxs"
+            app:backgroundTint="@color/background"
+            app:layout_constraintBottom_toBottomOf="@id/tv_address_detail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_address_name"
+            app:strokeColor="@color/textLine"
+            app:strokeWidth="1dp" />
+
+        <View
+            android:id="@+id/view_divider_1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@color/textLine"
+            android:alpha="0.5"
+            app:layout_constraintTop_toBottomOf="@id/tv_address_detail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_order_summary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/pjs_bold"
+            android:text="Order Summary"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_divider_1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_left"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.4" />
+
+        <ImageView
+            android:id="@+id/imageCartProduct"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/bg_stroke"
+            android:src="@drawable/img"
+            android:scaleType="centerCrop"
+            android:layout_marginStart="20dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/guideline_left"
+            app:layout_constraintTop_toBottomOf="@id/tv_order_summary"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/designOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="60dp"
+            android:scaleType="centerInside"
+            android:layout_marginHorizontal="45dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginHorizontal="45dp"
+            android:layout_marginBottom="20dp"
+            android:background="@android:color/transparent"
+            android:ellipsize="none"
+            android:fontFamily="@font/pjs_regular"
+            android:textSize="11sp"
+            app:autoSizeMaxTextSize="11sp"
+            app:autoSizeMinTextSize="6sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_product_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/pjs_bold"
+            android:text="T-Shirt"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

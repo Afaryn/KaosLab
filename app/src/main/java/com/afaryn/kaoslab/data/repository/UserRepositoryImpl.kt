@@ -1,4 +1,4 @@
-package com.afaryn.kaoslab.data
+package com.afaryn.kaoslab.data.repository
 
 import androidx.core.net.toUri
 import com.afaryn.kaoslab.domain.model.CartProduct
@@ -51,6 +51,55 @@ class UserRepositoryImpl @Inject constructor(
                         designType = designType?.copy(overlay = url)
                     )
                 )).await()
+
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "Terjadi kesalahan"))
+        }
+
+        awaitClose { }
+    }
+
+    override fun getCartProducts(): Flow<Resource<List<CartProduct>>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        val listener = firestore.collection(COLL_USER).document(uid).collection(COLL_CART)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                    close()
+                    return@addSnapshotListener
+                }
+
+                value?.toObjects(CartProduct::class.java)?.let {
+                    trySend(Resource.Success(it))
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    override fun deleteCartProduct(id: String): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.currentUser?.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            firestore.collection(COLL_USER)
+                .document(uid)
+                .collection(COLL_CART)
+                .document(id)
+                .delete().await()
 
             trySend(Resource.Success(Unit))
         } catch (e: Exception) {

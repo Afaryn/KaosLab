@@ -23,4 +23,13 @@
     <dimen name="text_size_large">20sp</dimen>
     <dimen name="text_size_medium">18sp</dimen>
     <dimen name="text_size_regular">16sp</dimen>
+
+    <dimen name="text_xxs">10sp</dimen>
+    <dimen name="text_xs">11sp</dimen>
+    <dimen name="text_sm">13sp</dimen>
+    <dimen name="text_md">15sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_xxl">22sp</dimen>
+    <dimen name="text_3xl">24sp</dimen>
 </resources>

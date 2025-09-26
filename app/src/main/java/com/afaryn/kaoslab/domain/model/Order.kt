@@ -3,6 +3,7 @@ package com.afaryn.kaoslab.domain.model
 import android.os.Parcelable
 import com.google.firebase.Timestamp
 import kotlinx.parcelize.Parcelize
+import java.util.Date
 import java.util.UUID
 
 @Parcelize
@@ -10,13 +11,13 @@ data class Order(
     val orderId: String = UUID.randomUUID().toString().replace("-", "").substring(0, 20),
     val customerId: String = "",
     val designId: String = "",
-    val status: String = "",
+    val status: String = "pending",
     val totalAmount: Double = 0.0,
     val totalPieces: Int = 0,
     val cartProducts: List<CartProduct> = emptyList(),
     val courierId: String? = null,
     val noResi: String? = null,
-    val createdAt: Timestamp? = null,
+    val createdAt: Timestamp? = Timestamp(Date()),
     // Transient fields - fetched dynamically in UI
     @Transient val customerName: String = "",
     @Transient val customerAvatarUrl: String = "",

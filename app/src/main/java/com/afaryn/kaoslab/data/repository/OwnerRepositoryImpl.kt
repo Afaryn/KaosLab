@@ -1,4 +1,4 @@
-package com.afaryn.kaoslab.data
+package com.afaryn.kaoslab.data.repository
 
 import com.afaryn.kaoslab.domain.model.ProductTemplate
 import com.afaryn.kaoslab.domain.model.SizeOption
@@ -245,8 +245,8 @@ class OwnerRepositoryImpl @Inject constructor(
             val startDate = calendar.time
 
             val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
-                .whereGreaterThanOrEqualTo("createdAt", com.google.firebase.Timestamp(startDate))
-                .whereLessThanOrEqualTo("createdAt", com.google.firebase.Timestamp(endDate))
+                .whereGreaterThanOrEqualTo("createdAt", Timestamp(startDate))
+                .whereLessThanOrEqualTo("createdAt", Timestamp(endDate))
                 .get()
                 .await()
 
@@ -771,7 +771,7 @@ class OwnerRepositoryImpl @Inject constructor(
 
                         val customerId = data["customerId"] as? String ?: ""
                         val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
-                        val createdAt = data["createdAt"] as? com.google.firebase.Timestamp
+                        val createdAt = data["createdAt"] as? Timestamp
 
                         // Get customer name
                         firestore.collection(COLLECTION_USERS)

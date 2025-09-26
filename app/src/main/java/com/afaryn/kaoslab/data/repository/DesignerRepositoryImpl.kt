@@ -1,6 +1,7 @@
-package com.afaryn.kaoslab.data
+package com.afaryn.kaoslab.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.domain.model.Portfolio
@@ -9,6 +10,7 @@ import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -30,13 +32,13 @@ class DesignerRepositoryImpl @Inject constructor(
             val snapshot = try {
                 firestore.collection("designs")
                     .whereEqualTo("designerId", currentUserId)
-                    .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get()
                     .await()
             } catch (indexException: Exception) {
                 if (indexException.message?.contains("index") == true) {
                     // If index doesn't exist yet, fall back to simple query without ordering
-                    android.util.Log.w("DesignerRepository", "Index not found, using simple query")
+                    Log.w("DesignerRepository", "Index not found, using simple query")
                     firestore.collection("designs")
                         .whereEqualTo("designerId", currentUserId)
                         .get()
@@ -58,7 +60,7 @@ class DesignerRepositoryImpl @Inject constructor(
             emit(Response.Success(designs))
         } catch (e: Exception) {
             // Log the error for debugging
-            android.util.Log.e("DesignerRepository", "Error getting designs", e)
+            Log.e("DesignerRepository", "Error getting designs", e)
 
             // Check if it's a collection not found error or other Firestore errors
             when {
@@ -74,7 +76,7 @@ class DesignerRepositoryImpl @Inject constructor(
                 }
                 e.message?.contains("index") == true -> {
                     // Firestore index not created yet, but still try to return empty for now
-                    android.util.Log.w("DesignerRepository", "Firestore index not ready, returning empty list")
+                    Log.w("DesignerRepository", "Firestore index not ready, returning empty list")
                     emit(Response.Success(emptyList()))
                 }
                 else -> {
@@ -178,12 +180,12 @@ class DesignerRepositoryImpl @Inject constructor(
             val snapshot = try {
                 firestore.collection("designerPortfolios")
                     .whereEqualTo("designerId", currentUserId)
-                    .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get()
                     .await()
             } catch (indexException: Exception) {
                 if (indexException.message?.contains("index") == true) {
-                    android.util.Log.w("DesignerRepository", "Index not found for portfolios, using simple query")
+                    Log.w("DesignerRepository", "Index not found for portfolios, using simple query")
                     firestore.collection("designerPortfolios")
                         .whereEqualTo("designerId", currentUserId)
                         .get()
@@ -202,7 +204,7 @@ class DesignerRepositoryImpl @Inject constructor(
 
             emit(Response.Success(portfolios))
         } catch (e: Exception) {
-            android.util.Log.e("DesignerRepository", "Error getting portfolios", e)
+            Log.e("DesignerRepository", "Error getting portfolios", e)
 
             when {
                 e.message?.contains("not found") == true -> {
@@ -215,7 +217,7 @@ class DesignerRepositoryImpl @Inject constructor(
                     emit(Response.Error("Network error. Please check your internet connection."))
                 }
                 e.message?.contains("index") == true -> {
-                    android.util.Log.w("DesignerRepository", "Firestore index not ready for portfolios, returning empty list")
+                    Log.w("DesignerRepository", "Firestore index not ready for portfolios, returning empty list")
                     emit(Response.Success(emptyList()))
                 }
                 else -> {
@@ -387,7 +389,7 @@ class DesignerRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             // Log error but don't fail the operation
-            android.util.Log.w("DesignerRepository", "Failed to delete image from storage: ${e.message}")
+            Log.w("DesignerRepository", "Failed to delete image from storage: ${e.message}")
         }
     }
 

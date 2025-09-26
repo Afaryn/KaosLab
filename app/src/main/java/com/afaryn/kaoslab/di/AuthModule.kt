@@ -1,7 +1,7 @@
 package com.afaryn.kaoslab.di
 
 import com.afaryn.kaoslab.domain.repository.AuthRepository
-import com.afaryn.kaoslab.data.AuthRepositoryImpl
+import com.afaryn.kaoslab.data.repository.AuthRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
