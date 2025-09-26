@@ -3,8 +3,8 @@
 package com.afaryn.kaoslab.utils
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
@@ -12,10 +12,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.afaryn.kaoslab.R
-import com.afaryn.kaoslab.ui_customer.MainActivity
+import com.afaryn.kaoslab.presentation.ui_customer.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -69,7 +70,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun saveNotification(title: String, body: String) {
-        val sharedPreferences = getSharedPreferences("notifications", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("notifications", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         val timestampMillis = System.currentTimeMillis()

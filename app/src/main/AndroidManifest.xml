@@ -28,13 +28,13 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
         <activity
-            android:name=".ui_customer.desain.DetailDesainActivity"
+            android:name=".presentation.ui_customer.desain.DetailDesainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui_customer.custome.OrderSummaryActivity"
+            android:name=".presentation.ui_customer.custome.OrderSummaryActivity"
             android:exported="false" />
         <activity
-            android:name=".splash_screen.SplashScreenActivity"
+            android:name=".presentation.splash_screen.SplashScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,19 +43,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui_owner.OwnerActivity"
+            android:name=".presentation.ui_owner.OwnerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui_designer.DesignerActivity"
+            android:name=".presentation.ui_designer.DesignerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui_customer.custome.CustomeActivity"
+            android:name=".presentation.ui_customer.custome.CustomeActivity"
             android:exported="false" />
         <activity
-            android:name=".authentication.VerificationActivity"
+            android:name=".presentation.authentication.VerificationActivity"
             android:exported="false" />
         <activity
-            android:name=".authentication.LoginActivity"
+            android:name=".presentation.authentication.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -64,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".authentication.RegistrationActivity"
+            android:name=".presentation.authentication.RegistrationActivity"
             android:exported="false" />
 
         <provider
@@ -82,7 +82,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".ui_customer.MainActivity"
+            android:name=".presentation.ui_customer.MainActivity"
             android:exported="false" />
     </application>
 

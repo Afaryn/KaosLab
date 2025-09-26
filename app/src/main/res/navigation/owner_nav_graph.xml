@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeOwnerFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.home.HomeOwnerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.home.HomeOwnerFragment"
         android:label="fragment_home_owner"
         tools:layout="@layout/fragment_home_owner">
         <action
@@ -26,13 +26,13 @@
 
     <fragment
         android:id="@+id/businessReportFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.report.BusinessReportFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.report.BusinessReportFragment"
         android:label="fragment_business_report"
         tools:layout="@layout/fragment_business_report" />
 
     <fragment
         android:id="@+id/mySalesFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.sales.my_sales.MySalesFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.my_sales.MySalesFragment"
         android:label="fragment_my_sales"
         tools:layout="@layout/fragment_my_sales">
         <action
@@ -45,7 +45,7 @@
 
     <fragment
         android:id="@+id/myShopOwnerFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.my_shop.MyShopOwnerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.MyShopOwnerFragment"
         android:label="fragment_my_shop_owner"
         tools:layout="@layout/fragment_my_shop_owner" >
         <action
@@ -61,7 +61,7 @@
 
     <fragment
         android:id="@+id/productTemplateFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.my_shop.product_template.ProductTemplateFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.product_template.ProductTemplateFragment"
         android:label="fragment_product_template"
         tools:layout="@layout/fragment_product_template" >
         <action
@@ -71,7 +71,7 @@
 
     <fragment
         android:id="@+id/addTemplateCategoryFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.my_shop.add_template.AddTemplateCategoryFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.add_template.AddTemplateCategoryFragment"
         android:label="Upload Template"
         tools:layout="@layout/fragment_add_template_category" >
         <action
@@ -81,7 +81,7 @@
 
     <fragment
         android:id="@+id/addTemplateDetailsFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.my_shop.add_template.AddTemplateDetailsFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.add_template.AddTemplateDetailsFragment"
         android:label="Upload Template"
         tools:layout="@layout/fragment_add_template_details" >
         <argument
@@ -91,32 +91,32 @@
 
     <fragment
         android:id="@+id/chatOwnerFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.chat.ChatOwnerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.chat.ChatOwnerFragment"
         android:label="fragment_chat_owner"
         tools:layout="@layout/fragment_chat_owner" />
 
     <fragment
         android:id="@+id/salesRevenueOwnerFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.sales.SalesRevenueOwnerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.SalesRevenueOwnerFragment"
         android:label="fragment_sales_revenue_owner"
         tools:layout="@layout/fragment_sales_revenue_owner" />
 
     <fragment
         android:id="@+id/ekspedisiFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.my_shop.ekspedisi.EkspedisiFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.ekspedisi.EkspedisiFragment"
         android:label="fragment_ekspedisi"
         tools:layout="@layout/fragment_ekspedisi" />
 
     <fragment
         android:id="@+id/listCustomersFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.customers.ListCustomersFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.customers.ListCustomersFragment"
         android:label="List Customers"
         tools:layout="@layout/fragment_list_customers" />
 
     <!-- Arrange Shipment Flow -->
     <fragment
         android:id="@+id/chooseCourierFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.sales.arrange_shipment.ChooseCourierFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.arrange_shipment.ChooseCourierFragment"
         android:label="fragment_choose_courier"
         tools:layout="@layout/fragment_choose_courier">
         <argument
@@ -129,7 +129,7 @@
 
     <fragment
         android:id="@+id/trackingNumberFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.sales.arrange_shipment.TrackingNumberFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.arrange_shipment.TrackingNumberFragment"
         android:label="fragment_tracking_number"
         tools:layout="@layout/fragment_tracking_number">
         <argument
@@ -145,7 +145,7 @@
 
     <fragment
         android:id="@+id/orderDetailsFragment"
-        android:name="com.afaryn.kaoslab.ui_owner.sales.order_details.OrderDetailsFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.order_details.OrderDetailsFragment"
         android:label="fragment_order_details"
         tools:layout="@layout/fragment_order_details">
         <argument

@@ -1,6 +1,6 @@
 package com.afaryn.kaoslab.di
 
-import com.afaryn.kaoslab.data.DesignerRepository
+import com.afaryn.kaoslab.domain.repository.DesignerRepository
 import com.afaryn.kaoslab.data.DesignerRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

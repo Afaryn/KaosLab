@@ -1,9 +1,10 @@
 package com.afaryn.kaoslab.data
 
 import android.net.Uri
-import com.afaryn.kaoslab.model.User
-import com.afaryn.kaoslab.model.Design
-import com.afaryn.kaoslab.model.Portfolio
+import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.model.Design
+import com.afaryn.kaoslab.domain.model.Portfolio
+import com.afaryn.kaoslab.domain.repository.DesignerRepository
 import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

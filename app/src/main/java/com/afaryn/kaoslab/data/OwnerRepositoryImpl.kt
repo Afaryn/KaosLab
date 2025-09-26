@@ -1,24 +1,26 @@
 package com.afaryn.kaoslab.data
 
-import com.afaryn.kaoslab.model.ProductTemplate
-import com.afaryn.kaoslab.model.SizeOption
-import com.afaryn.kaoslab.model.Order
-import com.afaryn.kaoslab.model.BusinessInsights
-import com.afaryn.kaoslab.model.ChartData
-import com.afaryn.kaoslab.model.OrderStatusCounts
-import com.afaryn.kaoslab.model.CustomDesign
-import com.afaryn.kaoslab.model.Kurir
-import com.afaryn.kaoslab.model.TransactionFilter
-import com.afaryn.kaoslab.model.User
+import com.afaryn.kaoslab.domain.model.ProductTemplate
+import com.afaryn.kaoslab.domain.model.SizeOption
+import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.domain.model.BusinessInsights
+import com.afaryn.kaoslab.domain.model.ChartData
+import com.afaryn.kaoslab.domain.model.OrderStatusCounts
+import com.afaryn.kaoslab.domain.model.Kurir
+import com.afaryn.kaoslab.domain.model.Transaction
+import com.afaryn.kaoslab.domain.model.TransactionFilter
+import com.afaryn.kaoslab.domain.model.TransactionType
+import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.repository.OwnerRepository
 import com.afaryn.kaoslab.utils.Constants.DELIVERED_STATUS
 import com.afaryn.kaoslab.utils.Constants.PENDING_STATUS
 import com.afaryn.kaoslab.utils.Constants.PROCESSING_STATUS
 import com.afaryn.kaoslab.utils.Constants.SHIPPED_STATUS
 import com.afaryn.kaoslab.utils.Response
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -94,7 +96,7 @@ class OwnerRepositoryImpl @Inject constructor(
                         type = data["type"] as? String ?: "",
                         sizes = sizes,
                         colors = colors,
-                        createdAt = data["createdAt"] as? com.google.firebase.Timestamp
+                        createdAt = data["createdAt"] as? Timestamp
                     )
                 } catch (e: Exception) {
                     null
@@ -187,7 +189,7 @@ class OwnerRepositoryImpl @Inject constructor(
                         designId = data["designId"] as? String ?: "",
                         status = data["status"] as? String ?: "",
                         totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
-                        createdAt = data["createdAt"] as? com.google.firebase.Timestamp
+                        createdAt = data["createdAt"] as? Timestamp
                     )
                 } catch (e: Exception) {
                     null
@@ -427,10 +429,9 @@ class OwnerRepositoryImpl @Inject constructor(
                     status = data["status"] as? String ?: "",
                     totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
                     totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                    size = data["size"] as? String ?: "M",
                     courierId = courierId,
                     noResi = data["noResi"] as? String,
-                    createdAt = data["createdAt"] as? com.google.firebase.Timestamp,
+                    createdAt = data["createdAt"] as? Timestamp,
                     // Dynamic fields populated from fetched data
                     customerName = customerName,
                     customerAvatarUrl = customerAvatarUrl,
@@ -556,10 +557,9 @@ class OwnerRepositoryImpl @Inject constructor(
                     status = data["status"] as? String ?: "",
                     totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
                     totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                    size = data["size"] as? String ?: "M",
                     courierId = courierId,
                     noResi = data["noResi"] as? String,
-                    createdAt = data["createdAt"] as? com.google.firebase.Timestamp,
+                    createdAt = data["createdAt"] as? Timestamp,
                     // Dynamic fields populated from fetched data
                     customerName = customerName,
                     customerAvatarUrl = customerAvatarUrl,
@@ -700,10 +700,9 @@ class OwnerRepositoryImpl @Inject constructor(
                 status = data["status"] as? String ?: "",
                 totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
                 totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                size = data["size"] as? String ?: "M",
                 courierId = courierId,
                 noResi = data["noResi"] as? String,
-                createdAt = data["createdAt"] as? com.google.firebase.Timestamp,
+                createdAt = data["createdAt"] as? Timestamp,
                 customerName = customerName,
                 customerAvatarUrl = customerAvatarUrl,
                 courierInfo = courierInfo,
@@ -742,7 +741,7 @@ class OwnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getTransactionHistory(filter: TransactionFilter?): Flow<Response<List<com.afaryn.kaoslab.model.Transaction>>> = callbackFlow {
+    override fun getTransactionHistory(filter: TransactionFilter?): Flow<Response<List<Transaction>>> = callbackFlow {
         trySend(Response.Loading)
         try {
             // Get completed orders to create payment transactions
@@ -751,7 +750,7 @@ class OwnerRepositoryImpl @Inject constructor(
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener { ordersSnapshot ->
-                    val transactions = mutableListOf<com.afaryn.kaoslab.model.Transaction>()
+                    val transactions = mutableListOf<Transaction>()
 
                     // Create payment transactions from orders
                     var processedCount = 0
@@ -784,9 +783,9 @@ class OwnerRepositoryImpl @Inject constructor(
                                     ?: userData?.get("name") as? String
                                     ?: "Unknown Customer"
 
-                                val transaction = com.afaryn.kaoslab.model.Transaction(
+                                val transaction = Transaction(
                                     id = document.id,
-                                    type = com.afaryn.kaoslab.model.TransactionType.PAYMENT,
+                                    type = TransactionType.PAYMENT,
                                     amount = totalAmount,
                                     customerName = customerName,
                                     customerId = customerId,
@@ -801,15 +800,15 @@ class OwnerRepositoryImpl @Inject constructor(
                                 if (processedCount == totalDocuments) {
                                     // Add mock withdrawal transactions for demo
                                     transactions.add(
-                                        com.afaryn.kaoslab.model.Transaction(
+                                        Transaction(
                                             id = "withdrawal_1",
-                                            type = com.afaryn.kaoslab.model.TransactionType.WITHDRAWAL,
+                                            type = TransactionType.WITHDRAWAL,
                                             amount = 200000.0,
                                             customerName = "",
                                             customerId = "",
                                             orderId = null,
                                             description = "Withdrawal",
-                                            createdAt = com.google.firebase.Timestamp.now()
+                                            createdAt = Timestamp.now()
                                         )
                                     )
 
@@ -821,9 +820,9 @@ class OwnerRepositoryImpl @Inject constructor(
                             }
                             .addOnFailureListener {
                                 // Use default name if user fetch fails
-                                val transaction = com.afaryn.kaoslab.model.Transaction(
+                                val transaction = Transaction(
                                     id = document.id,
-                                    type = com.afaryn.kaoslab.model.TransactionType.PAYMENT,
+                                    type = TransactionType.PAYMENT,
                                     amount = totalAmount,
                                     customerName = "Unknown Customer",
                                     customerId = customerId,
@@ -838,15 +837,15 @@ class OwnerRepositoryImpl @Inject constructor(
                                 if (processedCount == totalDocuments) {
                                     // Add mock withdrawal transactions for demo
                                     transactions.add(
-                                        com.afaryn.kaoslab.model.Transaction(
+                                        Transaction(
                                             id = "withdrawal_1",
-                                            type = com.afaryn.kaoslab.model.TransactionType.WITHDRAWAL,
+                                            type = TransactionType.WITHDRAWAL,
                                             amount = 200000.0,
                                             customerName = "",
                                             customerId = "",
                                             orderId = null,
                                             description = "Withdrawal",
-                                            createdAt = com.google.firebase.Timestamp.now()
+                                            createdAt = Timestamp.now()
                                         )
                                     )
 
@@ -870,9 +869,9 @@ class OwnerRepositoryImpl @Inject constructor(
     }
 
     private fun applyTransactionFilters(
-        transactions: List<com.afaryn.kaoslab.model.Transaction>,
+        transactions: List<Transaction>,
         filter: TransactionFilter?
-    ): List<com.afaryn.kaoslab.model.Transaction> {
+    ): List<Transaction> {
         var filteredTransactions = transactions
 
         filter?.let { f ->
@@ -943,7 +942,7 @@ class OwnerRepositoryImpl @Inject constructor(
                         profilePicture = data["profilePicture"] as? String ?: "",
                         role = data["role"] as? String ?: "customer",
                         phone = data["phone"] as? String ?: "",
-                        createdAt = data["createdAt"] as? com.google.firebase.Timestamp ?: com.google.firebase.Timestamp.now()
+                        createdAt = data["createdAt"] as? Timestamp ?: Timestamp.now()
                     )
                 } catch (e: Exception) {
                     null

@@ -6,6 +6,8 @@ object Constants {
 
     const val PRODUCT_COLLECTION = "product"
     const val CUSTOM_PRODUCT_COLLECTION = "customproduct"
+    const val COLL_CART = "cart"
+    const val COLL_USER = "users"
 
 
     val PERMISSIONS = arrayOf(

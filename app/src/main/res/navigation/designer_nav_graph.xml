@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/homeDesignerFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.home.HomeDesignerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.home.HomeDesignerFragment"
         android:label="fragment_home_designer"
         tools:layout="@layout/fragment_home_designer" />
 
     <fragment
         android:id="@+id/accountDesignerFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.account.AccountDesignerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.account.AccountDesignerFragment"
         android:label="fragment_account_designer"
         tools:layout="@layout/fragment_account_designer">
 
@@ -28,14 +28,14 @@
 
     <fragment
         android:id="@+id/feedDesignerFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.feed.FeedDesignerFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.feed.FeedDesignerFragment"
         android:label="fragment_feed_designer"
         tools:layout="@layout/fragment_feed_designer" />
 
     <!-- Seller Centre Navigation -->
     <fragment
         android:id="@+id/sellerCentreFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.seller_centre.SellerCentreFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.seller_centre.SellerCentreFragment"
         android:label="fragment_seller_centre"
         tools:layout="@layout/fragment_seller_centre">
 
@@ -51,7 +51,7 @@
     <!-- Design Management Navigation -->
     <fragment
         android:id="@+id/designListFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_design.DesignListFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.DesignListFragment"
         android:label="fragment_design_list"
         tools:layout="@layout/fragment_design_list">
 
@@ -70,13 +70,13 @@
 
     <fragment
         android:id="@+id/addDesignFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_design.AddDesignFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.AddDesignFragment"
         android:label="fragment_add_design"
         tools:layout="@layout/fragment_add_design" />
 
     <fragment
         android:id="@+id/detailEditDesignFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_design.DetailEditDesignFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.DetailEditDesignFragment"
         android:label="fragment_detail_edit_design"
         tools:layout="@layout/fragment_detail_edit_design">
 
@@ -88,7 +88,7 @@
     <!-- Portfolio Management Navigation -->
     <fragment
         android:id="@+id/portfolioListFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_portofolio.PortfolioListFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.PortfolioListFragment"
         android:label="fragment_portfolio_list"
         tools:layout="@layout/fragment_portfolio_list">
 
@@ -107,13 +107,13 @@
 
     <fragment
         android:id="@+id/addPortfolioFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_portofolio.AddPortfolioFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.AddPortfolioFragment"
         android:label="fragment_add_portfolio"
         tools:layout="@layout/fragment_add_portfolio" />
 
     <fragment
         android:id="@+id/editPortfolioFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.manage_portofolio.EditPortfolioFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.EditPortfolioFragment"
         android:label="fragment_edit_portfolio"
         tools:layout="@layout/fragment_edit_portfolio">
 
@@ -125,7 +125,7 @@
     <!-- Profile Management Navigation -->
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.afaryn.kaoslab.ui_designer.edit_profile.EditProfileFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.edit_profile.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
 

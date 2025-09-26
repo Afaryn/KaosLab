@@ -1,6 +1,7 @@
 package com.afaryn.kaoslab.data
 
-import com.afaryn.kaoslab.model.User
+import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.repository.AuthRepository
 import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

@@ -23,13 +23,12 @@ import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.afaryn.kaoslab.R
-import com.afaryn.kaoslab.ui_designer.DesignerActivity
-import com.afaryn.kaoslab.ui_owner.OwnerActivity
+import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
+import com.afaryn.kaoslab.presentation.ui_owner.OwnerActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -71,11 +70,11 @@ fun validatePassword(password: String, passwordConfirmation: String?): Validatio
     return Validation.Success
 }
 
-fun Fragment.toast(msg: String) {
+fun Fragment.toast(msg: String?) {
     Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 }
 
-fun Activity.toast(msg: String) {
+fun Activity.toast(msg: String?) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
@@ -429,4 +428,10 @@ inline fun <reified T : Parcelable> Intent?.getParcelable(key: String): T? {
         @Suppress("DEPRECATION")
         (this?.getParcelableExtra(key))
     }
+}
+
+fun Int.formatRupiah(): String {
+    val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+    formatter.maximumFractionDigits = 0
+    return formatter.format(toDouble())
 }
