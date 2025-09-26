@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.presentation.ui_customer.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentHomeBinding
 import com.afaryn.kaoslab.domain.model.Product
+import com.afaryn.kaoslab.presentation.ui_customer.cart.CartActivity
 import com.afaryn.kaoslab.presentation.ui_customer.home.adapter.BannerAdapter
 import com.afaryn.kaoslab.presentation.ui_customer.home.adapter.ProductAdapter
 import com.afaryn.kaoslab.presentation.ui_customer.home.viewModel.HomeViewModel
@@ -81,8 +83,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun action() {
-        // Tambahkan action listener jika diperlukan
+    private fun action() = with(binding) {
+        btnCart.setOnClickListener {
+            startActivity(Intent(requireContext(), CartActivity::class.java))
+        }
     }
 
     private fun setRvRekom(items: List<Product>) {
