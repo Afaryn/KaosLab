@@ -108,8 +108,8 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_delete"
             style="@style/Widget.Material3.MaterialTimePicker.ImageButton"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_marginTop="3dp"
             app:icon="@drawable/ic_delete"
             app:iconSize="12dp"
