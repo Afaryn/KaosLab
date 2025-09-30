@@ -435,3 +435,5 @@ fun Int.formatRupiah(): String {
     formatter.maximumFractionDigits = 0
     return formatter.format(toDouble())
 }
+
+fun Int?.orZero(): Int = this ?: 0

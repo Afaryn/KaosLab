@@ -28,6 +28,12 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.ui_customer.address.create.CreateAddressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.ui_customer.address.AddressActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.ui_customer.cart.checkout.CheckOutActivity"
             android:exported="false" />
         <activity

@@ -77,7 +77,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/pjs_medium"
             android:maxLines="1"
-            android:text="Home | John Doe"
+            android:text="Pick an Address"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_sm"
             app:layout_constraintBottom_toBottomOf="@id/ic_pin"
@@ -95,7 +95,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/plusjakartasans"
             android:maxLines="3"
-            android:text="Jl. Arief Rahman Hakim No.103-B, Surabaya, Jawa Timur"
+            android:text="-"
             android:textColor="@color/dimgray"
             android:textSize="@dimen/text_sm"
             app:layout_constraintEnd_toStartOf="@id/btn_change_address"
@@ -151,7 +151,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_products"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="170dp"
             app:layout_constraintTop_toBottomOf="@id/tv_order_summary"
             tools:listitem="@layout/item_cart_co" />
 
@@ -164,8 +164,8 @@
             android:fontFamily="@font/pjs_regular"
             android:text="Total"
             android:textSize="@dimen/text_sm"
-            app:layout_constraintBottom_toTopOf="@id/tv_delivery_fee_holder"
-            app:layout_constraintStart_toStartOf="@id/tv_delivery_fee_holder"
+            app:layout_constraintBottom_toTopOf="@id/tv_service_fee_holder"
+            app:layout_constraintStart_toStartOf="@id/tv_service_fee_holder"
             app:layout_constraintTop_toBottomOf="@id/rv_products"
             app:layout_constraintVertical_bias="1" />
 
@@ -179,32 +179,32 @@
             android:fontFamily="@font/pjs_regular"
             android:text="Rp. 0,-"
             android:textSize="@dimen/text_sm"
-            app:layout_constraintBottom_toTopOf="@id/tv_delivery_fee"
+            app:layout_constraintBottom_toTopOf="@id/tv_service_fee"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rv_products"
             app:layout_constraintVertical_bias="1" />
 
         <TextView
-            android:id="@+id/tv_delivery_fee_holder"
+            android:id="@+id/tv_service_fee_holder"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="10dp"
             android:fontFamily="@font/pjs_regular"
-            android:text="Delivery Fee"
+            android:text="Service Fee"
             android:textSize="@dimen/text_sm"
             app:layout_constraintBottom_toTopOf="@id/tv_sub_total_holder"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/tv_delivery_fee"
+            android:id="@+id/tv_service_fee"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/pjs_regular"
-            android:text="Rp. 0,-"
+            android:text="Rp. 7.000.00,-"
             android:textSize="@dimen/text_sm"
             app:layout_constraintEnd_toEndOf="@id/tv_total"
-            app:layout_constraintTop_toTopOf="@id/tv_delivery_fee_holder" />
+            app:layout_constraintTop_toTopOf="@id/tv_service_fee_holder" />
 
         <TextView
             android:id="@+id/tv_sub_total_holder"
@@ -216,7 +216,7 @@
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_md"
             app:layout_constraintBottom_toTopOf="@id/view_divider_2"
-            app:layout_constraintStart_toStartOf="@id/tv_delivery_fee_holder" />
+            app:layout_constraintStart_toStartOf="@id/tv_service_fee_holder" />
 
         <TextView
             android:id="@+id/tv_sub_total"
@@ -227,7 +227,7 @@
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_md"
             app:layout_constraintBottom_toBottomOf="@id/tv_sub_total_holder"
-            app:layout_constraintEnd_toEndOf="@id/tv_delivery_fee" />
+            app:layout_constraintEnd_toEndOf="@id/tv_service_fee" />
 
         <View
             android:id="@+id/view_divider_2"
