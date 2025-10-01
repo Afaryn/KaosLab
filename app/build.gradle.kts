@@ -22,12 +22,38 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+
+            buildConfigField(
+                "String",
+                "MIDTRANS_BASE_URL",
+                "\"https://ngtlqybmpszxnjnpcvgy.supabase.co/functions/v1/\""
+            )
+            buildConfigField("String", "CLIENT_KEY", "\"SB-Mid-client-8f2UJwxCvEBJuwBg\"")
+            buildConfigField(
+                "String",
+                "SUPABASE_API_KEY",
+                "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ndGxxeWJtcHN6eG5qbnBjdmd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTA5NjMsImV4cCI6MjA3NDg2Njk2M30.iB8E18Nb-6_zlyQgd9B6OIAuiTVIZXcV0JmU4q4j7Dc\""
+            )
+        }
+        debug {
+            buildConfigField(
+                "String",
+                "MIDTRANS_BASE_URL",
+                "\"https://ngtlqybmpszxnjnpcvgy.supabase.co/functions/v1/\""
+            )
+            buildConfigField("String", "CLIENT_KEY", "\"SB-Mid-client-8f2UJwxCvEBJuwBg\"")
+            buildConfigField(
+                "String",
+                "SUPABASE_API_KEY",
+                "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ndGxxeWJtcHN6eG5qbnBjdmd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTA5NjMsImV4cCI6MjA3NDg2Njk2M30.iB8E18Nb-6_zlyQgd9B6OIAuiTVIZXcV0JmU4q4j7Dc\""
             )
         }
     }
@@ -38,8 +64,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
-        viewBinding= true
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
     }
 
 }
@@ -58,20 +85,19 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.dotsindicator)
-    implementation (libs.androidx.viewpager2)
-    implementation (libs.androidx.fragment.ktx)
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.androidx.fragment.ktx)
 
     //Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.firestore)
-    implementation (libs.firebase.core)
+    implementation(libs.firebase.core)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.auth.ktx)
-    implementation (libs.firebaseui.firebase.ui.auth)
+    implementation(libs.firebaseui.firebase.ui.auth)
     implementation(libs.play.services.auth)
     implementation(libs.firebase.messaging)
-
 
 
     // Circle Image View
@@ -112,20 +138,23 @@ dependencies {
     implementation("com.prolificinteractive:material-calendarview:1.4.3")
 
     //imageCrop
-    implementation ("com.github.yalantis:ucrop:2.2.9-native")
+    implementation("com.github.yalantis:ucrop:2.2.9-native")
 
     //Chart
 //    implementation ("com.github.AAChartModel:AAChartCore-Kotlin:+")
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     //flexbox
-    implementation ("com.google.android.flexbox:flexbox:3.0.0")
-    implementation ("androidx.gridlayout:gridlayout:1.0.0")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
 
     // ViewPager2
-    implementation ("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 
-    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // MidTrans
+    implementation("com.midtrans:uikit:2.4.0-SANDBOX")
 }
 kapt {
     correctErrorTypes = true

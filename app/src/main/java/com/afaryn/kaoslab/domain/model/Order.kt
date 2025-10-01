@@ -18,7 +18,6 @@ data class Order(
     val courierId: String? = null,
     val noResi: String? = null,
     val createdAt: Timestamp? = Timestamp(Date()),
-    // Transient fields - fetched dynamically in UI
     @Transient val customerName: String = "",
     @Transient val customerAvatarUrl: String = "",
     @Transient val courierInfo: String? = null,
