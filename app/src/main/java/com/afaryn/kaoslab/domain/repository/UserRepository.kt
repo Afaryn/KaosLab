@@ -2,6 +2,8 @@ package com.afaryn.kaoslab.domain.repository
 
 import com.afaryn.kaoslab.domain.model.Address
 import com.afaryn.kaoslab.domain.model.CartProduct
+import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.domain.model.SnapResponse
 import com.afaryn.kaoslab.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +18,8 @@ interface UserRepository {
     fun getAddress(): Flow<Resource<List<Address>>>
     fun createAddress(address: Address): Flow<Resource<Unit>>
     fun deleteAddress(id: String): Flow<Resource<Unit>>
+
+    // Payment
+    suspend fun getSnapToken(order: Order): Flow<Resource<SnapResponse>>
+    fun clearCart(order: Order): Flow<Resource<Unit>>
 }

@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class SnapRequest(
     val orderId: String,
     val amount: Long,
-    val name: String,
-    val email: String
+    val name: String = "",
+    val email: String = ""
 )
 
 data class SnapResponse(

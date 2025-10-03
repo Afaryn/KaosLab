@@ -1,9 +1,14 @@
 package com.afaryn.kaoslab.data.repository
 
 import androidx.core.net.toUri
+import com.afaryn.kaoslab.data.remote.MidtransApi
 import com.afaryn.kaoslab.domain.model.Address
 import com.afaryn.kaoslab.domain.model.CartProduct
 import com.afaryn.kaoslab.domain.model.DesignUplType
+import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.domain.model.SnapRequest
+import com.afaryn.kaoslab.domain.model.SnapResponse
+import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.repository.UserRepository
 import com.afaryn.kaoslab.utils.Constants.COLL_ADDRESS
 import com.afaryn.kaoslab.utils.Constants.COLL_CART
@@ -25,7 +30,8 @@ import javax.inject.Singleton
 class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val midtransApi: MidtransApi
 ) : UserRepository {
 
     override fun addToCart(cartProduct: CartProduct): Flow<Resource<Unit>> = callbackFlow {
@@ -209,6 +215,68 @@ class UserRepositoryImpl @Inject constructor(
             trySend(Resource.Success(Unit))
         } catch (e: Exception) {
             trySend(Resource.Error(e.message ?: "Terjadi kesalahan"))
+        }
+
+        awaitClose { }
+    }
+
+    override suspend fun getSnapToken(order: Order): Flow<Resource<SnapResponse>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val user = firestore.collection(COLL_USER)
+                .document(uid).get().await().toObject(User::class.java)
+                ?: throw Exception("Gagal mendapatkan data user")
+
+            val request = SnapRequest(
+                orderId = order.orderId,
+                amount = (order.totalAmount + 7000).toLong(),
+                name = user.name.orEmpty(),
+                email = user.email ?: throw Exception("Failed getting user's email")
+            )
+
+            val response = midtransApi.createSnap(request)
+
+            trySend(Resource.Success(response))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
+
+    override fun clearCart(order: Order): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val cartIds = order.cartProducts.map { it.id }
+            val batch = firestore.batch()
+
+            val cartCollection = firestore.collection(COLL_USER)
+                .document(uid)
+                .collection(COLL_CART)
+
+            cartIds.forEach { cartId ->
+                val docRef = cartCollection.document(cartId)
+                batch.delete(docRef)
+            }
+
+            batch.commit().await()
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
         }
 
         awaitClose { }

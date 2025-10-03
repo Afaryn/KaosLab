@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.di
 
+import com.afaryn.kaoslab.data.remote.MidtransApi
 import com.afaryn.kaoslab.domain.repository.UserRepository
 import com.afaryn.kaoslab.data.repository.UserRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
@@ -20,8 +21,9 @@ object UserModule {
     fun provideUserRepository(
         auth: FirebaseAuth,
         firestore: FirebaseFirestore,
-        storage: FirebaseStorage
+        storage: FirebaseStorage,
+        midtransApi: MidtransApi
     ): UserRepository {
-        return UserRepositoryImpl(auth, firestore, storage)
+        return UserRepositoryImpl(auth, firestore, storage, midtransApi)
     }
 }

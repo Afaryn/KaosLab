@@ -26,6 +26,7 @@ import com.afaryn.kaoslab.domain.model.CartProduct
 import com.afaryn.kaoslab.domain.model.CustomProduct
 import com.afaryn.kaoslab.domain.model.DesignType
 import com.afaryn.kaoslab.domain.model.DesignUplType
+import com.afaryn.kaoslab.domain.model.ItemType
 import com.afaryn.kaoslab.domain.model.OrderItem
 import com.afaryn.kaoslab.domain.model.SizeOption
 import com.afaryn.kaoslab.presentation.ui_customer.custome.OrderSummaryActivity
@@ -383,7 +384,8 @@ class StepThreeFragment : Fragment() {
             ),
             quantity = totalPieces,
             totalAmount = totalAmount.toDouble(),
-            selectedColor = selectedColor
+            selectedColor = selectedColor,
+            type = ItemType.Custom.value
         )
 
         val intent = Intent(requireContext(), OrderSummaryActivity::class.java).apply {

@@ -1,10 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui_customer.desain.DetailDesainActivity">
+    android:background="@color/background"
+    android:fillViewport="true"
+    tools:context=".presentation.ui_customer.desain.DetailDesainActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/background"
+            android:src="@drawable/ic_left_line"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_design"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_marginTop="20dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toBottomOf="@id/btn_back"
+            tools:src="@tools:sample/backgrounds/scenic" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_designer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_design"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tv_designer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/pjs_bold"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintStart_toEndOf="@id/iv_designer"
+            app:layout_constraintTop_toTopOf="@id/iv_designer"
+            tools:text="Nama" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/fl_ratings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@id/tv_designer"
+            app:layout_constraintTop_toBottomOf="@id/tv_designer">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="@android:color/darker_gray" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="@android:color/darker_gray" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="@android:color/darker_gray" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="@android:color/darker_gray" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="@android:color/darker_gray" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <TextView
+            android:id="@+id/tv_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/pjs_bold"
+            android:gravity="end"
+            android:textColor="@color/chocoTan"
+            android:textSize="@dimen/text_lg"
+            app:layout_constraintBottom_toBottomOf="@id/iv_designer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fl_ratings"
+            app:layout_constraintTop_toTopOf="@id/iv_designer"
+            tools:text="Rp. 35.000" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/pjs_bold"
+            android:maxLines="2"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_lg"
+            app:layout_constraintEnd_toStartOf="@id/btn_favorite"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_designer"
+            tools:text="Cartoon Design by BudiBud" />
+
+        <ImageButton
+            android:id="@+id/btn_favorite"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/ic_favorite_border"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_title" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

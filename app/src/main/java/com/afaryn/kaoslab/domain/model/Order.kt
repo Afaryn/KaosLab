@@ -24,7 +24,7 @@ data class Order(
     @Transient val courierLogo: String? = null,
     @Transient val designImageUrl: String = "",
     @Transient val title: String = ""
-):Parcelable
+): Parcelable
 
 sealed class DesignUplType(val value: String) {
     object Upload : DesignUplType("image_upload")
