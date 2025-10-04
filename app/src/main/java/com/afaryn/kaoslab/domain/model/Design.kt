@@ -14,6 +14,7 @@ data class Design(
     val fileUrl: String = "",
     val thumbnailUrl: String = "",
     val licenses: List<License> = listOf(),
+    val selectedLicense: License? = null,
     val tags: List<String> = listOf(),
     val minPrice: Double = 0.0, // Lowest price from all licenses
     val maxPrice: Double = 0.0, // Highest price from all licenses

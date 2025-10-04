@@ -19,6 +19,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityMainBinding
 import com.afaryn.kaoslab.presentation.ui_customer.custome.CustomeActivity
+import com.afaryn.kaoslab.presentation.ui_customer.desain.UserDesignActivity
 import com.afaryn.kaoslab.presentation.ui_customer.orders.OrdersActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -61,6 +62,10 @@ class MainActivity : AppCompatActivity() {
     private fun checkForIntent() {
         intent.getBooleanExtra("order", false).takeIf { it }?.let {
             startActivity(Intent(this, OrdersActivity::class.java))
+        }
+
+        intent.getBooleanExtra("design", false).takeIf { it }?.let {
+            startActivity(Intent(this, UserDesignActivity::class.java))
         }
     }
 

@@ -1,20 +1,16 @@
 package com.afaryn.kaoslab.utils
 
-import android.Manifest
-
 object Constants {
 
     const val PRODUCT_COLLECTION = "product"
+    const val DESIGN_COLLECTION = "designs"
     const val CUSTOM_PRODUCT_COLLECTION = "customproduct"
     const val COLL_CART = "cart"
     const val COLL_USER = "users"
     const val COLL_ADDRESS = "address"
+    const val COLL_USER_DESIGN = "designs"
+    const val COLL_USER_DESIGN_PENDING = "pending_designs"
 
-
-    val PERMISSIONS = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
 
     const val CUSTOMER = "customer"
     const val OWNER = "owner"

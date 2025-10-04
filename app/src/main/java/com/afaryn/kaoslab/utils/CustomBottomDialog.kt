@@ -56,15 +56,16 @@ class CustomBottomDialog(context: Context) {
             tvDesc.text = license.description
             tvPrice.text = license.price.toInt().formatRupiah()
 
-            rb.setOnClickListener {
-                // uncheck all other radios
-                (0 until binding.containerLicenses.childCount).forEach { i ->
-                    val other = binding.containerLicenses.getChildAt(i)
-                        .findViewById<MaterialRadioButton>(R.id.rb_license)
-                    other.isChecked = false
+            listOf(itemView, rb).forEach {
+                it.setOnClickListener {
+                    (0 until binding.containerLicenses.childCount).forEach { i ->
+                        val other = binding.containerLicenses.getChildAt(i)
+                            .findViewById<MaterialRadioButton>(R.id.rb_license)
+                        other.isChecked = false
+                    }
+                    rb.isChecked = true
+                    selectedLicense = license
                 }
-                rb.isChecked = true
-                selectedLicense = license
             }
 
             if (license.isDefault) {

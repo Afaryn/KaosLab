@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentHomeBinding
-import com.afaryn.kaoslab.domain.model.Product
+import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.presentation.ui_customer.cart.CartActivity
 import com.afaryn.kaoslab.presentation.ui_customer.desain.DetailDesainActivity
 import com.afaryn.kaoslab.presentation.ui_customer.home.adapter.BannerAdapter
@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setRvRekom(items: List<Product>) {
+    private fun setRvRekom(items: List<Design>) {
         val limitedItems = items.take(4)
         recyclerViewAdapter = ProductAdapter(limitedItems).also {
             it.onItemClick = { desain ->

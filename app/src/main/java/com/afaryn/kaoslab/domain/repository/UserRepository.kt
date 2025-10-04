@@ -2,6 +2,7 @@ package com.afaryn.kaoslab.domain.repository
 
 import com.afaryn.kaoslab.domain.model.Address
 import com.afaryn.kaoslab.domain.model.CartProduct
+import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.domain.model.SnapResponse
 import com.afaryn.kaoslab.utils.Resource
@@ -20,6 +21,9 @@ interface UserRepository {
     fun deleteAddress(id: String): Flow<Resource<Unit>>
 
     // Payment
-    suspend fun getSnapToken(order: Order): Flow<Resource<SnapResponse>>
+    suspend fun getSnapToken(order: Order? = null, design: Design? = null): Flow<Resource<SnapResponse>>
     fun clearCart(order: Order): Flow<Resource<Unit>>
+
+    // Design
+    fun addDesign(design: Design, isPending: Boolean): Flow<Resource<Unit>>
 }

@@ -5,21 +5,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.databinding.ItemProductBinding
-import com.afaryn.kaoslab.domain.model.Product
+import com.afaryn.kaoslab.domain.model.Design
 import com.bumptech.glide.Glide
 
-class ProductAdapter(val items: List<Product>) :
+class ProductAdapter(val items: List<Design>) :
     RecyclerView.Adapter<ProductAdapter.Viewholder>() {
 
     inner class Viewholder(val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
-        fun bind(item: Product) = with(binding) {
-            titleText.text = item.name
-            authorText.text = "by " + item.createdBy
+        fun bind(item: Design) = with(binding) {
+            titleText.text = item.title
+            authorText.text = "by " + item.designerName
 
 
-            val imageUrl =
-                item.imageUrl
+            val imageUrl = item.thumbnailUrl
 
             Glide.with(root.context)
                 .load(imageUrl)
@@ -47,5 +46,5 @@ class ProductAdapter(val items: List<Product>) :
 
     override fun getItemCount(): Int = items.size
 
-    var onItemClick: ((Product) -> Unit)? = null
+    var onItemClick: ((Design) -> Unit)? = null
 }
