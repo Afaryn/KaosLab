@@ -12,6 +12,7 @@ import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentHomeBinding
 import com.afaryn.kaoslab.domain.model.Product
 import com.afaryn.kaoslab.presentation.ui_customer.cart.CartActivity
+import com.afaryn.kaoslab.presentation.ui_customer.desain.DetailDesainActivity
 import com.afaryn.kaoslab.presentation.ui_customer.home.adapter.BannerAdapter
 import com.afaryn.kaoslab.presentation.ui_customer.home.adapter.ProductAdapter
 import com.afaryn.kaoslab.presentation.ui_customer.home.viewModel.HomeViewModel
@@ -56,7 +57,7 @@ class HomeFragment : Fragment() {
 
         bannerAdapter = BannerAdapter(banners)
         binding.viewPager2.adapter = bannerAdapter
-        binding.dotIndicator.setViewPager2(binding.viewPager2)
+        binding.dotIndicator.attachTo(binding.viewPager2)
         binding.dotIndicator.visibility = View.VISIBLE
     }
 
@@ -91,7 +92,13 @@ class HomeFragment : Fragment() {
 
     private fun setRvRekom(items: List<Product>) {
         val limitedItems = items.take(4)
-        recyclerViewAdapter = ProductAdapter(limitedItems)
+        recyclerViewAdapter = ProductAdapter(limitedItems).also {
+            it.onItemClick = { desain ->
+                startActivity(Intent(requireContext(), DetailDesainActivity::class.java).apply {
+                    putExtra("desain", desain)
+                })
+            }
+        }
         binding.viewRecommendation.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = recyclerViewAdapter

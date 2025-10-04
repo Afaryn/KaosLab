@@ -1,5 +1,9 @@
 package com.afaryn.kaoslab.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Design(
     val id: String = "",
     val designerId: String = "",
@@ -18,8 +22,9 @@ data class Design(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val isActive: Boolean = true
-)
+): Parcelable
 
+@Parcelize
 data class License(
     val id: String = "",
     val type: String = "", // "standard", "exclusive", "custom"
@@ -28,4 +33,4 @@ data class License(
     val features: List<String> = listOf(), // List of features included
     val price: Double = 0.0,
     val isDefault: Boolean = false
-)
+): Parcelable
