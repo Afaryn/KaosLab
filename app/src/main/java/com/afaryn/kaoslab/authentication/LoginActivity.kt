@@ -17,6 +17,8 @@ import com.afaryn.kaoslab.ui_owner.OwnerActivity
 import com.afaryn.kaoslab.utils.Constants.DESIGNER
 import com.afaryn.kaoslab.utils.Constants.OWNER
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.emailNotVerifiedDialog
+import com.afaryn.kaoslab.utils.forgotPasswordDialog
 import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.afaryn.kaoslab.utils.toast
@@ -70,6 +72,7 @@ class LoginActivity : AppCompatActivity() {
             }
             false
         }
+
         binding.btnLogin.setOnClickListener{
             val email = binding.edtEmail.text.toString()
             val password = binding.edtPass.text.toString()
@@ -96,7 +99,40 @@ class LoginActivity : AppCompatActivity() {
                         is Response.Error -> {
                             binding.progressBar.hide()
                             binding.btnLogin.isEnabled = true
-                            toast(resource.message)
+
+                            // Check if error is due to email not being verified
+                            if (resource.message == "EMAIL_NOT_VERIFIED") {
+                                emailNotVerifiedDialog(
+                                    context = this,
+                                    email = email,
+                                    password = password,
+                                    onResendVerification = { userEmail, userPassword ->
+                                        viewModel.resendEmailVerification(userEmail, userPassword).observe(this) { verificationResource ->
+                                            when (verificationResource) {
+                                                is Response.Loading -> {
+                                                    binding.progressBar.show()
+                                                }
+                                                is Response.Success -> {
+                                                    binding.progressBar.hide()
+                                                    toast("Email verification sent successfully. Please check your spam folder as well.")
+                                                }
+                                                is Response.Error -> {
+                                                    binding.progressBar.hide()
+                                                    toast(verificationResource.message ?: "Failed to send verification email")
+                                                }
+                                                else -> {
+                                                    binding.progressBar.hide()
+                                                }
+                                            }
+                                        }
+                                    },
+                                    onCancel = {
+                                        // Dialog dismissed, do nothing
+                                    }
+                                )
+                            } else {
+                                toast(resource.message)
+                            }
                         }
                         else -> {
                             binding.progressBar.hide()
@@ -108,6 +144,31 @@ class LoginActivity : AppCompatActivity() {
                 toast("Email and password cannot be empty")
             }
         }
+
+        // Add forgot password functionality
+        binding.txtForgotPassword.setOnClickListener {
+            forgotPasswordDialog(this) { email ->
+                viewModel.resetPassword(email).observe(this) { resource ->
+                    when (resource) {
+                        is Response.Loading -> {
+                            binding.progressBar.show()
+                        }
+                        is Response.Success -> {
+                            binding.progressBar.hide()
+                            toast("Password reset email sent successfully. Please check your email.")
+                        }
+                        is Response.Error -> {
+                            binding.progressBar.hide()
+                            toast(resource.message)
+                        }
+                        else -> {
+                            binding.progressBar.hide()
+                        }
+                    }
+                }
+            }
+        }
+
         binding.txtRegis.setOnClickListener {
             val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
