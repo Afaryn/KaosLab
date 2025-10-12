@@ -108,6 +108,86 @@ fun confirmDialog(
     }
 }
 
+fun emailVerificationDialog(
+    context: Context,
+    title: String,
+    message: String,
+    openEmailAction: () -> Unit,
+    goToLoginAction: () -> Unit
+) {
+    AlertDialog.Builder(context).apply {
+        setTitle(title)
+        setMessage(message)
+        setCancelable(false)
+        setPositiveButton("Open Email App") { _, _ ->
+            openEmailAction()
+        }
+        setNegativeButton("Go to Login") { _, _ ->
+            goToLoginAction()
+        }
+        create()
+        show()
+    }
+}
+
+fun emailNotVerifiedDialog(
+    context: Context,
+    email: String,
+    password: String,
+    onResendVerification: (String, String) -> Unit,
+    onCancel: () -> Unit
+) {
+    AlertDialog.Builder(context).apply {
+        setTitle("Email Not Verified")
+        setMessage("Your email address has not been verified yet. Please check your email and verify your account, or resend the verification email.")
+        setCancelable(false)
+        setPositiveButton("Resend Verification") { _, _ ->
+            onResendVerification(email, password)
+        }
+        setNegativeButton("Cancel") { _, _ ->
+            onCancel()
+        }
+        setNeutralButton("Open Email App") { _, _ ->
+            val emailIntent = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_APP_EMAIL)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            try {
+                context.startActivity(emailIntent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "No email app found", Toast.LENGTH_SHORT).show()
+            }
+        }
+        create()
+        show()
+    }
+}
+
+fun forgotPasswordDialog(
+    context: Context,
+    onSendReset: (String) -> Unit
+) {
+    val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_forgot_password, null)
+    val editTextEmail = dialogView.findViewById<android.widget.EditText>(R.id.editTextEmail)
+
+    AlertDialog.Builder(context).apply {
+        setTitle("Reset Password")
+        setView(dialogView)
+        setPositiveButton("Send Reset Email") { _, _ ->
+            val email = editTextEmail.text.toString().trim()
+            if (email.isNotEmpty()) {
+                onSendReset(email)
+            } else {
+                Toast.makeText(context, "Please enter your email", Toast.LENGTH_SHORT).show()
+            }
+        }
+        setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+        create()
+        show()
+    }
+}
 
 fun Fragment.hideBottomNavOwner() {
     val appBar: BottomAppBar = (activity as OwnerActivity).findViewById(R.id.menuBottom)

@@ -8,6 +8,7 @@ import com.afaryn.kaoslab.databinding.ActivityRegistrationBinding
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.presentation.ui_customer.MainActivity
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.emailVerificationDialog
 import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.afaryn.kaoslab.utils.toast
@@ -54,11 +55,33 @@ class RegistrationActivity : AppCompatActivity() {
                             }
                             is Response.Success -> {
                                 binding.progressBar.hide()
-                                val intent = Intent(this@RegistrationActivity, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(intent)
-                                toast("Registration successful")
-                                finish()
+                                binding.btnRegis.isEnabled = true
+
+                                // Show email verification dialog
+                                emailVerificationDialog(
+                                    context = this@RegistrationActivity,
+                                    title = "Email Verification",
+                                    message = "We have sent an email verification to $email. Please verify your email before logging in. If you don't see the email, please check your spam folder.",
+                                    openEmailAction = {
+                                        // Open email app
+                                        val emailIntent = Intent(Intent.ACTION_MAIN).apply {
+                                            addCategory(Intent.CATEGORY_APP_EMAIL)
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                        try {
+                                            startActivity(emailIntent)
+                                        } catch (e: Exception) {
+                                            toast("No email app found")
+                                        }
+                                    },
+                                    goToLoginAction = {
+                                        // Navigate to login
+                                        val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                )
                             }
                             is Response.Error -> {
                                 binding.progressBar.hide()

@@ -15,7 +15,6 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.1" />
 
-
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -31,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/pjs_bold"
-            android:text="Login"
+            android:text="Sign In"
             android:textColor="@color/darkBlue"
             android:textSize="24sp" />
 
@@ -40,8 +39,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center"
             android:layout_marginTop="5dp"
-            android:text="Welcome Back!" />
+            android:text="Hi! Welcome back, you\nhave been missed" />
 
     </LinearLayout>
 
@@ -113,19 +113,19 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/txt_forgotPass"
-            android:layout_width="match_parent"
+            android:id="@+id/txt_forgot_password"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:padding="5dp"
-            android:focusable="true"
             android:clickable="true"
-            android:fontFamily="@font/pjs_bold"
-            android:gravity="end"
-            android:text="@string/forgot_password"
+            android:focusable="true"
+            android:fontFamily="@font/pjs_medium"
+            android:text="Forgot Password?"
             android:textColor="@color/darkBlue"
-            android:textSize="16sp" />
+            android:textSize="14sp"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="4dp" />
 
         <Button
             android:id="@+id/btn_login"
@@ -133,8 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:fontFamily="@font/pjs_bold"
-            android:textColor="@color/white"
-            android:text="Login"
+            android:text="Sign In"
             android:backgroundTint="@color/darkBlue"/>
 
         <ProgressBar
@@ -162,8 +161,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/pjs_medium"
-                android:text="Or Login With"
+                android:text="Or Sign In With"
                 android:paddingHorizontal="8dp"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
@@ -204,17 +202,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:padding="5dp"
                 android:clickable="true"
-                android:focusable="true"
                 android:fontFamily="@font/pjs_bold"
-                android:text="Register"
+                android:text="Sign Up"
                 android:textColor="@color/darkBlue"
                 android:textSize="14sp" />
         </LinearLayout>
 
-
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
