@@ -325,4 +325,32 @@ class UserRepositoryImpl @Inject constructor(
 
         awaitClose { }
     }
+
+    override fun getOwnedDesigns(isPending: Boolean): Flow<Resource<List<Design>>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        val coll = if (isPending) COLL_USER_DESIGN_PENDING else COLL_USER_DESIGN
+
+        val listener = firestore.collection(COLL_USER).document(uid)
+            .collection(coll)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                    close()
+                    return@addSnapshotListener
+                }
+
+                value?.toObjects(Design::class.java)?.let {
+                    trySend(Resource.Success(it))
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
 }

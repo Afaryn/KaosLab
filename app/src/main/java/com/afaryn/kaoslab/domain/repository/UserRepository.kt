@@ -26,4 +26,5 @@ interface UserRepository {
 
     // Design
     fun addDesign(design: Design, isPending: Boolean): Flow<Resource<Unit>>
+    fun getOwnedDesigns(isPending: Boolean): Flow<Resource<List<Design>>>
 }

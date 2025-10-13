@@ -53,7 +53,7 @@ class DesignCheckOutActivity : AppCompatActivity() {
                     STATUS_PENDING -> addDesign(design!!, true)
                     STATUS_SUCCESS, STATUS_SETTLEMENT -> addDesign(design!!, false)
                     STATUS_FAILED -> toast("Payment Failed: ${transactionResult.status}")
-                    else -> toast("Payment Canceled or Unknown")
+                    else -> toast("Payment canceled or design is owned")
                 }
             }
         } else {

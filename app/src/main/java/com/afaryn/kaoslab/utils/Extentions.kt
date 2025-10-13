@@ -517,3 +517,8 @@ fun Int.formatRupiah(): String {
 }
 
 fun Int?.orZero(): Int = this ?: 0
+
+fun Long.toDateString(): String {
+    val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    return format.format(Date(this))
+}

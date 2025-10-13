@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.afaryn.kaoslab.presentation.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentAccountBinding
+import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignActivity
 import com.afaryn.kaoslab.utils.confirmDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,6 +34,7 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
+        setActions()
     }
 
     private fun setupToolbar() {
@@ -50,5 +52,16 @@ class AccountFragment : Fragment() {
                 },
             )
         }
+    }
+
+    private fun setActions() = with(binding) {
+        btnMyDesign.setOnClickListener {
+            startActivity(Intent(requireContext(), MyDesignActivity::class.java))
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
