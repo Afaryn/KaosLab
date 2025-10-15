@@ -20,7 +20,7 @@ import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityMainBinding
 import com.afaryn.kaoslab.presentation.ui_customer.custome.CustomeActivity
 import com.afaryn.kaoslab.presentation.ui_customer.desain.UserDesignActivity
-import com.afaryn.kaoslab.presentation.ui_customer.orders.OrdersActivity
+import com.afaryn.kaoslab.presentation.ui_customer.account.orders.OrdersActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

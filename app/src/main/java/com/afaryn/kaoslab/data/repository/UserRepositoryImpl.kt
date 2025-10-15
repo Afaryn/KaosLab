@@ -1,21 +1,30 @@
 package com.afaryn.kaoslab.data.repository
 
+import android.net.Uri
 import androidx.core.net.toUri
 import com.afaryn.kaoslab.data.remote.MidtransApi
 import com.afaryn.kaoslab.domain.model.Address
 import com.afaryn.kaoslab.domain.model.CartProduct
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.domain.model.DesignUplType
+import com.afaryn.kaoslab.domain.model.Feed
+import com.afaryn.kaoslab.domain.model.Likes
 import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.domain.model.OrderStatus
 import com.afaryn.kaoslab.domain.model.SnapRequest
 import com.afaryn.kaoslab.domain.model.SnapResponse
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.repository.UserRepository
 import com.afaryn.kaoslab.utils.Constants.COLL_ADDRESS
 import com.afaryn.kaoslab.utils.Constants.COLL_CART
+import com.afaryn.kaoslab.utils.Constants.COLL_FEED
+import com.afaryn.kaoslab.utils.Constants.COLL_ORDERS
 import com.afaryn.kaoslab.utils.Constants.COLL_USER
 import com.afaryn.kaoslab.utils.Constants.COLL_USER_DESIGN
 import com.afaryn.kaoslab.utils.Constants.COLL_USER_DESIGN_PENDING
+import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_PENDING
+import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_SETTLEMENT
+import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_SUCCESS
 import com.afaryn.kaoslab.utils.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,6 +45,9 @@ class UserRepositoryImpl @Inject constructor(
     private val storage: FirebaseStorage,
     private val midtransApi: MidtransApi
 ) : UserRepository {
+    override fun getUserId(): String {
+        return auth.currentUser?.uid.orEmpty()
+    }
 
     override fun addToCart(cartProduct: CartProduct): Flow<Resource<Unit>> = callbackFlow {
         trySend(Resource.Loading)
@@ -223,7 +235,10 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override suspend fun getSnapToken(order: Order?, design: Design?): Flow<Resource<SnapResponse>> = callbackFlow {
+    override suspend fun getSnapToken(
+        order: Order?,
+        design: Design?
+    ): Flow<Resource<SnapResponse>> = callbackFlow {
         trySend(Resource.Loading)
 
         val uid = auth.uid ?: run {
@@ -268,7 +283,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override fun clearCart(order: Order): Flow<Resource<Unit>> = callbackFlow {
+    override fun clearCart(order: Order, snapToken: String?): Flow<Resource<Unit>> = callbackFlow {
         trySend(Resource.Loading)
 
         val uid = auth.uid ?: run {
@@ -285,6 +300,13 @@ class UserRepositoryImpl @Inject constructor(
                 .document(uid)
                 .collection(COLL_CART)
 
+            val ordersCollection = firestore.collection(COLL_USER)
+                .document(uid)
+                .collection(COLL_ORDERS)
+
+            val orderRef = ordersCollection.document(order.orderId)
+            batch.set(orderRef, order.copy(snapToken = snapToken))
+
             cartIds.forEach { cartId ->
                 val docRef = cartCollection.document(cartId)
                 batch.delete(docRef)
@@ -299,32 +321,33 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override fun addDesign(design: Design, isPending: Boolean): Flow<Resource<Unit>> = callbackFlow {
-        trySend(Resource.Loading)
+    override fun addDesign(design: Design, isPending: Boolean): Flow<Resource<Unit>> =
+        callbackFlow {
+            trySend(Resource.Loading)
 
-        val uid = auth.uid ?: run {
-            trySend(Resource.Error("Gagal mendapatkan data user"))
-            close()
-            return@callbackFlow
+            val uid = auth.uid ?: run {
+                trySend(Resource.Error("Gagal mendapatkan data user"))
+                close()
+                return@callbackFlow
+            }
+
+            try {
+                val coll = if (isPending) COLL_USER_DESIGN_PENDING else COLL_USER_DESIGN
+
+                firestore.collection(COLL_USER)
+                    .document(uid)
+                    .collection(coll)
+                    .document(design.id)
+                    .set(design)
+                    .await()
+
+                trySend(Resource.Success(Unit))
+            } catch (e: Exception) {
+                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+            }
+
+            awaitClose { }
         }
-
-        try {
-            val coll = if (isPending) COLL_USER_DESIGN_PENDING else COLL_USER_DESIGN
-
-            firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(coll)
-                .document(design.id)
-                .set(design)
-                .await()
-
-            trySend(Resource.Success(Unit))
-        } catch (e: Exception) {
-            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-        }
-
-        awaitClose { }
-    }
 
     override fun getOwnedDesigns(isPending: Boolean): Flow<Resource<List<Design>>> = callbackFlow {
         trySend(Resource.Loading)
@@ -352,5 +375,157 @@ class UserRepositoryImpl @Inject constructor(
             }
 
         awaitClose { listener.remove() }
+    }
+
+    override fun postFeed(feed: Feed, imgUri: Uri): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val fileRef = storage.reference.child("feeds/${feed.id}.jpg")
+            fileRef.putFile(imgUri).await()
+            val imgUrl = fileRef.downloadUrl.await().toString()
+
+            val user = firestore.collection(COLL_USER).document(uid).get().await()
+                .toObject(User::class.java) ?: throw Exception("Failed getting user data")
+
+            firestore.collection(COLL_FEED)
+                .document(feed.id)
+                .set(feed.copy(userId = uid, user = user, photoUrl = imgUrl))
+                .await()
+
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
+
+    override fun getFeeds(): Flow<Resource<List<Feed>>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val listener = firestore.collection(COLL_FEED)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                    close()
+                    return@addSnapshotListener
+                }
+
+                value?.toObjects(Feed::class.java)?.let {
+                    trySend(Resource.Success(it))
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    override fun likeFeed(feedId: String, isLiking: Boolean): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val feed = firestore.collection(COLL_FEED).document(feedId).get().await()
+                .toObject(Feed::class.java) ?: throw Exception("Failed getting feed data")
+
+            val likes = feed.likes.toMutableList()
+            if (isLiking) likes.add(Likes(userId = uid))
+            else likes.remove(likes.find { it.userId == uid })
+
+            firestore.collection(COLL_FEED)
+                .document(feed.id)
+                .set(feed.copy(likes = likes))
+                .await()
+
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
+
+    override fun getOrders(status: String): Flow<Resource<List<Order>>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        val listener = firestore.collection(COLL_USER)
+            .document(uid)
+            .collection(COLL_ORDERS)
+            .whereEqualTo("status", status)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                    close()
+                    return@addSnapshotListener
+                }
+
+                value?.toObjects(Order::class.java)?.let {
+                    trySend(Resource.Success(it))
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    override fun updatePaymentStatus(order: Order): Flow<Resource<Pair<String, Boolean>>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val response = midtransApi.getStatus(order.orderId)
+
+            when (response.transactionStatus) {
+                in listOf(STATUS_SUCCESS, STATUS_SETTLEMENT) -> {
+                    firestore.collection(COLL_USER)
+                        .document(uid)
+                        .collection(COLL_ORDERS)
+                        .document(order.orderId)
+                        .set(order.copy(status = OrderStatus.Processing.value))
+                        .await()
+
+                    trySend(Resource.Success("Payment Successful" to true))
+                    close()
+                    return@callbackFlow
+                }
+
+                STATUS_PENDING -> {
+                    trySend(Resource.Success(order.snapToken.orEmpty() to false))
+                    close()
+                    return@callbackFlow
+                }
+
+                else -> {
+                    trySend(Resource.Error("Payment failed or unknown"))
+                    close()
+                    return@callbackFlow
+                }
+            }
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
     }
 }

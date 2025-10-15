@@ -41,6 +41,7 @@ class CheckOutActivity : AppCompatActivity() {
     private val cartAdapter by lazy { CheckoutAdapter() }
     private var selectedAddress: Address? = null
     private var order: Order? = null
+    private var snapToken: String? = null
 
     @Inject
     lateinit var uiKitApi: UiKitApi
@@ -54,7 +55,7 @@ class CheckOutActivity : AppCompatActivity() {
 
                 when (transactionResult?.status) {
                     STATUS_SUCCESS, STATUS_PENDING, STATUS_SETTLEMENT -> {
-                        order?.let { o -> clearCart(o) }
+                        order?.let { o -> clearCart(o, snapToken) }
                     }
 
                     STATUS_FAILED -> {
@@ -130,6 +131,8 @@ class CheckOutActivity : AppCompatActivity() {
 
     private fun showMidtransUi(response: SnapResponse) {
         try {
+            snapToken = response.token
+
             uiKitApi.startPaymentUiFlow(
                 activity = this,
                 launcher = paymentLauncher,
@@ -180,8 +183,8 @@ class CheckOutActivity : AppCompatActivity() {
     }
 
 
-    private fun clearCart(order: Order) = lifecycleScope.launch {
-        vm.clearCart(order).collect {
+    private fun clearCart(order: Order, token: String?) = lifecycleScope.launch {
+        vm.clearCart(order, token).collect {
             when(it) {
                 is Resource.Error -> toast(it.error)
                 is Resource.Success -> {

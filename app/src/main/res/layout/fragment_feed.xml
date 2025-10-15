@@ -7,7 +7,7 @@
     tools:context=".presentation.ui_customer.feed.FeedFragment"
     android:background="@color/background">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -15,10 +15,12 @@
         android:background="@color/background">
 
         <LinearLayout
+            android:id="@+id/ll_top_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/searchCard"
@@ -47,23 +49,40 @@
 
             <!-- Filter Button -->
             <ImageButton
+                android:id="@+id/btn_post_feed"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_rounded_button"
                 android:contentDescription="null"
-                android:src="@drawable/ic_setting"/>
+                android:src="@drawable/ic_add"
+                app:tint="@color/white" />
         </LinearLayout>
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvFeed"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             tools:listitem="@layout/item_feed"
             android:clipToPadding="false"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/ll_top_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:contentDescription="rv feed"/>
-    </LinearLayout>
 
-
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pjs_bold"
+            android:text="There are no feeds posted yet."
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            android:textStyle="italic"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_top_bar"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

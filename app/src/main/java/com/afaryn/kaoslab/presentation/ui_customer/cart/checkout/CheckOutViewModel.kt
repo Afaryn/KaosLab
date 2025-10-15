@@ -13,6 +13,6 @@ class CheckOutViewModel @Inject constructor(
 
     suspend fun getSnapToken(order: Order) = userRepository.getSnapToken(order)
     fun getLastAddress() = userRepository.getLastAddress()
-    fun clearCart(order: Order) = userRepository.clearCart(order)
+    fun clearCart(order: Order, token: String?) = userRepository.clearCart(order, token)
 
 }

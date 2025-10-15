@@ -29,6 +29,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.Timestamp
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -521,4 +522,14 @@ fun Int?.orZero(): Int = this ?: 0
 fun Long.toDateString(): String {
     val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     return format.format(Date(this))
+}
+
+fun Date.toMonthDay(): String {
+    val format = SimpleDateFormat("MMM d", Locale.getDefault())
+    return format.format(this)
+}
+
+fun MaterialButton.setLoading(isLoading: Boolean, placeholder: String) {
+    isEnabled = !isLoading
+    text = if (!isLoading) placeholder else "Loading..."
 }

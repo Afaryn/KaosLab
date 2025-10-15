@@ -10,6 +10,8 @@ import androidx.fragment.app.viewModels
 import com.afaryn.kaoslab.presentation.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentAccountBinding
 import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignActivity
+import com.afaryn.kaoslab.presentation.ui_customer.account.orders.OrdersActivity
+import com.afaryn.kaoslab.presentation.ui_customer.address.AddressActivity
 import com.afaryn.kaoslab.utils.confirmDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -55,8 +57,16 @@ class AccountFragment : Fragment() {
     }
 
     private fun setActions() = with(binding) {
+        btnMyOrder.setOnClickListener {
+            startActivity(Intent(requireContext(), OrdersActivity::class.java))
+        }
+
         btnMyDesign.setOnClickListener {
             startActivity(Intent(requireContext(), MyDesignActivity::class.java))
+        }
+
+        btnAddress.setOnClickListener {
+            startActivity(Intent(requireContext(), AddressActivity::class.java))
         }
     }
 

@@ -39,7 +39,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/btnBecomeSeller"
+                        android:id="@+id/btnBecomeDesigner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_white_rounded"
@@ -47,7 +47,7 @@
                         android:paddingVertical="10dp"
                         android:paddingStart="16dp"
                         android:paddingEnd="20dp"
-                        android:text="Become a seller"
+                        android:text="Become a designer"
                         android:textColor="@color/darkBlue"
                         android:textSize="14sp" />
 
@@ -246,48 +246,6 @@
                     android:background="@color/line" />
 
                 <LinearLayout
-                    android:id="@+id/btn_payment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="15dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:contentDescription="@string/content_description"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_card_bank" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/pjs_medium"
-                        android:text="Payment Methods"
-                        android:textColor="@color/darkBlue"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:padding="8dp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_navigate_next" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/line" />
-
-                <LinearLayout
                     android:id="@+id/btn_user_security"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -426,89 +384,47 @@
                 </LinearLayout>
 
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/line" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/line" />-->
 
-                <LinearLayout
-                    android:id="@+id/btn_language"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="15dp">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/btn_language"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="?attr/selectableItemBackground"-->
+<!--                    android:clickable="true"-->
+<!--                    android:focusable="true"-->
+<!--                    android:gravity="center_vertical"-->
+<!--                    android:paddingVertical="15dp">-->
 
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:contentDescription="@string/content_description"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_earth" />
+<!--                    <ImageView-->
+<!--                        android:layout_width="30dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:contentDescription="@string/content_description"-->
+<!--                        android:scaleType="fitXY"-->
+<!--                        android:src="@drawable/ic_earth" />-->
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/pjs_medium"
-                        android:text="Language"
-                        android:textColor="@color/darkBlue"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+<!--                    <TextView-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="10dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:fontFamily="@font/pjs_medium"-->
+<!--                        android:text="Language"-->
+<!--                        android:textColor="@color/darkBlue"-->
+<!--                        android:textSize="14sp"-->
+<!--                        android:textStyle="bold" />-->
 
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:padding="8dp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_navigate_next" />
+<!--                    <ImageView-->
+<!--                        android:layout_width="34dp"-->
+<!--                        android:layout_height="34dp"-->
+<!--                        android:padding="8dp"-->
+<!--                        android:scaleType="fitXY"-->
+<!--                        android:src="@drawable/ic_navigate_next" />-->
 
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/line" />
-
-                <LinearLayout
-                    android:id="@+id/btn_cache"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="15dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:contentDescription="@string/content_description"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_brush" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/pjs_medium"
-                        android:text="Clear Cache"
-                        android:textColor="@color/darkBlue"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:padding="8dp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/ic_navigate_next" />
-
-                </LinearLayout>
+<!--                </LinearLayout>-->
 
                 <View
                     android:layout_width="match_parent"

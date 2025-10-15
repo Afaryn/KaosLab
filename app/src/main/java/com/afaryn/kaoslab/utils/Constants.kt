@@ -6,10 +6,12 @@ object Constants {
     const val DESIGN_COLLECTION = "designs"
     const val CUSTOM_PRODUCT_COLLECTION = "customproduct"
     const val COLL_CART = "cart"
+    const val COLL_ORDERS = "orders"
     const val COLL_USER = "users"
     const val COLL_ADDRESS = "address"
     const val COLL_USER_DESIGN = "designs"
     const val COLL_USER_DESIGN_PENDING = "pending_designs"
+    const val COLL_FEED = "feed"
 
 
     const val CUSTOMER = "customer"

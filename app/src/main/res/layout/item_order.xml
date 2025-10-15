@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="5dp"
+    android:layout_marginHorizontal="20dp"
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/background" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginVertical="10dp">
+
+        <ImageView
+            android:id="@+id/ic_truck"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginHorizontal="20dp"
+            android:src="@drawable/ic_truck_delivery"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"
+            app:tint="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_delivery_msg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/pjs_bold"
+            android:gravity="center_vertical"
+            android:text="Package is on the way"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_sm"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ic_truck"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_truck"
+            app:layout_constraintTop_toTopOf="@id/ic_truck" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_left"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <ImageView
+            android:id="@+id/imageCartProduct"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/bg_gradient_top"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/guideline_left"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_truck" />
+
+        <ImageView
+            android:id="@+id/designOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="10dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:ellipsize="none"
+            android:fontFamily="@font/pjs_regular"
+            android:textSize="11sp"
+            app:autoSizeMaxTextSize="11sp"
+            app:autoSizeMinTextSize="6sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="@id/imageCartProduct"
+            app:layout_constraintStart_toStartOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_product_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/pjs_bold"
+            android:text="T-Shirt"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageCartProduct"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct" />
+
+        <TextView
+            android:id="@+id/tv_color"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pjs_regular"
+            android:text="White"
+            android:textColor="@color/dimgray"
+            android:textSize="@dimen/text_sm"
+            app:layout_constraintEnd_toEndOf="@id/tv_product_name"
+            app:layout_constraintStart_toStartOf="@id/tv_product_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_product_name" />
+
+        <TextView
+            android:id="@+id/tv_size"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pjs_regular"
+            android:text="L : 5 x Rp60.000"
+            android:textColor="@color/dimgray"
+            android:textSize="@dimen/text_sm"
+            app:layout_constraintEnd_toEndOf="@id/tv_product_name"
+            app:layout_constraintStart_toStartOf="@id/tv_product_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_color" />
+
+        <TextView
+            android:id="@+id/tv_total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
+            android:fontFamily="@font/pjs_bold"
+            android:text="Total: "
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_contact_seller"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageCartProduct"
+            app:layout_constraintVertical_bias="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_contact_seller"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Contact Seller"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_sm"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageCartProduct" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
