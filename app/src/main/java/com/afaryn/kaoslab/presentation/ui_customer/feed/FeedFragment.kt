@@ -78,7 +78,7 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun setupView(feeds: List<Feed>) = binding.run {
+    private fun setupView(feeds: List<Feed>) = binding?.run {
         tvNoData.isVisible = feeds.isEmpty()
         feedAdapter.differ.submitList(feeds)
     }

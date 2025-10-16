@@ -20,6 +20,7 @@ import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.utils.Constants.DESIGNER
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.confirmDialog
+import com.afaryn.kaoslab.utils.glide
 import com.afaryn.kaoslab.utils.show
 import com.afaryn.kaoslab.utils.showBottomNav
 import com.afaryn.kaoslab.utils.toast
@@ -63,6 +64,10 @@ class AccountFragment : Fragment() {
 
     private fun setupView(data: User) = binding.run {
         txtName.text = data.name?.replaceFirstChar { it.uppercaseChar() }
+
+        data.profilePicture.takeIf { it.isNotEmpty() }?.let {
+            imgProfile.glide(it)
+        }
 
         btnBecomeDesigner.apply {
             text = if (data.role == DESIGNER) "Seller Centre" else "Become a Seller"

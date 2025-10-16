@@ -125,7 +125,8 @@ class AuthRepositoryImpl @Inject constructor(
                 emit(Response.Error("No user logged in"))
             }
         } catch (e: Exception) {
-            emit(Response.Error(e.message ?: "An error occurred"))
+            e.printStackTrace()
+//            emit(Response.Error(e.message ?: "An error occurred"))
         }
     }
 

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui_designer.seller_centre.SellerCentreFragment"
     android:background="@color/background"
     app:statusBarBackground="@color/darkBlue"
     android:fitsSystemWindows="true">
@@ -98,6 +97,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plusjakartasans"
+                            android:visibility="gone"
                             android:text="scpInk.co.id/jdoeDesign"
                             android:textColor="@color/textGray"
                             android:textSize="14sp" />
@@ -130,7 +130,8 @@
                     <LinearLayout
                         android:id="@+id/btn_see_detail"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
 
                         <TextView
                             android:layout_width="wrap_content"

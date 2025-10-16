@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.presentation.ui_designer.seller_centre
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,8 +9,11 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentSellerCentreBinding
+import com.afaryn.kaoslab.presentation.ui_designer.seller_centre.sales.DesignSalesActivity
 import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SellerCentreFragment : Fragment() {
 
     private var _binding: FragmentSellerCentreBinding? = null
@@ -44,6 +48,10 @@ class SellerCentreFragment : Fragment() {
 
         binding.btnPortfolio.setOnClickListener {
             findNavController().navigate(R.id.action_sellerCentreFragment_to_portfolioListFragment)
+        }
+
+        binding.btnSeeDetailSales.setOnClickListener {
+            startActivity(Intent(requireContext(), DesignSalesActivity::class.java))
         }
     }
 
