@@ -76,6 +76,7 @@ class OrderAdapter: RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
                 tvOverlay.text = it
             }
 
+            tvProductName.text = product.orderItem?.designType?.product?.name
             tvSize.text = "Size: ${product.orderItem?.size}"
             tvColor.text = product.selectedColor
 

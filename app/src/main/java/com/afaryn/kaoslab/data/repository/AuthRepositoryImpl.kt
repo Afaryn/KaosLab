@@ -21,13 +21,14 @@ class AuthRepositoryImpl @Inject constructor(
                 val result = auth.signInWithEmailAndPassword(email, password).await()
                 val user = result.user ?: throw Exception("User is null")
 
+                // TODO: UNCOMMENT EMAIL VERIFICATION
                 // Check if email is verified
-                if (!user.isEmailVerified) {
-                    // Sign out the user since email is not verified
-                    auth.signOut()
-                    emit(Response.Error("EMAIL_NOT_VERIFIED"))
-                    return@flow
-                }
+//                if (!user.isEmailVerified) {
+//                    // Sign out the user since email is not verified
+//                    auth.signOut()
+//                    emit(Response.Error("EMAIL_NOT_VERIFIED"))
+//                    return@flow
+//                }
 
                 val userId = user.uid
                 val userDocument = firestore.collection("users").document(userId).get().await()

@@ -2,6 +2,7 @@ package com.afaryn.kaoslab.domain.model
 
 import android.os.Parcelable
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ServerTimestamp
 import kotlinx.parcelize.Parcelize
 import java.util.Date
 
@@ -22,7 +23,7 @@ data class OrderItem(
     val title: String = "",
     val designId: String = "",
     val designType: DesignType? = null,
-    val createdAt: Date = Date(),
+    @ServerTimestamp val createdAt: Date = Date(),
 ): Parcelable
 
 @Parcelize

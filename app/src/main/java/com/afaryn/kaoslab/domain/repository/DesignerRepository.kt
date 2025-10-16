@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface DesignerRepository {
     // Design Management methods
     fun getDesigns(): Flow<Response<List<Design>>>
-    fun addDesign(design: Design): Flow<Response<String>>
-    fun updateDesign(design: Design): Flow<Response<String>>
+    fun addDesign(design: Design, imgUri: Uri): Flow<Response<String>>
+    fun updateDesign(design: Design, imgUri: Uri? = null): Flow<Response<String>>
     fun deleteDesign(designId: String): Flow<Response<String>>
     fun getDesignById(designId: String): Flow<Response<Design>>
 

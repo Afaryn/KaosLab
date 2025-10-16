@@ -6,26 +6,26 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.databinding.FragmentEditProfileBinding
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import com.afaryn.kaoslab.utils.hideBottomNav
 import com.afaryn.kaoslab.utils.successDialog
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 @AndroidEntryPoint
 class EditProfileFragment : Fragment() {
@@ -63,7 +63,7 @@ class EditProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        hideBottomNavDesigner()
+        hideBottomNav()
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         return binding.root
     }

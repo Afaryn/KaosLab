@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.presentation.ui_owner.home.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -54,16 +55,13 @@ class LastOrderAdapter(
                     tvOrderDate.text = "No date"
                 }
 
-                // Load design image
-                if (order.designImageUrl.isNotEmpty()) {
+                Log.i("TESS", "bind: KONTOL ${order}")
+                order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
                     Glide.with(binding.root.context)
-                        .load(order.designImageUrl)
+                        .load(it)
                         .centerCrop()
                         .into(ivDesignImage)
-                } else {
-                    // Set placeholder image
-                    ivDesignImage.setImageResource(com.afaryn.kaoslab.R.drawable.ic_image_placeholder)
-                }
+                } ?: ivDesignImage.setImageResource(com.afaryn.kaoslab.R.drawable.ic_image_placeholder)
 
 //                // Set status styling
 //                tvOrderStatus.text = order.status.replaceFirstChar {

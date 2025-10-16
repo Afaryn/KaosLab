@@ -33,7 +33,11 @@
         android:id="@+id/AccountFragment"
         android:name="com.afaryn.kaoslab.presentation.ui_customer.account.AccountFragment"
         android:label="Account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_AccountFragment_to_editProfileFragment2"
+            app:destination="@id/editProfileFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/myShopOwnerFragment"
         android:name="com.afaryn.kaoslab.presentation.ui_owner.my_shop.MyShopOwnerFragment"
@@ -54,5 +58,13 @@
         android:name="com.afaryn.kaoslab.presentation.ui_owner.sales.SalesRevenueOwnerFragment"
         android:label="fragment_sales_revenue_owner"
         tools:layout="@layout/fragment_sales_revenue_owner" />
+    <fragment
+        android:id="@+id/editProfileFragment2"
+        android:name="com.afaryn.kaoslab.presentation.ui_designer.edit_profile.EditProfileFragment"
+        android:label="EditProfileFragment" >
+        <action
+            android:id="@+id/action_editProfileFragment2_to_AccountFragment"
+            app:destination="@id/AccountFragment" />
+    </fragment>
 
 </navigation>

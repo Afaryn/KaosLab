@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/pjs_bold"
-        android:text="No design yet."
+        android:text="No order yet."
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_md"
         android:textStyle="italic"

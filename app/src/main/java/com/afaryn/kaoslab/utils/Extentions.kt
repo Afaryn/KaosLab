@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -214,6 +215,15 @@ fun Fragment.hideBottomNavDesigner() {
     bottomNavView.visibility = View.GONE
 }
 
+fun Fragment.hideBottomNav() {
+    val activity = requireActivity()
+    val appBar: BottomAppBar? = activity.findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView? = activity.findViewById(R.id.bottom_navigation)
+
+    appBar?.visibility = View.GONE
+    bottomNavView?.visibility = View.GONE
+}
+
 fun Fragment.showBottomNavDesigner() {
     val appBar: BottomAppBar = (activity as DesignerActivity).findViewById(R.id.menuBottom)
     val bottomNavView: BottomNavigationView = (activity as DesignerActivity).findViewById(R.id.bottom_navigation)
@@ -222,6 +232,14 @@ fun Fragment.showBottomNavDesigner() {
     bottomNavView.visibility = View.VISIBLE
 }
 
+fun Fragment.showBottomNav() {
+    val activity = activity ?: return
+    val appBar: BottomAppBar? = activity.findViewById(R.id.menuBottom)
+    val bottomNavView: BottomNavigationView? = activity.findViewById(R.id.bottom_navigation)
+
+    appBar?.visibility = View.VISIBLE
+    bottomNavView?.visibility = View.VISIBLE
+}
 
 fun Int.toCurrencyFormat(): String {
     val numberFormat = NumberFormat.getNumberInstance(Locale("id", "ID"))
@@ -533,3 +551,6 @@ fun MaterialButton.setLoading(isLoading: Boolean, placeholder: String) {
     isEnabled = !isLoading
     text = if (!isLoading) placeholder else "Loading..."
 }
+
+val Int.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density).toInt()

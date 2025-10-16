@@ -36,7 +36,7 @@ class MySalesViewModel @Inject constructor(
             val firebaseStatus = when (status) {
                 "unpaid" -> "pending"
                 "to_deliver" -> "processing"
-                "shipped" -> "shipped"
+                "shipping" -> "shipped"
                 "completed" -> "delivered"
                 else -> status
             }
@@ -45,7 +45,7 @@ class MySalesViewModel @Inject constructor(
                 when (status) {
                     "unpaid" -> _unpaidOrders.value = response
                     "to_deliver" -> _toDeliverOrders.value = response
-                    "shipped" -> _shippingOrders.value = response
+                    "shipping" -> _shippingOrders.value = response
                     "completed" -> _completedOrders.value = response
                 }
             }
@@ -57,7 +57,7 @@ class MySalesViewModel @Inject constructor(
     fun loadAllOrders() {
         loadOrdersByStatus("unpaid")
         loadOrdersByStatus("to_deliver")
-        loadOrdersByStatus("shipped")
+        loadOrdersByStatus("shipping")
         loadOrdersByStatus("completed")
     }
 

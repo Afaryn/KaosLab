@@ -1,9 +1,11 @@
 package com.afaryn.kaoslab.data.repository
 
+import android.util.Log
 import com.afaryn.kaoslab.domain.model.ProductTemplate
 import com.afaryn.kaoslab.domain.model.SizeOption
 import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.domain.model.BusinessInsights
+import com.afaryn.kaoslab.domain.model.CartProduct
 import com.afaryn.kaoslab.domain.model.ChartData
 import com.afaryn.kaoslab.domain.model.OrderStatusCounts
 import com.afaryn.kaoslab.domain.model.Kurir
@@ -21,7 +23,12 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
@@ -335,248 +342,97 @@ class OwnerRepositoryImpl @Inject constructor(
 
     override fun getLastOrders(limit: Int): Flow<Response<List<Order>>> = callbackFlow {
         trySend(Response.Loading)
+
         try {
-            val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
+            val snapshot = firestore.collection(COLLECTION_ORDERS)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(limit.toLong())
                 .get()
                 .await()
 
-            val orders = mutableListOf<Order>()
+            val orders = coroutineScope {
+                snapshot.documents.mapNotNull { doc ->
+                    async {
+                        val order = doc.toObject(Order::class.java)?.copy(orderId = doc.id)
+                            ?: return@async null
 
-            for (document in ordersSnapshot.documents) {
-                val data = document.data ?: continue
-                val customerId = data["customerId"] as? String ?: ""
-                val designId = data["designId"] as? String ?: ""
-                val courierId = data["courierId"] as? String
+                        val customerDeferred = async { fetchCustomerData(order.customerId) }
+                        val courierDeferred = async { fetchCourierData(order.courierId) }
+                        val designDeferred = async { fetchDesignData(order.designId) }
 
-                // Fetch customer data dynamically for current info
-                val (customerName, customerAvatarUrl) = if (customerId.isNotEmpty()) {
-                    try {
-                        val userSnapshot = firestore.collection(COLLECTION_USERS)
-                            .document(customerId)
-                            .get()
-                            .await()
-                        val userData = userSnapshot.data
-                        if (userData != null) {
-                            val name = userData["fullName"] as? String
-                                ?: userData["name"] as? String
-                                ?: "Unknown Customer"
-                            val avatar = userData["avatarUrl"] as? String
-                                ?: userData["profilePicture"] as? String
-                                ?: ""
-                            Pair(name, avatar)
-                        } else {
-                            Pair("Unknown Customer", "")
-                        }
-                    } catch (e: Exception) {
-                        Pair("Unknown Customer", "")
+                        val (customerName, customerAvatar) = customerDeferred.await()
+                        val (courierName, courierLogo) = courierDeferred.await()
+                        val (designImage, designTitle) = designDeferred.await()
+
+                        order.copy(
+                            customerName = customerName,
+                            customerAvatarUrl = customerAvatar,
+                            courierInfo = courierName,
+                            courierLogo = courierLogo,
+                            designImageUrl = designImage,
+                            title = designTitle
+                        )
                     }
-                } else {
-                    Pair("Unknown Customer", "")
-                }
-
-                // Fetch courier information dynamically from masterEkspedisi collection
-                val (courierInfo, courierLogo) = if (!courierId.isNullOrEmpty()) {
-                    try {
-                        val courierSnapshot = firestore.collection(COLLECTION_EKSPEDISI)
-                            .document(courierId)
-                            .get()
-                            .await()
-
-                        val courierData = courierSnapshot.data
-                        if (courierData != null) {
-                            val name = courierData["name"] as? String ?: ""
-                            val logo = courierData["logo"] as? String ?: ""
-                            Pair(name, logo)
-                        } else {
-                            Pair(null, null)
-                        }
-                    } catch (e: Exception) {
-                        Pair(null, null)
-                    }
-                } else {
-                    Pair(null, null)
-                }
-
-                // Fetch design details from customDesigns collection
-                val (designImageUrl, designTitle) = if (designId.isNotEmpty()) {
-                    try {
-                        val designSnapshot = firestore.collection(COLLECTION_CUSTOM_DESIGNS)
-                            .document(designId)
-                            .get()
-                            .await()
-
-                        val designData = designSnapshot.data
-                        if (designData != null) {
-                            val imageUrl = designData["imageUrl"] as? String ?: ""
-                            val title = designData["title"] as? String ?: "Custom Design"
-                            Pair(imageUrl, title)
-                        } else {
-                            Pair("", "Custom Order")
-                        }
-                    } catch (e: Exception) {
-                        Pair("", "Custom Order")
-                    }
-                } else {
-                    Pair("", "Custom Order")
-                }
-
-                val order = Order(
-                    orderId = document.id,
-                    customerId = customerId,
-                    designId = designId,
-                    status = data["status"] as? String ?: "",
-                    totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
-                    totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                    courierId = courierId,
-                    noResi = data["noResi"] as? String,
-                    createdAt = data["createdAt"] as? Timestamp,
-                    // Dynamic fields populated from fetched data
-                    customerName = customerName,
-                    customerAvatarUrl = customerAvatarUrl,
-                    courierInfo = courierInfo,
-                    courierLogo = courierLogo,
-                    designImageUrl = designImageUrl,
-                    title = designTitle
-                )
-                orders.add(order)
+                }.awaitAll().filterNotNull()
             }
 
             trySend(Response.Success(orders))
-            close()
         } catch (e: Exception) {
             trySend(Response.Error(e.message ?: "Failed to fetch last orders"))
-            close()
         }
+
         awaitClose { }
     }
 
     override fun getOrdersByStatus(status: String): Flow<Response<List<Order>>> = callbackFlow {
         trySend(Response.Loading)
+
         try {
-            // Map the status to match Firebase collection structure
-            val statusFilter = when (status) {
-                PENDING_STATUS -> listOf("pending")
-                PROCESSING_STATUS -> listOf("processing")
-                SHIPPED_STATUS -> listOf("shipped")
-                DELIVERED_STATUS -> listOf("delivered")
+            val statusFilter = when (status.lowercase()) {
+                "pending" -> listOf("pending")
+                "processing" -> listOf("processing")
+                "shipped" -> listOf("shipped")
+                "delivered" -> listOf("delivered")
                 else -> listOf(status)
             }
 
-            val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
+            val snapshot = firestore.collection(COLLECTION_ORDERS)
                 .whereIn("status", statusFilter)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .await()
 
-            val orders = mutableListOf<Order>()
+            val orders = coroutineScope {
+                snapshot.documents.mapNotNull { doc ->
+                    async {
+                        val order = doc.toObject(Order::class.java)?.copy(orderId = doc.id)
+                            ?: return@async null
 
-            for (document in ordersSnapshot.documents) {
-                val data = document.data ?: continue
-                val customerId = data["customerId"] as? String ?: ""
-                val designId = data["designId"] as? String ?: ""
-                val courierId = data["courierId"] as? String
+                        val customerDeferred = async { fetchCustomerData(order.customerId) }
+                        val courierDeferred = async { fetchCourierData(order.courierId) }
+                        val designDeferred = async { fetchDesignData(order.designId) }
 
-                // Fetch customer data dynamically for current info
-                val (customerName, customerAvatarUrl) = if (customerId.isNotEmpty()) {
-                    try {
-                        val userSnapshot = firestore.collection(COLLECTION_USERS)
-                            .document(customerId)
-                            .get()
-                            .await()
-                        val userData = userSnapshot.data
-                        if (userData != null) {
-                            val name = userData["fullName"] as? String
-                                ?: userData["name"] as? String
-                                ?: "Unknown Customer"
-                            val avatar = userData["avatarUrl"] as? String
-                                ?: userData["profilePicture"] as? String
-                                ?: ""
-                            Pair(name, avatar)
-                        } else {
-                            Pair("Unknown Customer", "")
-                        }
-                    } catch (e: Exception) {
-                        Pair("Unknown Customer", "")
+                        val (customerName, customerAvatar) = customerDeferred.await()
+                        val (courierName, courierLogo) = courierDeferred.await()
+                        val (designImage, designTitle) = designDeferred.await()
+
+                        order.copy(
+                            customerName = customerName,
+                            customerAvatarUrl = customerAvatar,
+                            courierInfo = courierName,
+                            courierLogo = courierLogo,
+                            designImageUrl = designImage,
+                            title = designTitle
+                        )
                     }
-                } else {
-                    Pair("Unknown Customer", "")
-                }
-
-                // Fetch courier information dynamically from masterEkspedisi collection
-                val (courierInfo, courierLogo) = if (!courierId.isNullOrEmpty()) {
-                    try {
-                        val courierSnapshot = firestore.collection(COLLECTION_EKSPEDISI)
-                            .document(courierId)
-                            .get()
-                            .await()
-
-                        val courierData = courierSnapshot.data
-                        if (courierData != null) {
-                            val name = courierData["name"] as? String ?: ""
-                            val logo = courierData["logo"] as? String ?: ""
-                            Pair(name, logo)
-                        } else {
-                            Pair(null, null)
-                        }
-                    } catch (e: Exception) {
-                        Pair(null, null)
-                    }
-                } else {
-                    Pair(null, null)
-                }
-
-                // Fetch design details from customDesigns collection
-                val (designImageUrl, designTitle) = if (designId.isNotEmpty()) {
-                    try {
-                        val designSnapshot = firestore.collection(COLLECTION_CUSTOM_DESIGNS)
-                            .document(designId)
-                            .get()
-                            .await()
-
-                        val designData = designSnapshot.data
-                        if (designData != null) {
-                            val imageUrl = designData["imageUrl"] as? String ?: ""
-                            val title = designData["title"] as? String ?: "Custom Design"
-                            Pair(imageUrl, title)
-                        } else {
-                            Pair("", "Custom Order")
-                        }
-                    } catch (e: Exception) {
-                        Pair("", "Custom Order")
-                    }
-                } else {
-                    Pair("", "Custom Order")
-                }
-
-                val order = Order(
-                    orderId = document.id,
-                    customerId = customerId,
-                    designId = designId,
-                    status = data["status"] as? String ?: "",
-                    totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
-                    totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                    courierId = courierId,
-                    noResi = data["noResi"] as? String,
-                    createdAt = data["createdAt"] as? Timestamp,
-                    // Dynamic fields populated from fetched data
-                    customerName = customerName,
-                    customerAvatarUrl = customerAvatarUrl,
-                    courierInfo = courierInfo,
-                    courierLogo = courierLogo,
-                    designImageUrl = designImageUrl,
-                    title = designTitle
-                )
-                orders.add(order)
+                }.awaitAll().filterNotNull()
             }
 
             trySend(Response.Success(orders))
-            close()
         } catch (e: Exception) {
             trySend(Response.Error(e.message ?: "Failed to fetch orders by status"))
-            close()
         }
+
         awaitClose { }
     }
 
@@ -603,115 +459,46 @@ class OwnerRepositoryImpl @Inject constructor(
     }
 
     override fun getOrderById(orderId: String): Flow<Response<Order>> = flow {
-        try {
-            emit(Response.Loading)
+        emit(Response.Loading)
 
-            val orderSnapshot = firestore.collection(COLLECTION_ORDERS)
+        try {
+            val doc = firestore.collection(COLLECTION_ORDERS)
                 .document(orderId)
                 .get()
                 .await()
 
-            if (!orderSnapshot.exists()) {
+            if (!doc.exists()) {
                 emit(Response.Error("Order not found"))
                 return@flow
             }
 
-            val data = orderSnapshot.data!!
-            val customerId = data["customerId"] as? String ?: ""
-            val designId = data["designId"] as? String ?: ""
-            val courierId = data["courierId"] as? String
-
-            // Fetch customer data
-            val (customerName, customerAvatarUrl) = if (customerId.isNotEmpty()) {
-                try {
-                    val userSnapshot = firestore.collection(COLLECTION_USERS)
-                        .document(customerId)
-                        .get()
-                        .await()
-                    val userData = userSnapshot.data
-                    if (userData != null) {
-                        val name = userData["fullName"] as? String
-                            ?: userData["name"] as? String
-                            ?: "Unknown Customer"
-                        val avatar = userData["avatarUrl"] as? String
-                            ?: userData["profilePicture"] as? String
-                            ?: ""
-                        Pair(name, avatar)
-                    } else {
-                        Pair("Unknown Customer", "")
-                    }
-                } catch (e: Exception) {
-                    Pair("Unknown Customer", "")
-                }
-            } else {
-                Pair("Unknown Customer", "")
+            val baseOrder = doc.toObject(Order::class.java)?.copy(orderId = doc.id)
+            if (baseOrder == null) {
+                emit(Response.Error("Failed to parse order data"))
+                return@flow
             }
 
-            // Fetch courier information
-            val (courierInfo, courierLogo) = if (!courierId.isNullOrEmpty()) {
-                try {
-                    val courierSnapshot = firestore.collection(COLLECTION_EKSPEDISI)
-                        .document(courierId)
-                        .get()
-                        .await()
+            val enrichedOrder = coroutineScope {
+                val customerDeferred = async { fetchCustomerData(baseOrder.customerId) }
+                val courierDeferred  = async { fetchCourierData(baseOrder.courierId) }
+                val designDeferred   = async { fetchDesignData(baseOrder.designId) }
 
-                    val courierData = courierSnapshot.data
-                    if (courierData != null) {
-                        val name = courierData["name"] as? String ?: ""
-                        val logo = courierData["logo"] as? String ?: ""
-                        Pair(name, logo)
-                    } else {
-                        Pair(null, null)
-                    }
-                } catch (e: Exception) {
-                    Pair(null, null)
-                }
-            } else {
-                Pair(null, null)
+                val (customerName, customerAvatar) = customerDeferred.await()
+                val (courierName, courierLogo)     = courierDeferred.await()
+                val (designImage, designTitle)     = designDeferred.await()
+
+                baseOrder.copy(
+                    customerName = customerName,
+                    customerAvatarUrl = customerAvatar,
+                    courierInfo = courierName,
+                    courierLogo = courierLogo,
+                    designImageUrl = designImage,
+                    title = designTitle
+                )
             }
 
-            // Fetch design details
-            val (designImageUrl, designTitle) = if (designId.isNotEmpty()) {
-                try {
-                    val designSnapshot = firestore.collection(COLLECTION_CUSTOM_DESIGNS)
-                        .document(designId)
-                        .get()
-                        .await()
+            emit(Response.Success(enrichedOrder))
 
-                    val designData = designSnapshot.data
-                    if (designData != null) {
-                        val imageUrl = designData["imageUrl"] as? String ?: ""
-                        val title = designData["title"] as? String ?: "Custom Design"
-                        Pair(imageUrl, title)
-                    } else {
-                        Pair("", "Custom Order")
-                    }
-                } catch (e: Exception) {
-                    Pair("", "Custom Order")
-                }
-            } else {
-                Pair("", "Custom Order")
-            }
-
-            val order = Order(
-                orderId = orderSnapshot.id,
-                customerId = customerId,
-                designId = designId,
-                status = data["status"] as? String ?: "",
-                totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
-                totalPieces = (data["totalPieces"] as? Number)?.toInt() ?: 1,
-                courierId = courierId,
-                noResi = data["noResi"] as? String,
-                createdAt = data["createdAt"] as? Timestamp,
-                customerName = customerName,
-                customerAvatarUrl = customerAvatarUrl,
-                courierInfo = courierInfo,
-                courierLogo = courierLogo,
-                designImageUrl = designImageUrl,
-                title = designTitle
-            )
-
-            emit(Response.Success(order))
         } catch (e: Exception) {
             emit(Response.Error(e.message ?: "Failed to fetch order details"))
         }
@@ -967,5 +754,61 @@ class OwnerRepositoryImpl @Inject constructor(
             close()
         }
         awaitClose { }
+    }
+
+    private suspend fun fetchCustomerData(customerId: String): Pair<String, String> {
+        if (customerId.isEmpty()) return "Unknown Customer" to ""
+        return try {
+            val snapshot = firestore
+                .collection(COLLECTION_USERS)
+                .document(customerId)
+                .get()
+                .await()
+
+            val data = snapshot.data ?: return "Unknown Customer" to ""
+            val name = data["fullName"] as? String
+                ?: data["name"] as? String
+                ?: "Unknown Customer"
+            val avatar = data["avatarUrl"] as? String
+                ?: data["profilePicture"] as? String
+                ?: ""
+            name to avatar
+        } catch (e: Exception) {
+            "Unknown Customer" to ""
+        }
+    }
+
+    private suspend fun fetchCourierData(courierId: String?): Pair<String?, String?> {
+        if (courierId.isNullOrEmpty()) return null to null
+        return try {
+            val snapshot = firestore
+                .collection(COLLECTION_EKSPEDISI)
+                .document(courierId)
+                .get()
+                .await()
+
+            val data = snapshot.data ?: return null to null
+            (data["name"] as? String) to (data["logo"] as? String)
+        } catch (e: Exception) {
+            null to null
+        }
+    }
+
+    private suspend fun fetchDesignData(designId: String): Pair<String, String> {
+        if (designId.isEmpty()) return "" to "Custom Order"
+        return try {
+            val snapshot = firestore
+                .collection(COLLECTION_CUSTOM_DESIGNS)
+                .document(designId)
+                .get()
+                .await()
+
+            val data = snapshot.data ?: return "" to "Custom Order"
+            val imageUrl = data["imageUrl"] as? String ?: ""
+            val title = data["title"] as? String ?: "Custom Design"
+            imageUrl to title
+        } catch (e: Exception) {
+            "" to "Custom Order"
+        }
     }
 }

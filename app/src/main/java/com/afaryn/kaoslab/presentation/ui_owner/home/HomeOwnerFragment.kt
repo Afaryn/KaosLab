@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentHomeOwnerBinding
 import com.afaryn.kaoslab.presentation.ui_owner.home.adapter.LastOrderAdapter
-import com.afaryn.kaoslab.presentation.ui_owner.home.HomeOwnerFragmentDirections
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
 import dagger.hilt.android.AndroidEntryPoint

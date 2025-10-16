@@ -6,6 +6,7 @@ import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.domain.repository.DesignerRepository
+import com.afaryn.kaoslab.utils.Constants.COLL_USER
 import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,7 +22,7 @@ class DesignerRepositoryImpl @Inject constructor(
     val auth: FirebaseAuth,
     val firestore: FirebaseFirestore,
     val storage: FirebaseStorage
-): DesignerRepository {
+) : DesignerRepository {
 
     override fun getDesigns(): Flow<Response<List<Design>>> = flow {
         try {
@@ -50,7 +51,7 @@ class DesignerRepositoryImpl @Inject constructor(
 
             // Handle empty collection gracefully
             val designs = if (snapshot.isEmpty) {
-                emptyList<Design>()
+                emptyList()
             } else {
                 val designList = snapshot.toObjects(Design::class.java).filterNotNull()
                 // Sort manually if we had to use simple query
@@ -68,17 +69,21 @@ class DesignerRepositoryImpl @Inject constructor(
                     // Collection doesn't exist yet, return empty list
                     emit(Response.Success(emptyList()))
                 }
+
                 e.message?.contains("permission") == true -> {
                     emit(Response.Error("Permission denied. Please check your authentication."))
                 }
+
                 e.message?.contains("network") == true || e.message?.contains("offline") == true -> {
                     emit(Response.Error("Network error. Please check your internet connection."))
                 }
+
                 e.message?.contains("index") == true -> {
                     // Firestore index not created yet, but still try to return empty for now
                     Log.w("DesignerRepository", "Firestore index not ready, returning empty list")
                     emit(Response.Success(emptyList()))
                 }
+
                 else -> {
                     emit(Response.Error(e.message ?: "Failed to get designs"))
                 }
@@ -86,22 +91,29 @@ class DesignerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addDesign(design: Design): Flow<Response<String>> = flow {
+    override fun addDesign(design: Design, imgUri: Uri): Flow<Response<String>> = flow {
         try {
             emit(Response.Loading)
             val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+            val user = firestore.collection(COLL_USER).document(currentUserId).get()
+                .await().toObject(User::class.java) ?: throw Exception("Failed getting user data")
 
-            val designId = firestore.collection("designs").document().id
-            val designWithId = design.copy(
-                id = designId,
-                designerId = currentUserId,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
-            )
+            val fileRef = storage.reference.child("designs/$currentUserId/${design.id}.jpg")
+            fileRef.putFile(imgUri).await()
+            val imgUrl = fileRef.downloadUrl.await().toString()
 
             firestore.collection("designs")
-                .document(designId)
-                .set(designWithId)
+                .document(design.id)
+                .set(
+                    design.copy(
+                        designerId = currentUserId,
+                        designerName = user.name?.replaceFirstChar { it.uppercaseChar() } ?: "-",
+                        fileUrl = imgUrl,
+                        thumbnailUrl = imgUrl,
+                        createdAt = System.currentTimeMillis(),
+                        updatedAt = System.currentTimeMillis()
+                    )
+                )
                 .await()
 
             emit(Response.Success("Design added successfully"))
@@ -110,7 +122,7 @@ class DesignerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun updateDesign(design: Design): Flow<Response<String>> = flow {
+    override fun updateDesign(design: Design, imgUri: Uri?): Flow<Response<String>> = flow {
         try {
             emit(Response.Loading)
             val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
@@ -119,7 +131,17 @@ class DesignerRepositoryImpl @Inject constructor(
                 throw Exception("Unauthorized to update this design")
             }
 
-            val updatedDesign = design.copy(updatedAt = System.currentTimeMillis())
+            val imgUrl = imgUri?.let {
+                val fileRef = storage.reference.child("designs/$currentUserId/${design.id}.jpg")
+                fileRef.putFile(imgUri).await()
+                fileRef.downloadUrl.await().toString()
+            } ?: design.fileUrl
+
+            val updatedDesign = design.copy(
+                updatedAt = System.currentTimeMillis(),
+                fileUrl = imgUrl,
+                thumbnailUrl = imgUrl
+            )
 
             firestore.collection("designs")
                 .document(design.id)
@@ -185,7 +207,10 @@ class DesignerRepositoryImpl @Inject constructor(
                     .await()
             } catch (indexException: Exception) {
                 if (indexException.message?.contains("index") == true) {
-                    Log.w("DesignerRepository", "Index not found for portfolios, using simple query")
+                    Log.w(
+                        "DesignerRepository",
+                        "Index not found for portfolios, using simple query"
+                    )
                     firestore.collection("designerPortfolios")
                         .whereEqualTo("designerId", currentUserId)
                         .get()
@@ -196,7 +221,7 @@ class DesignerRepositoryImpl @Inject constructor(
             }
 
             val portfolios = if (snapshot.isEmpty) {
-                emptyList<Portfolio>()
+                emptyList()
             } else {
                 val portfolioList = snapshot.toObjects(Portfolio::class.java).filterNotNull()
                 portfolioList.sortedByDescending { it.createdAt }
@@ -210,16 +235,23 @@ class DesignerRepositoryImpl @Inject constructor(
                 e.message?.contains("not found") == true -> {
                     emit(Response.Success(emptyList()))
                 }
+
                 e.message?.contains("permission") == true -> {
                     emit(Response.Error("Permission denied. Please check your authentication."))
                 }
+
                 e.message?.contains("network") == true || e.message?.contains("offline") == true -> {
                     emit(Response.Error("Network error. Please check your internet connection."))
                 }
+
                 e.message?.contains("index") == true -> {
-                    Log.w("DesignerRepository", "Firestore index not ready for portfolios, returning empty list")
+                    Log.w(
+                        "DesignerRepository",
+                        "Firestore index not ready for portfolios, returning empty list"
+                    )
                     emit(Response.Success(emptyList()))
                 }
+
                 else -> {
                     emit(Response.Error(e.message ?: "Failed to get portfolios"))
                 }

@@ -6,24 +6,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.afaryn.kaoslab.R.drawable
 import com.afaryn.kaoslab.databinding.FragmentOrderDetailsBinding
 import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.utils.Response
+import com.afaryn.kaoslab.utils.dp
 import com.afaryn.kaoslab.utils.hideBottomNavOwner
 import com.afaryn.kaoslab.utils.toast
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.util.*
-import androidx.core.graphics.toColorInt
-import com.afaryn.kaoslab.presentation.ui_owner.sales.order_details.OrderDetailsFragmentArgs
-import com.afaryn.kaoslab.presentation.ui_owner.sales.order_details.OrderDetailsFragmentDirections
+import java.util.Locale
 
 @AndroidEntryPoint
 class OrderDetailsFragment : Fragment() {
@@ -66,6 +68,7 @@ class OrderDetailsFragment : Fragment() {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.contentLayout.visibility = View.GONE
                 }
+
                 is Response.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.contentLayout.visibility = View.VISIBLE
@@ -73,10 +76,12 @@ class OrderDetailsFragment : Fragment() {
                     populateOrderDetails(response.data)
                     loadCustomerDetails(response.data.customerId)
                 }
+
                 is Response.Error -> {
                     binding.progressBar.visibility = View.GONE
                     toast(response.message)
                 }
+
                 else -> {}
             }
         }
@@ -88,17 +93,20 @@ class OrderDetailsFragment : Fragment() {
                         binding.primaryButton.isEnabled = false
                         binding.primaryButton.text = "Updating..."
                     }
+
                     is Response.Success -> {
                         if (response.data.isNotEmpty()) {
                             toast("Order updated successfully")
                             findNavController().navigateUp()
                         }
                     }
+
                     is Response.Error -> {
                         binding.primaryButton.isEnabled = true
                         setupButtonsForStatus(currentOrder?.status ?: "")
                         toast(response.message)
                     }
+
                     else -> {}
                 }
             }
@@ -116,9 +124,11 @@ class OrderDetailsFragment : Fragment() {
                     customerPhone = response.data.phone
                     binding.customerAddress.text = "${response.data.name}\n${response.data.email}"
                 }
+
                 is Response.Error -> {
                     binding.customerAddress.text = "Customer information not available"
                 }
+
                 else -> {}
             }
         }
@@ -128,18 +138,22 @@ class OrderDetailsFragment : Fragment() {
         binding.apply {
             // Customer info
             customerName.text = order.customerName
-            Glide.with(requireContext())
-                .load(order.customerAvatarUrl)
-                .into(customerAvatar)
+            order.customerAvatarUrl.takeIf { it.isNotEmpty() }?.let {
+                Glide.with(requireContext())
+                    .load(it)
+                    .into(customerAvatar)
+            }
 
             // Product info
             productTitle.text = order.title
-            Glide.with(requireContext())
-                .load(order.designImageUrl)
-                .into(productImage)
+            order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
+                Glide.with(requireContext())
+                    .load(it)
+                    .into(productImage)
+            } ?: productImage.setImageResource(drawable.ic_image_placeholder)
 
             // Order details
-            colorValue.text = "White" // You can add this to Order model
+            colorValue.text = order.cartProducts.joinToString(", ") { it.selectedColor.toString() }
             sizeValue.text = order.cartProducts.joinToString { it.orderItem?.size.toString() }
 
             // Format total amount
@@ -159,6 +173,25 @@ class OrderDetailsFragment : Fragment() {
                     .into(courierLogo)
             } else {
                 courierInfoSection.visibility = View.GONE
+            }
+
+            llColors.removeAllViews()
+            order.cartProducts.mapNotNull { it.selectedColor }.forEach {
+                try {
+                    val color = it.toColorInt()
+
+                    val imageView = ImageView(requireContext()).apply {
+                        layoutParams = LinearLayout.LayoutParams(25.dp, 25.dp).apply {
+                            marginEnd = 8.dp
+                        }
+                        setBackgroundColor(color)
+                        contentDescription = "Color variant"
+                    }
+
+                    llColors.addView(imageView)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -189,39 +222,45 @@ class OrderDetailsFragment : Fragment() {
                     statusText.text = "Unpaid"
                     statusIcon.visibility = View.GONE
                 }
+
                 "processing" -> {
                     // Unpaid completed (green), processing active (blue)
                     unpaidStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
                         "#4CAF50".toColorInt()
                     )
-                    processingStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                        "#2196F3".toColorInt()
-                    )
+                    processingStatus.backgroundTintList =
+                        android.content.res.ColorStateList.valueOf(
+                            "#2196F3".toColorInt()
+                        )
                     statusText.text = "To Deliver"
                     statusIcon.visibility = View.GONE
                 }
+
                 "shipped" -> {
                     // Unpaid and processing completed (green), shipped active (blue)
                     unpaidStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
                         "#4CAF50".toColorInt()
                     )
-                    processingStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                        "#4CAF50".toColorInt()
-                    )
+                    processingStatus.backgroundTintList =
+                        android.content.res.ColorStateList.valueOf(
+                            "#4CAF50".toColorInt()
+                        )
                     shippedStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
                         "#2196F3".toColorInt()
                     )
                     statusText.text = "Shipping"
                     statusIcon.visibility = View.GONE
                 }
+
                 "delivered" -> {
                     // All statuses completed (green)
                     unpaidStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
                         "#4CAF50".toColorInt()
                     )
-                    processingStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                        "#4CAF50".toColorInt()
-                    )
+                    processingStatus.backgroundTintList =
+                        android.content.res.ColorStateList.valueOf(
+                            "#4CAF50".toColorInt()
+                        )
                     shippedStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
                         "#4CAF50".toColorInt()
                     )
@@ -250,15 +289,18 @@ class OrderDetailsFragment : Fragment() {
                 "pending" -> {
                     // No progress lines are active yet
                 }
+
                 "processing" -> {
                     // First progress line is completed (green)
                     progressLine1.setBackgroundColor("#4CAF50".toColorInt())
                 }
+
                 "shipped" -> {
                     // First two progress lines are completed (green)
                     progressLine1.setBackgroundColor("#4CAF50".toColorInt())
                     progressLine2.setBackgroundColor("#4CAF50".toColorInt())
                 }
+
                 "delivered" -> {
                     // All progress lines are completed (green)
                     progressLine1.setBackgroundColor("#4CAF50".toColorInt())
@@ -278,6 +320,7 @@ class OrderDetailsFragment : Fragment() {
                     secondaryButton.visibility = View.GONE
                     primaryButton.setOnClickListener { contactCustomer() }
                 }
+
                 "processing" -> {
                     primaryButton.text = "Arrange Shipment"
                     secondaryButton.text = "Download"
@@ -286,12 +329,14 @@ class OrderDetailsFragment : Fragment() {
                     primaryButton.setOnClickListener { arrangeShipment() }
                     secondaryButton.setOnClickListener { downloadOrder() }
                 }
+
                 "shipped" -> {
                     primaryButton.text = "Set to Delivered"
                     primaryButton.visibility = View.VISIBLE
                     secondaryButton.visibility = View.GONE
                     primaryButton.setOnClickListener { setToDelivered() }
                 }
+
                 "delivered" -> {
                     primaryButton.visibility = View.GONE
                     secondaryButton.visibility = View.GONE
@@ -303,7 +348,8 @@ class OrderDetailsFragment : Fragment() {
 
     private fun contactCustomer() {
         if (customerPhone.isNotEmpty()) {
-            val message = "Hello ${currentOrder?.customerName}, regarding your order ${args.orderId}..."
+            val message =
+                "Hello ${currentOrder?.customerName}, regarding your order ${args.orderId}..."
             val uri = Uri.parse("https://wa.me/$customerPhone?text=${Uri.encode(message)}")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)

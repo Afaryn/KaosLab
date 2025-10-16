@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.afaryn.kaoslab.R.*
 import com.afaryn.kaoslab.databinding.ItemSalesBinding
 import com.afaryn.kaoslab.domain.model.Order
 import com.bumptech.glide.Glide
@@ -37,9 +38,12 @@ class SalesAdapter(
             binding.apply {
                 // User info
                 userName.text = order.customerName
-                Glide.with(itemView.context)
-                    .load(order.customerAvatarUrl)
-                    .into(userAvatar)
+
+                order.customerAvatarUrl.takeIf { it.isNotEmpty() }?.let {
+                    Glide.with(itemView.context)
+                        .load(it)
+                        .into(userAvatar)
+                }
 
                 // Status tag
                 salesStatusTag.text = getStatusDisplayText(order.status)
@@ -49,9 +53,11 @@ class SalesAdapter(
                 productDetails.text = "Size: ${order.cartProducts.joinToString { it.orderItem?.size.toString() }}"
                 productQuantity.text = "x${order.totalPieces}"
 
-                Glide.with(itemView.context)
-                    .load(order.designImageUrl)
-                    .into(productImage)
+                order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
+                    Glide.with(itemView.context)
+                        .load(it)
+                        .into(productImage)
+                } ?: productImage.setImageResource(drawable.ic_image_placeholder)
 
                 // Total amount
                 val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))

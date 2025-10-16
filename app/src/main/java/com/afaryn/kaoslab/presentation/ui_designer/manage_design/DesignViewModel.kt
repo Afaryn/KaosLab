@@ -3,8 +3,8 @@ package com.afaryn.kaoslab.presentation.ui_designer.manage_design
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afaryn.kaoslab.domain.repository.DesignerRepository
 import com.afaryn.kaoslab.domain.model.Design
+import com.afaryn.kaoslab.domain.repository.DesignerRepository
 import com.afaryn.kaoslab.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,22 +46,10 @@ class DesignViewModel @Inject constructor(
             try {
                 _addDesignState.value = Response.Loading
 
-                // Generate design ID for Firebase Storage naming
-                val designId = java.util.UUID.randomUUID().toString()
-
-                val imageUrl = if (imageUri != null) {
-                    // Upload image to Firebase Storage
-                    repository.uploadDesignImage(imageUri, designId)
-                } else {
-                    design.fileUrl // Keep existing URL if no new image
-                }
-
-                val designWithImage = design.copy(
-                    id = designId,
-                    fileUrl = imageUrl
-                )
-
-                repository.addDesign(designWithImage).collect { response ->
+                repository.addDesign(
+                    design,
+                    imageUri ?: throw Exception("No image attached")
+                ).collect { response ->
                     _addDesignState.value = response
                     if (response is Response.Success) {
                         getDesigns() // Refresh the list

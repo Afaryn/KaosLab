@@ -300,12 +300,8 @@ class UserRepositoryImpl @Inject constructor(
                 .document(uid)
                 .collection(COLL_CART)
 
-            val ordersCollection = firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_ORDERS)
-
-            val orderRef = ordersCollection.document(order.orderId)
-            batch.set(orderRef, order.copy(snapToken = snapToken))
+            val orderRef = firestore.collection(COLL_ORDERS).document(order.orderId)
+            batch.set(orderRef, order.copy(snapToken = snapToken, customerId = uid))
 
             cartIds.forEach { cartId ->
                 val docRef = cartCollection.document(cartId)
@@ -465,9 +461,8 @@ class UserRepositoryImpl @Inject constructor(
             return@callbackFlow
         }
 
-        val listener = firestore.collection(COLL_USER)
-            .document(uid)
-            .collection(COLL_ORDERS)
+        val listener = firestore.collection(COLL_ORDERS)
+            .whereEqualTo("customerId", uid)
             .whereEqualTo("status", status)
             .addSnapshotListener { value, error ->
                 error?.let {
@@ -484,48 +479,47 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { listener.remove() }
     }
 
-    override fun updatePaymentStatus(order: Order): Flow<Resource<Pair<String, Boolean>>> = callbackFlow {
-        trySend(Resource.Loading)
+    override fun updatePaymentStatus(order: Order): Flow<Resource<Pair<String, Boolean>>> =
+        callbackFlow {
+            trySend(Resource.Loading)
 
-        val uid = auth.uid ?: run {
-            trySend(Resource.Error("Gagal mendapatkan data user"))
-            close()
-            return@callbackFlow
-        }
-
-        try {
-            val response = midtransApi.getStatus(order.orderId)
-
-            when (response.transactionStatus) {
-                in listOf(STATUS_SUCCESS, STATUS_SETTLEMENT) -> {
-                    firestore.collection(COLL_USER)
-                        .document(uid)
-                        .collection(COLL_ORDERS)
-                        .document(order.orderId)
-                        .set(order.copy(status = OrderStatus.Processing.value))
-                        .await()
-
-                    trySend(Resource.Success("Payment Successful" to true))
-                    close()
-                    return@callbackFlow
-                }
-
-                STATUS_PENDING -> {
-                    trySend(Resource.Success(order.snapToken.orEmpty() to false))
-                    close()
-                    return@callbackFlow
-                }
-
-                else -> {
-                    trySend(Resource.Error("Payment failed or unknown"))
-                    close()
-                    return@callbackFlow
-                }
+            val uid = auth.uid ?: run {
+                trySend(Resource.Error("Gagal mendapatkan data user"))
+                close()
+                return@callbackFlow
             }
-        } catch (e: Exception) {
-            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-        }
 
-        awaitClose { }
-    }
+            try {
+                val response = midtransApi.getStatus(order.orderId)
+
+                when (response.transactionStatus) {
+                    in listOf(STATUS_SUCCESS, STATUS_SETTLEMENT) -> {
+                        firestore.collection(COLL_ORDERS)
+                            .document(order.orderId)
+                            .set(order.copy(status = OrderStatus.Processing.value))
+                            .await()
+
+                        trySend(Resource.Success("Payment Successful" to true))
+                        close()
+                        return@callbackFlow
+                    }
+
+                    STATUS_PENDING -> {
+                        trySend(Resource.Success(order.snapToken.orEmpty() to false))
+                        close()
+                        return@callbackFlow
+                    }
+
+                    else -> {
+                        trySend(Resource.Error("Payment failed or unknown"))
+                        close()
+                        return@callbackFlow
+                    }
+                }
+            } catch (e: Exception) {
+                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+            }
+
+            awaitClose { }
+        }
 }

@@ -16,4 +16,6 @@ class AccountViewModel @Inject constructor(
             authRepository.logout()
         }
     }
+
+    fun user() = authRepository.getCurrentUser()
 }

@@ -7,13 +7,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.presentation.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentAccountBinding
+import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignActivity
 import com.afaryn.kaoslab.presentation.ui_customer.account.orders.OrdersActivity
 import com.afaryn.kaoslab.presentation.ui_customer.address.AddressActivity
+import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
+import com.afaryn.kaoslab.utils.Constants.DESIGNER
+import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.confirmDialog
+import com.afaryn.kaoslab.utils.show
+import com.afaryn.kaoslab.utils.showBottomNav
+import com.afaryn.kaoslab.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -27,7 +38,7 @@ class AccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
+        showBottomNav()
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -35,8 +46,32 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUser()
         setupToolbar()
         setActions()
+    }
+
+    private fun observeUser() = lifecycleScope.launch {
+        viewModel.user().collect { state ->
+            when (state) {
+                is Response.Success -> setupView(state.data)
+                is Response.Error -> toast(state.message)
+                else -> {}
+            }
+        }
+    }
+
+    private fun setupView(data: User) = binding.run {
+        txtName.text = data.name?.replaceFirstChar { it.uppercaseChar() }
+
+        btnBecomeDesigner.apply {
+            text = if (data.role == DESIGNER) "Seller Centre" else "Become a Seller"
+            setOnClickListener {
+                if (data.role == DESIGNER)
+                    startActivity(Intent(requireContext(), DesignerActivity::class.java))
+            }
+            show()
+        }
     }
 
     private fun setupToolbar() {
@@ -67,6 +102,10 @@ class AccountFragment : Fragment() {
 
         btnAddress.setOnClickListener {
             startActivity(Intent(requireContext(), AddressActivity::class.java))
+        }
+
+        btnUserSecurity.setOnClickListener {
+            findNavController().navigate(R.id.action_AccountFragment_to_editProfileFragment2)
         }
     }
 

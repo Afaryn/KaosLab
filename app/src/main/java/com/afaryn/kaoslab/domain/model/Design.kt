@@ -2,10 +2,11 @@ package com.afaryn.kaoslab.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 data class Design(
-    val id: String = "",
+    val id: String = UUID.randomUUID().toString(),
     val designerId: String = "",
     val designerName: String = "",
     val title: String = "",

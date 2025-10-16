@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.presentation.ui_designer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -9,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityDesignerBinding
+import com.afaryn.kaoslab.presentation.ui_customer.custome.CustomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,7 +54,7 @@ class DesignerActivity : AppCompatActivity() {
                     true
                 }
                 R.id.customFragment -> {
-                    navController.navigate(R.id.customFragment)
+                    startActivity(Intent(this, CustomeActivity::class.java))
                     true
                 }
                 R.id.accountDesignerFragment -> {

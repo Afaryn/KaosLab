@@ -472,13 +472,11 @@ class DetailEditDesignFragment : Fragment() {
             tags = tags,
             licenses = licenses,
             minPrice = minPrice,
-            maxPrice = maxPrice,
-            fileUrl = selectedImageUri?.toString() ?: currentDesign?.fileUrl ?: "",
-            thumbnailUrl = selectedImageUri?.toString() ?: currentDesign?.thumbnailUrl ?: ""
+            maxPrice = maxPrice
         )
 
         updatedDesign?.let { design ->
-            viewModel.updateDesign(design)
+            viewModel.updateDesign(design, selectedImageUri)
         }
     }
 

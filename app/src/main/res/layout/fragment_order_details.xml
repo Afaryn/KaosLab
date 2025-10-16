@@ -79,8 +79,8 @@
                     android:id="@+id/customerAvatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:contentDescription="Customer Avatar"
-                    tools:src="@tools:sample/avatars" />
+                    android:src="@drawable/img_sample_profile"
+                    android:contentDescription="Customer Avatar" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -130,12 +130,13 @@
                         android:id="@+id/productImage"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
                         android:contentDescription="Product Image"
                         tools:src="@tools:sample/backgrounds/scenic" />
 
                     <!-- Color Variations (small thumbnails) -->
                     <LinearLayout
+                        android:id="@+id/ll_colors"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
