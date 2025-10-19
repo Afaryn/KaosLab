@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ItemFeedBinding
-import com.afaryn.kaoslab.domain.model.Feed
+import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.utils.CustomTypefaceSpan
 import com.afaryn.kaoslab.utils.glide
 import com.afaryn.kaoslab.utils.orZero
@@ -24,17 +24,17 @@ class FeedAdapter : RecyclerView.Adapter<FeedAdapter.FeedViewHolder>() {
         currentUserId = id
     }
 
-    private val diffUtil = object : DiffUtil.ItemCallback<Feed>() {
+    private val diffUtil = object : DiffUtil.ItemCallback<Portfolio>() {
         override fun areItemsTheSame(
-            oldItem: Feed,
-            newItem: Feed
+            oldItem: Portfolio,
+            newItem: Portfolio
         ): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Feed,
-            newItem: Feed
+            oldItem: Portfolio,
+            newItem: Portfolio
         ): Boolean {
             return oldItem == newItem
         }
@@ -59,21 +59,23 @@ class FeedAdapter : RecyclerView.Adapter<FeedAdapter.FeedViewHolder>() {
     override fun getItemCount(): Int = differ.currentList.size
 
     inner class FeedViewHolder(val binding: ItemFeedBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(feed: Feed) = with(binding) {
+        fun bind(feed: Portfolio) = with(binding) {
             val usernameFont = ResourcesCompat.getFont(itemView.context, R.font.pjs_bold)
             val captionFont = ResourcesCompat.getFont(itemView.context, R.font.pjs_regular)
 
-            val spannable = SpannableString("${feed.user?.name} ${feed.caption}").apply {
+            val name = feed.user?.name ?: "Designer"
+
+            val spannable = SpannableString("$name ${feed.description}").apply {
                 setSpan(
                     CustomTypefaceSpan(usernameFont!!),
                     0,
-                    feed.user?.name?.length.orZero(),
+                    name.length.orZero(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
                 setSpan(
                     CustomTypefaceSpan(captionFont!!),
-                    feed.user?.name?.length.orZero() + 1,
+                    name.length.orZero() + 1,
                     length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
@@ -81,7 +83,7 @@ class FeedAdapter : RecyclerView.Adapter<FeedAdapter.FeedViewHolder>() {
 
             tvUsernameCaption.text = spannable
             tvCreatedAt.text = feed.createdAt.toMonthDay()
-            feed.photoUrl?.let { imagePost.glide(it) }
+            feed.imageUrl.takeIf { it.isNotEmpty() }?.let { imagePost.glide(it) }
 
             val drawable = if (feed.isLikedBy(currentUserId)) R.drawable.ic_like_fill
             else R.drawable.ic_like_line
@@ -94,7 +96,7 @@ class FeedAdapter : RecyclerView.Adapter<FeedAdapter.FeedViewHolder>() {
         }
     }
 
-    var onLike: ((Feed, Boolean) -> Unit)? = null
-    var onComment: ((Feed) -> Unit)? = null
-    var onShare: ((Feed) -> Unit)? = null
+    var onLike: ((Portfolio, Boolean) -> Unit)? = null
+    var onComment: ((Portfolio) -> Unit)? = null
+    var onShare: ((Portfolio) -> Unit)? = null
 }

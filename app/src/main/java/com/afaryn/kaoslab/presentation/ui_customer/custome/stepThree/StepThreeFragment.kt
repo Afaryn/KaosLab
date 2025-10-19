@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.R
@@ -32,13 +33,14 @@ import com.afaryn.kaoslab.domain.model.SizeOption
 import com.afaryn.kaoslab.presentation.ui_customer.custome.OrderSummaryActivity
 import com.afaryn.kaoslab.presentation.ui_customer.custome.adapter.YourDesignAdapter
 import com.afaryn.kaoslab.presentation.ui_customer.custome.viewModel.CustomViewModel
-import com.afaryn.kaoslab.utils.UiState
+import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.hide
 import com.afaryn.kaoslab.utils.show
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 
 @AndroidEntryPoint
@@ -67,7 +69,6 @@ class StepThreeFragment : Fragment() {
         setupTabListeners()
         setupTextWatcher()
         setupRecyclerView()
-        observeDesignState()
         updateNextButtonState()
 
         binding.tabYourDesign.performClick()
@@ -174,7 +175,7 @@ class StepThreeFragment : Fragment() {
         designSelected = viewModel.selectedYourDesignUrl != null
         inputTextValid = false
         updateNextButtonState()
-        viewModel.fetchUserDesigns()
+        observeDesignState()
     }
 
     private fun showAddTextTab() {
@@ -226,22 +227,24 @@ class StepThreeFragment : Fragment() {
         )
     }
 
-    private fun observeDesignState() {
-        viewModel.designsState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Loading -> {
-                    if (state.isLoading == true) {
-                        binding.progressBar2.show()
-                        binding.designRecyclerView.hide()
-                    } else {
-                        binding.progressBar2.hide()
-                        binding.designRecyclerView.show()
-                    }
+    private fun observeDesignState() = lifecycleScope.launch {
+        viewModel.ownedDesigns.collect {
+            when (it) {
+                is Resource.Loading -> {
+                    binding.progressBar2.show()
+                    binding.designRecyclerView.hide()
                 }
+                is Resource.Error -> {
+                    binding.progressBar2.hide()
+                    binding.designRecyclerView.show()
+                    Log.e("StepThreeFragment", "Gagal memuat desain: ${it.error}")
+                    Toast.makeText(requireContext(), "Gagal memuat desain", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Success -> {
+                    binding.progressBar2.hide()
+                    binding.designRecyclerView.show()
 
-                is UiState.Success -> {
-                    val designs = state.data.orEmpty()
-                    Log.d("YourDesignData", "Jumlah desain: ${designs.size}, Data: $designs")
+                    val designs = it.data?.map { o -> o.design.fileUrl }.orEmpty()
 
                     if (designs.isEmpty()) {
                         Toast.makeText(requireContext(), "Belum ada desain", Toast.LENGTH_SHORT).show()
@@ -262,11 +265,6 @@ class StepThreeFragment : Fragment() {
                         binding.designRecyclerView.invalidate()
                         binding.designRecyclerView.requestLayout()
                     }
-                }
-
-                is UiState.Error -> {
-                    Log.e("StepThreeFragment", "Gagal memuat desain: ${state.error}")
-                    Toast.makeText(requireContext(), "Gagal memuat desain", Toast.LENGTH_SHORT).show()
                 }
             }
         }

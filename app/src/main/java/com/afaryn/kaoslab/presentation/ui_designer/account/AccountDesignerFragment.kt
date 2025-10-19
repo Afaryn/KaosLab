@@ -66,9 +66,9 @@ class AccountDesignerFragment : Fragment() {
     }
 
     private fun setupActions() {
-        binding.btnSellerCentre.setOnClickListener {
-            findNavController().navigate(R.id.action_accountDesignerFragment_to_sellerCentreFragment)
-        }
+//        binding.btnSellerCentre.setOnClickListener {
+//            findNavController().navigate(R.id.action_accountDesignerFragment_to_sellerCentreFragment)
+//        }
         binding.btnUserSecurity.setOnClickListener {
             findNavController().navigate(R.id.action_accountDesignerFragment_to_editProfileFragment)
         }

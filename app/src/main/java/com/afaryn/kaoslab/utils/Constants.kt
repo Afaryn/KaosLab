@@ -9,9 +9,9 @@ object Constants {
     const val COLL_ORDERS = "orders"
     const val COLL_USER = "users"
     const val COLL_ADDRESS = "address"
-    const val COLL_USER_DESIGN = "designs"
-    const val COLL_USER_DESIGN_PENDING = "pending_designs"
-    const val COLL_FEED = "feed"
+    const val COLL_USER_DESIGN = "purchased_designs"
+    const val COLL_FAV_DESIGNS = "fav_designs"
+    const val COLL_PORTFOLIOS = "designerPortfolios"
 
 
     const val CUSTOMER = "customer"

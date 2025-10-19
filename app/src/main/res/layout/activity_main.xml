@@ -13,8 +13,8 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/menuBottom"
@@ -34,8 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@android:color/transparent"
-        >
+        android:background="@android:color/transparent">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -45,14 +44,19 @@
             android:background="@color/background"
             android:elevation="8dp"
             app:itemActiveIndicatorStyle="@color/chocoCream"
-            app:menu="@menu/bottom_nav_menu"
             app:itemIconSize="32dp"
+            app:itemIconTint="@color/bottom_nav_icon_color"
             app:itemTextAppearanceActive="@style/BottomNavText"
             app:itemTextAppearanceInactive="@style/BottomNavText"
-            app:itemIconTint="@color/bottom_nav_icon_color"
-            app:labelVisibilityMode="labeled" />
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu" />
 
     </FrameLayout>
 
+    <com.google.android.material.search.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:backgroundTint="@color/background"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

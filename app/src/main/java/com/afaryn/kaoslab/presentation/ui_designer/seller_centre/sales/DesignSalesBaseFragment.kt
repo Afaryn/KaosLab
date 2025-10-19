@@ -11,22 +11,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.data.adapter.DesignAdapter
 import com.afaryn.kaoslab.databinding.FragmentPendingPaymentBinding
-import com.afaryn.kaoslab.domain.model.Design
-import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignViewModel
+import com.afaryn.kaoslab.domain.model.DesignOrder
+import com.afaryn.kaoslab.domain.model.DesignOrderStatus
 import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.collections.orEmpty
 
 @AndroidEntryPoint
 abstract class DesignSalesBaseFragment : Fragment() {
 
-    abstract val isPending: Boolean
+    abstract val status: DesignOrderStatus
     private var _binding: FragmentPendingPaymentBinding? = null
     private val binding get() = _binding!!
     protected val vm: DesignSalesViewModel by activityViewModels()
-    private val designAdapter by lazy { DesignAdapter(isPending) }
+    private val designAdapter by lazy { DesignAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -48,7 +47,7 @@ abstract class DesignSalesBaseFragment : Fragment() {
     }
 
     private fun observeData() = lifecycleScope.launch {
-        vm.getDesigns(isPending).collect {
+        vm.getDesigns(status).collect {
             when (it) {
                 is Resource.Error -> toast(it.error)
                 is Resource.Success -> setupView(it.data.orEmpty())
@@ -57,7 +56,7 @@ abstract class DesignSalesBaseFragment : Fragment() {
         }
     }
 
-    private fun setupView(data: List<Design>) {
+    private fun setupView(data: List<DesignOrder>) {
         binding.tvNoData.isVisible = data.isEmpty()
         designAdapter.differ.submitList(data)
     }

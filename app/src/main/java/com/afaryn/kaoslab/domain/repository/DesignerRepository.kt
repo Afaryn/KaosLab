@@ -2,6 +2,8 @@ package com.afaryn.kaoslab.domain.repository
 
 import android.net.Uri
 import com.afaryn.kaoslab.domain.model.Design
+import com.afaryn.kaoslab.domain.model.DesignOrder
+import com.afaryn.kaoslab.domain.model.DesignOrderStatus
 import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.utils.Resource
@@ -15,7 +17,7 @@ interface DesignerRepository {
     fun updateDesign(design: Design, imgUri: Uri? = null): Flow<Response<String>>
     fun deleteDesign(designId: String): Flow<Response<String>>
     fun getDesignById(designId: String): Flow<Response<Design>>
-    fun getDesignSales(isPending: Boolean): Flow<Resource<List<Design>>>
+    fun getDesignSales(status: DesignOrderStatus): Flow<Resource<List<DesignOrder>>>
 
     // Portfolio Management methods
     fun getPortfolios(): Flow<Response<List<Portfolio>>>

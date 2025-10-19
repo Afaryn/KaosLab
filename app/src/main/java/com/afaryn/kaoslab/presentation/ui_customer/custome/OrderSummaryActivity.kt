@@ -17,7 +17,9 @@ import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityOrderSummaryBinding
 import com.afaryn.kaoslab.domain.model.CartProduct
 import com.afaryn.kaoslab.domain.model.DesignUplType
+import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.presentation.ui_customer.MainActivity
+import com.afaryn.kaoslab.presentation.ui_customer.cart.checkout.CheckOutActivity
 import com.afaryn.kaoslab.presentation.ui_customer.custome.viewModel.OrderSummaryViewModel
 import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.formatRupiah
@@ -160,7 +162,17 @@ class OrderSummaryActivity : AppCompatActivity() {
 
     private fun setupBottomButtons() {
         binding.nextButton.setOnClickListener {
-            Toast.makeText(this, "Melanjutkan ke Pembayaran (Total: ${binding.totalAmount.text})", Toast.LENGTH_SHORT).show()
+            orderData?.copy(quantity = currentQuantity)?.let { cart ->
+                val order = Order(
+                    totalAmount = cart.totalAmount,
+                    totalPieces = cart.quantity,
+                    cartProducts = listOf(cart)
+                )
+
+                startActivity(Intent(this@OrderSummaryActivity, CheckOutActivity::class.java).apply {
+                    putExtra("order", order)
+                })
+            }
         }
 
         binding.cartButton.setOnClickListener {

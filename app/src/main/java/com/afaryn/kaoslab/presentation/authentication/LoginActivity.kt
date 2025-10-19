@@ -88,8 +88,6 @@ class LoginActivity : AppCompatActivity() {
                             binding.progressBar.hide()
                             val intent = if (resource.data.role == OWNER) {
                                 Intent(this, OwnerActivity::class.java)
-                            } else if ( resource.data.role == DESIGNER ) {
-                                Intent(this, DesignerActivity::class.java)
                             } else {
                                 Intent(this, MainActivity::class.java)
                             }

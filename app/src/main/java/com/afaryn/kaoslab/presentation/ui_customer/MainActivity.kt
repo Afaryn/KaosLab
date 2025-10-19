@@ -3,10 +3,13 @@ package com.afaryn.kaoslab.presentation.ui_customer
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -18,13 +21,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityMainBinding
-import com.afaryn.kaoslab.presentation.ui_customer.custome.CustomeActivity
-import com.afaryn.kaoslab.presentation.ui_customer.desain.UserDesignActivity
+import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignActivity
 import com.afaryn.kaoslab.presentation.ui_customer.account.orders.OrdersActivity
+import com.afaryn.kaoslab.presentation.ui_customer.custome.CustomeActivity
+import com.afaryn.kaoslab.presentation.ui_customer.search.SearchResultActivity
+import com.afaryn.kaoslab.utils.SearchListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SearchListener {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -65,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         intent.getBooleanExtra("design", false).takeIf { it }?.let {
-            startActivity(Intent(this, UserDesignActivity::class.java))
+            startActivity(Intent(this, MyDesignActivity::class.java))
         }
     }
 
@@ -146,6 +151,35 @@ class MainActivity : AppCompatActivity() {
 
             val manager = getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(channel)
+        }
+    }
+
+    override fun onSearch(query: String) {
+
+    }
+
+    override fun triggerSearchView(isOpen: Boolean) {
+        with(binding.searchView) {
+            if (isOpen) {
+                show()
+                editText.requestFocus()
+                val imm = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+            } else {
+                hide()
+                clearFocus()
+            }
+
+            editText.setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    startActivity(Intent(this@MainActivity, SearchResultActivity::class.java).apply {
+                        putExtra("query", v.text.toString())
+                    })
+                    hide()
+                    clearFocus()
+                    true
+                } else false
+            }
         }
     }
 }

@@ -2,52 +2,44 @@ package com.afaryn.kaoslab.presentation.ui_customer.home.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.utils.Constants.DESIGN_COLLECTION
-import com.afaryn.kaoslab.utils.UiState
+import com.afaryn.kaoslab.utils.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val _product = MutableStateFlow<UiState<List<Design>>>(UiState.Loading(false))
-    val product = _product.asStateFlow().asLiveData()
+    fun getProduct() = callbackFlow {
+        trySend(Resource.Loading)
 
-    init {
-        getProduct()
-    }
+        val uid = auth.currentUser?.uid ?: run {
+            trySend(Resource.Error("User not logged in"))
+            close()
+            return@callbackFlow
+        }
 
-    private fun getProduct() {
-        _product.value = UiState.Loading(true)
-        firestore.collection(DESIGN_COLLECTION)
+        val listener = firestore.collection(DESIGN_COLLECTION)
+            .whereNotEqualTo("designerId", uid)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("HomeViewModel", "Error fetching products: ${error.message}")
-                    _product.value = UiState.Loading(false)
-                    _product.value = UiState.Error(error.message ?: "Unknown error occurred")
+                    trySend(Resource.Error(error.message ?: "Unknown error occurred"))
+                    close()
                     return@addSnapshotListener
                 }
 
-                val productList = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(Design::class.java)
-                }
-
-                _product.value = UiState.Loading(false)
-
-                if (!productList.isNullOrEmpty()) {
-                    _product.value = UiState.Success(productList)
-                    Log.d("HomeViewModel", "Fetched ${productList.size} products")
-                } else {
-                    _product.value = UiState.Error("No products found.")
-                    Log.w("HomeViewModel", "Product list is empty or null")
-                }
+                trySend(Resource.Success(snapshot?.toObjects(Design::class.java).orEmpty()))
             }
+
+        awaitClose { listener.remove() }
     }
 }

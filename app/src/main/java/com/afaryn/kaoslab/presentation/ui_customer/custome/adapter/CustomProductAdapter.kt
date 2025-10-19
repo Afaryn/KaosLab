@@ -12,10 +12,8 @@ import com.afaryn.kaoslab.domain.model.CustomProduct
 import com.bumptech.glide.Glide
 
 class CustomProductAdapter(
-    private val onItemSelected: () -> Unit
+    private val onItemSelected: (() -> Unit) = {}
 ) : ListAdapter<CustomProduct, CustomProductAdapter.ViewHolder>(DiffCallback()) {
-
-
 
     private var selectedPosition: Int? = null
 
@@ -53,6 +51,8 @@ class CustomProductAdapter(
                     notifyItemChanged(currentPosition)
                     onItemSelected()
                 }
+
+                onItemClicked?.invoke(product)
             }
         }
     }
@@ -83,4 +83,6 @@ class CustomProductAdapter(
             return oldItem == newItem
         }
     }
+
+    var onItemClicked: ((CustomProduct) -> Unit)? = null
 }

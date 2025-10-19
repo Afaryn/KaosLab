@@ -21,7 +21,7 @@ import com.afaryn.kaoslab.databinding.FragmentAddDesignBinding
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.domain.model.License
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import com.afaryn.kaoslab.utils.hideBottomNav
 import com.afaryn.kaoslab.utils.successDialog
 import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
@@ -75,7 +75,7 @@ class AddDesignFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        hideBottomNavDesigner()
+        hideBottomNav()
         _binding = FragmentAddDesignBinding.inflate(inflater, container, false)
         return binding.root
     }

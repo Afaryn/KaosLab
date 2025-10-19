@@ -61,6 +61,7 @@
             android:background="@drawable/bg_stroke"
             android:scaleType="centerCrop"
             android:src="@drawable/img"
+            android:foreground="@drawable/iv_watermark"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/guideline_left"
             app:layout_constraintStart_toStartOf="parent"

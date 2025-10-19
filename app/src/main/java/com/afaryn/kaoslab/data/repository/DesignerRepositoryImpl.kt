@@ -2,18 +2,19 @@ package com.afaryn.kaoslab.data.repository
 
 import android.net.Uri
 import android.util.Log
-import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.model.Design
+import com.afaryn.kaoslab.domain.model.DesignOrder
+import com.afaryn.kaoslab.domain.model.DesignOrderStatus
 import com.afaryn.kaoslab.domain.model.Portfolio
+import com.afaryn.kaoslab.domain.model.User
 import com.afaryn.kaoslab.domain.repository.DesignerRepository
 import com.afaryn.kaoslab.utils.Constants.COLL_USER
 import com.afaryn.kaoslab.utils.Constants.COLL_USER_DESIGN
-import com.afaryn.kaoslab.utils.Constants.COLL_USER_DESIGN_PENDING
 import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.Response
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
@@ -198,34 +199,34 @@ class DesignerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getDesignSales(isPending: Boolean): Flow<Resource<List<Design>>> = callbackFlow {
-        trySend(Resource.Loading)
+    override fun getDesignSales(status: DesignOrderStatus): Flow<Resource<List<DesignOrder>>> =
+        callbackFlow {
+            trySend(Resource.Loading)
 
-        val uid = auth.uid ?: run {
-            trySend(Resource.Error("Failed getting user data"))
-            close()
-            return@callbackFlow
-        }
-
-        val coll = if (isPending) COLL_USER_DESIGN_PENDING else COLL_USER_DESIGN
-
-        val listener = firestore.collectionGroup(coll)
-            .whereEqualTo("designerId", uid)
-            .addSnapshotListener { value, error ->
-                error?.let {
-                    trySend(Resource.Error(it.message ?: "Something happened"))
-                    Log.e("DesignerRepo", "getDesignSales: error getting data", error)
-                    close()
-                    return@addSnapshotListener
-                }
-
-                value?.toObjects(Design::class.java)?.let {
-                    trySend(Resource.Success(it))
-                }
+            val uid = auth.uid ?: run {
+                trySend(Resource.Error("Failed getting user data"))
+                close()
+                return@callbackFlow
             }
 
-        awaitClose { listener.remove() }
-    }
+            val listener = firestore.collectionGroup(COLL_USER_DESIGN)
+                .whereEqualTo("designerId", uid)
+                .whereEqualTo("status", status.value)
+                .addSnapshotListener { value, error ->
+                    error?.let {
+                        trySend(Resource.Error(it.message ?: "Something happened"))
+                        Log.e("DesignerRepo", "getDesignSales: error getting data", error)
+                        close()
+                        return@addSnapshotListener
+                    }
+
+                    value?.toObjects(DesignOrder::class.java)?.let {
+                        trySend(Resource.Success(it))
+                    }
+                }
+
+            awaitClose { listener.remove() }
+        }
 
     // Portfolio Management methods
     override fun getPortfolios(): Flow<Response<List<Portfolio>>> = flow {
@@ -298,9 +299,14 @@ class DesignerRepositoryImpl @Inject constructor(
             emit(Response.Loading)
             val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
 
+            val user = firestore.collection(COLL_USER).document(currentUserId).get().await()
+                .toObject(User::class.java)
+
             val portfolioId = firestore.collection("designerPortfolios").document().id
             val portfolioWithId = portfolio.copy(
                 id = portfolioId,
+                userId = currentUserId,
+                user = user,
                 designerId = currentUserId,
                 createdAt = Timestamp.now()
             )

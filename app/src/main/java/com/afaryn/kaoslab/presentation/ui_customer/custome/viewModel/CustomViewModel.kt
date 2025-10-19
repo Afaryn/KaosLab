@@ -7,9 +7,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afaryn.kaoslab.domain.model.CustomProduct
-import com.afaryn.kaoslab.domain.model.Product
+import com.afaryn.kaoslab.domain.model.DesignOrderStatus
+import com.afaryn.kaoslab.domain.repository.UserRepository
 import com.afaryn.kaoslab.utils.Constants.CUSTOM_PRODUCT_COLLECTION
-import com.afaryn.kaoslab.utils.Constants.PRODUCT_COLLECTION
 import com.afaryn.kaoslab.utils.UiState
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomViewModel @Inject constructor(
     private val firestore: FirebaseFirestore,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _productState = MutableLiveData<UiState<List<CustomProduct>>>()
@@ -34,12 +35,8 @@ class CustomViewModel @Inject constructor(
     val selectedColor: LiveData<String?> = _selectedColor
 
     var selectedCustomDesignUri: Uri? = null
-
     var selectedYourDesignUrl: String? = null
-
-    private val _designsState = MutableLiveData<UiState<List<String>>>()
-    val designsState: LiveData<UiState<List<String>>> get() = _designsState
-
+    val ownedDesigns = userRepository.getOwnedDesigns(DesignOrderStatus.Owned)
 
     fun setSelectedProduct(product: CustomProduct) {
         _selectedProduct = product
@@ -106,32 +103,6 @@ class CustomViewModel @Inject constructor(
             .addOnFailureListener { e ->
                 Log.e("CustomViewModel", "fetchProductsByType error", e)
                 _productState.value = UiState.Error("Gagal Mengambil Data: ${e.message}")
-            }
-    }
-
-    // ----------------------------
-    // Fetch desain user (StepThree)
-    // ----------------------------
-    fun fetchUserDesigns() {
-        _designsState.value = UiState.Loading(true)
-
-        firestore.collection(PRODUCT_COLLECTION)
-            .get()
-            .addOnSuccessListener { result ->
-                _designsState.value = UiState.Loading(false)
-                val products = result.toObjects(Product::class.java)
-                val designs = products.mapNotNull { it.imageUrl }
-
-                if (designs.isNotEmpty()) {
-                    _designsState.value = UiState.Success(designs)
-                } else {
-                    _designsState.value = UiState.Error("Tidak ada desain ditemukan.")
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("CustomViewModel", "fetchUserDesigns error", e)
-                _designsState.value = UiState.Loading(false)
-                _designsState.value = UiState.Error(e.message ?: "Unknown error")
             }
     }
 }

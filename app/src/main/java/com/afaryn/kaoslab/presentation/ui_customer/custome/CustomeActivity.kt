@@ -5,10 +5,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityCustomeBinding
+import com.afaryn.kaoslab.domain.model.CustomProduct
 import com.afaryn.kaoslab.presentation.ui_customer.custome.stepOne.StepOneFragment
 import com.afaryn.kaoslab.presentation.ui_customer.custome.stepThree.StepThreeFragment
 import com.afaryn.kaoslab.presentation.ui_customer.custome.stepTwo.StepTwoFragment
 import com.afaryn.kaoslab.presentation.ui_customer.custome.viewModel.CustomViewModel
+import com.afaryn.kaoslab.utils.getParcelable
 import dagger.hilt.android.AndroidEntryPoint
 
 @Suppress("DEPRECATION")
@@ -27,7 +29,7 @@ class CustomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         appBar()
-        goToStep(1)
+        checkIntentData()
 
         binding.imgStepOne.setOnClickListener {
             if (currentStep > 1) goToStep(1)
@@ -37,11 +39,22 @@ class CustomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkIntentData() {
+        intent.getParcelable<CustomProduct>("product")?.let {
+            viewModel.setSelectedProduct(it)
+            goToStep(2)
+        } ?: goToStep(1)
+    }
+
     fun goToStep(step: Int) {
         currentStep = step
 
+        val args = Bundle().apply {
+            putString("type", intent.getStringExtra("type").orEmpty())
+        }
+
         val fragment = when (step) {
-            1 -> StepOneFragment()
+            1 -> StepOneFragment().apply { arguments = args }
             2 -> StepTwoFragment()
             3 -> StepThreeFragment()
             else -> StepOneFragment()

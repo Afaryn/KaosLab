@@ -9,13 +9,11 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.databinding.ActivitySplashScreenBinding
 import com.afaryn.kaoslab.presentation.authentication.AuthViewModel
 import com.afaryn.kaoslab.presentation.authentication.LoginActivity
-import com.afaryn.kaoslab.databinding.ActivitySplashScreenBinding
 import com.afaryn.kaoslab.presentation.ui_customer.MainActivity
-import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.presentation.ui_owner.OwnerActivity
-import com.afaryn.kaoslab.utils.Constants.DESIGNER
 import com.afaryn.kaoslab.utils.Constants.OWNER
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.show
@@ -54,8 +52,6 @@ class SplashScreenActivity : AppCompatActivity() {
                             is Response.Success -> {
                                 val intent = if (resource.data.role == OWNER) {
                                     Intent(this, OwnerActivity::class.java)
-                                } else if (resource.data.role == DESIGNER) {
-                                    Intent(this, DesignerActivity::class.java)
                                 } else {
                                     Intent(this, MainActivity::class.java)
                                 }

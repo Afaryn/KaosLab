@@ -3,6 +3,7 @@ package com.afaryn.kaoslab.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.DownloadManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -41,6 +42,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.UUID
+import androidx.core.net.toUri
 
 fun validateEmail(email: String): Validation {
     if (email.isEmpty()) {
@@ -542,9 +545,14 @@ fun Long.toDateString(): String {
     return format.format(Date(this))
 }
 
-fun Date.toMonthDay(): String {
-    val format = SimpleDateFormat("MMM d", Locale.getDefault())
+fun Date.toDateString(): String {
+    val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     return format.format(this)
+}
+
+fun Timestamp.toMonthDay(): String {
+    val format = SimpleDateFormat("MMM d", Locale.getDefault())
+    return format.format(toDate())
 }
 
 fun MaterialButton.setLoading(isLoading: Boolean, placeholder: String) {
@@ -554,3 +562,37 @@ fun MaterialButton.setLoading(isLoading: Boolean, placeholder: String) {
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+fun Context.downloadDesign(designUrl: String, onFinished: () -> Unit, onError: (String?) -> Unit) {
+    try {
+        val appName = getString(R.string.app_name)
+        val fileName = designUrl.substringAfterLast("/")
+
+        val request = DownloadManager.Request(designUrl.toUri())
+            .setTitle(fileName)
+            .setDescription("Downloading design...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+            .setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                "$appName/$fileName"
+            )
+
+        val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        dm.enqueue(request)
+
+        onFinished.invoke()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onError.invoke(e.message)
+    }
+}
+
+fun Double?.toIdrFormat(): String {
+    if (this == null) return "Rp 0,-"
+    val localeID = Locale("in", "ID") // Create a Locale for Indonesia
+    val numberFormat = NumberFormat.getCurrencyInstance(localeID)
+    numberFormat.maximumFractionDigits = 0 // Remove decimal part, e.g., ",00"
+    return numberFormat.format(this).replace("Rp", "Rp ") // Add a space after Rp for better readability
+}

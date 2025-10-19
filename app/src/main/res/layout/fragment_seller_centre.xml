@@ -87,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/plusjakartasans"
-                            android:text="Owner Name"
+                            android:text="-"
                             android:textColor="@android:color/white"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -152,9 +152,10 @@
 
                 <!-- Nominal Rupiah -->
                 <TextView
+                    android:id="@+id/tv_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rp6.000.000"
+                    android:text="Rp -,."
                     android:textStyle="bold"
                     android:textColor="@android:color/white"
                     android:layout_marginTop="16dp"
@@ -226,7 +227,7 @@
 
                         <TextView
                             android:id="@+id/toShip_count"
-                            android:text="1"
+                            android:text="0"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
                             android:textSize="24sp"

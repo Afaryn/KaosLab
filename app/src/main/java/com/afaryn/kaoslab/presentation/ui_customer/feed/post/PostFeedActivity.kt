@@ -81,20 +81,20 @@ class PostFeedActivity : AppCompatActivity() {
     }
 
     private fun postFeed(feed: Feed) = lifecycleScope.launch {
-        vm.postFeed(feed, imgUri!!).collect {
-            when(it) {
-                is Resource.Loading -> binding.btnPost.setLoading(true, "Post")
-                is Resource.Error -> {
-                    binding.btnPost.setLoading(false, "Post")
-                    toast(it.error)
-                }
-                is Resource.Success -> {
-                    binding.btnPost.setLoading(false, "Post")
-                    toast("Posted successfully")
-                    finish()
-                }
-            }
-        }
+//        vm.postFeed(feed, imgUri!!).collect {
+//            when(it) {
+//                is Resource.Loading -> binding.btnPost.setLoading(true, "Post")
+//                is Resource.Error -> {
+//                    binding.btnPost.setLoading(false, "Post")
+//                    toast(it.error)
+//                }
+//                is Resource.Success -> {
+//                    binding.btnPost.setLoading(false, "Post")
+//                    toast("Posted successfully")
+//                    finish()
+//                }
+//            }
+//        }
     }
 
     override fun onDestroy() {

@@ -19,9 +19,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afaryn.kaoslab.databinding.FragmentEditPortfolioBinding
 import com.afaryn.kaoslab.domain.model.Portfolio
-import com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.EditPortfolioFragmentArgs
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import com.afaryn.kaoslab.utils.hideBottomNav
 import com.afaryn.kaoslab.utils.successDialog
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,7 +65,7 @@ class EditPortfolioFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        hideBottomNavDesigner()
+        hideBottomNav()
         _binding = FragmentEditPortfolioBinding.inflate(inflater, container, false)
         return binding.root
     }

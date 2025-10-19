@@ -13,9 +13,8 @@ import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentPortfolioListBinding
 import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.adapter.PortfolioAdapter
-import com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.PortfolioListFragmentDirections
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import com.afaryn.kaoslab.utils.hideBottomNav
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,7 +30,7 @@ class PortfolioListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        hideBottomNavDesigner()
+        hideBottomNav()
         _binding = FragmentPortfolioListBinding.inflate(inflater, container, false)
         return binding.root
     }

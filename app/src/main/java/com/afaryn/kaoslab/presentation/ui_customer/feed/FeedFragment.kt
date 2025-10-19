@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.data.adapter.FeedAdapter
 import com.afaryn.kaoslab.databinding.FragmentFeedBinding
-import com.afaryn.kaoslab.domain.model.Feed
+import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.presentation.ui_customer.feed.post.PostFeedActivity
 import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.toast
@@ -47,6 +48,23 @@ class FeedFragment : Fragment() {
         btnPostFeed.setOnClickListener {
             startActivity(Intent(requireContext(), PostFeedActivity::class.java))
         }
+
+        searchEditText.doOnTextChanged { text, _, _, _ ->
+            if (text.isNullOrEmpty()) {
+                observeFeeds()
+                return@doOnTextChanged
+            }
+
+            val filteredData = feedAdapter.differ.currentList.filter {
+                it.description.contains(
+                    text.toString(),
+                    ignoreCase = true
+                ) || it.user?.name?.contains(text.toString(), ignoreCase = true) == true
+            }
+
+            tvNoData.isVisible = filteredData.isEmpty()
+            feedAdapter.differ.submitList(filteredData)
+        }
     }
 
     private fun setupRv() = binding.rvFeed.apply {
@@ -61,7 +79,7 @@ class FeedFragment : Fragment() {
 
     private fun likeFeed(feedId: String, liking: Boolean) = lifecycleScope.launch {
         vm.likeFeed(feedId, liking).collect {
-            when(it) {
+            when (it) {
                 is Resource.Error -> toast(it.error)
                 else -> {}
             }
@@ -70,7 +88,7 @@ class FeedFragment : Fragment() {
 
     private fun observeFeeds() = lifecycleScope.launch {
         vm.getFeeds().collect {
-            when(it) {
+            when (it) {
                 is Resource.Error -> toast(it.error)
                 is Resource.Success -> setupView(it.data.orEmpty())
                 else -> {}
@@ -78,7 +96,7 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun setupView(feeds: List<Feed>) = binding?.run {
+    private fun setupView(feeds: List<Portfolio>) = binding?.run {
         tvNoData.isVisible = feeds.isEmpty()
         feedAdapter.differ.submitList(feeds)
     }

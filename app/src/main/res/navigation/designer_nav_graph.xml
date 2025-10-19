@@ -18,10 +18,6 @@
         tools:layout="@layout/fragment_account_designer">
 
         <action
-            android:id="@+id/action_accountDesignerFragment_to_sellerCentreFragment"
-            app:destination="@id/sellerCentreFragment" />
-
-        <action
             android:id="@+id/action_accountDesignerFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
     </fragment>
@@ -31,96 +27,6 @@
         android:name="com.afaryn.kaoslab.presentation.ui_designer.feed.FeedDesignerFragment"
         android:label="fragment_feed_designer"
         tools:layout="@layout/fragment_feed_designer" />
-
-    <!-- Seller Centre Navigation -->
-    <fragment
-        android:id="@+id/sellerCentreFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.seller_centre.SellerCentreFragment"
-        android:label="fragment_seller_centre"
-        tools:layout="@layout/fragment_seller_centre">
-
-        <action
-            android:id="@+id/action_sellerCentreFragment_to_designListFragment"
-            app:destination="@id/designListFragment" />
-
-        <action
-            android:id="@+id/action_sellerCentreFragment_to_portfolioListFragment"
-            app:destination="@id/portfolioListFragment" />
-    </fragment>
-
-    <!-- Design Management Navigation -->
-    <fragment
-        android:id="@+id/designListFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.DesignListFragment"
-        android:label="fragment_design_list"
-        tools:layout="@layout/fragment_design_list">
-
-        <action
-            android:id="@+id/action_designListFragment_to_addDesignFragment"
-            app:destination="@id/addDesignFragment" />
-
-        <action
-            android:id="@+id/action_designListFragment_to_detailEditDesignFragment"
-            app:destination="@id/detailEditDesignFragment">
-            <argument
-                android:name="designId"
-                app:argType="string" />
-        </action>
-    </fragment>
-
-    <fragment
-        android:id="@+id/addDesignFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.AddDesignFragment"
-        android:label="fragment_add_design"
-        tools:layout="@layout/fragment_add_design" />
-
-    <fragment
-        android:id="@+id/detailEditDesignFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_design.DetailEditDesignFragment"
-        android:label="fragment_detail_edit_design"
-        tools:layout="@layout/fragment_detail_edit_design">
-
-        <argument
-            android:name="designId"
-            app:argType="string" />
-    </fragment>
-
-    <!-- Portfolio Management Navigation -->
-    <fragment
-        android:id="@+id/portfolioListFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.PortfolioListFragment"
-        android:label="fragment_portfolio_list"
-        tools:layout="@layout/fragment_portfolio_list">
-
-        <action
-            android:id="@+id/action_portfolioListFragment_to_addPortfolioFragment"
-            app:destination="@id/addPortfolioFragment" />
-
-        <action
-            android:id="@+id/action_portfolioListFragment_to_editPortfolioFragment"
-            app:destination="@id/editPortfolioFragment">
-            <argument
-                android:name="portfolioId"
-                app:argType="string" />
-        </action>
-    </fragment>
-
-    <fragment
-        android:id="@+id/addPortfolioFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.AddPortfolioFragment"
-        android:label="fragment_add_portfolio"
-        tools:layout="@layout/fragment_add_portfolio" />
-
-    <fragment
-        android:id="@+id/editPortfolioFragment"
-        android:name="com.afaryn.kaoslab.presentation.ui_designer.manage_portofolio.EditPortfolioFragment"
-        android:label="fragment_edit_portfolio"
-        tools:layout="@layout/fragment_edit_portfolio">
-
-        <argument
-            android:name="portfolioId"
-            app:argType="string" />
-    </fragment>
 
     <!-- Profile Management Navigation -->
     <fragment

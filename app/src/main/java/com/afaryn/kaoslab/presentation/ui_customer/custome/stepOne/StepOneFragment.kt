@@ -1,6 +1,7 @@
 // StepOneFragment.kt
 package com.afaryn.kaoslab.presentation.ui_customer.custome.stepOne
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,9 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.FragmentStepOneBinding
+import com.afaryn.kaoslab.domain.model.CustomProduct
 import com.afaryn.kaoslab.presentation.ui_customer.custome.viewModel.CustomViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class StepOneFragment : Fragment() {
 
@@ -22,10 +25,17 @@ class StepOneFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by activityViewModels<CustomViewModel>()
+    private var type: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            type = it.getString("type")
+        }
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStepOneBinding.inflate(inflater, container, false)
         return binding.root
@@ -34,8 +44,7 @@ class StepOneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Asumsi awal, tampilkan TopFragment dan set status aktifnya
-        setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
+        checkForBundle()
 
         binding.cardTop.setOnClickListener {
             setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
@@ -50,9 +59,15 @@ class StepOneFragment : Fragment() {
         }
     }
 
+    private fun checkForBundle() = when(type) {
+        "0" -> setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
+        "1" -> setActiveCard(binding.cardBottom, binding.textTitleBottom, BottomFragment())
+        "2" -> setActiveCard(binding.cardHat, binding.textTitleHat, HatFragment())
+        else -> setActiveCard(binding.cardTop, binding.textTitleTop, TopFragment())
+    }
+
     private fun loadChildFragment(fragment: Fragment) {
-        childFragmentManager.beginTransaction()
-            .replace(binding.fragmentContainer.id, fragment)
+        childFragmentManager.beginTransaction().replace(binding.fragmentContainer.id, fragment)
             .commit()
     }
 

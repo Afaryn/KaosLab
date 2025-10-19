@@ -14,7 +14,7 @@ import com.afaryn.kaoslab.databinding.FragmentDesignListBinding
 import com.afaryn.kaoslab.domain.model.Design
 import com.afaryn.kaoslab.presentation.ui_designer.manage_design.adapter.DesignAdapter
 import com.afaryn.kaoslab.utils.Response
-import com.afaryn.kaoslab.utils.hideBottomNavDesigner
+import com.afaryn.kaoslab.utils.hideBottomNav
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,7 @@ class DesignListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        hideBottomNavDesigner()
+        hideBottomNav()
         _binding = FragmentDesignListBinding.inflate(inflater, container, false)
         return binding.root
     }

@@ -12,5 +12,5 @@ class PostFeedViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
-    fun postFeed(feed: Feed, imgUri: Uri) = userRepository.postFeed(feed, imgUri)
+//    fun postFeed(feed: Feed, imgUri: Uri) = userRepository.postFeed(feed, imgUri)
 }

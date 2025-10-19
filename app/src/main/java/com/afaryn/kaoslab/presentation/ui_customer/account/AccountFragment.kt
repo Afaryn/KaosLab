@@ -1,23 +1,26 @@
 package com.afaryn.kaoslab.presentation.ui_customer.account
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afaryn.kaoslab.R
-import com.afaryn.kaoslab.presentation.authentication.LoginActivity
 import com.afaryn.kaoslab.databinding.FragmentAccountBinding
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.presentation.authentication.LoginActivity
+import com.afaryn.kaoslab.presentation.ui_customer.account.becomeseller.BecomeSellerActivity
 import com.afaryn.kaoslab.presentation.ui_customer.account.design.MyDesignActivity
 import com.afaryn.kaoslab.presentation.ui_customer.account.orders.OrdersActivity
 import com.afaryn.kaoslab.presentation.ui_customer.address.AddressActivity
-import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.utils.Constants.DESIGNER
+import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.confirmDialog
 import com.afaryn.kaoslab.utils.glide
@@ -52,12 +55,31 @@ class AccountFragment : Fragment() {
         setActions()
     }
 
-    private fun observeUser() = lifecycleScope.launch {
-        viewModel.user().collect { state ->
-            when (state) {
-                is Response.Success -> setupView(state.data)
-                is Response.Error -> toast(state.message)
-                else -> {}
+    private fun observeUser() {
+        lifecycleScope.launch {
+            viewModel.user().collect { state ->
+                when (state) {
+                    is Response.Success -> setupView(state.data)
+                    is Response.Error -> toast(state.message)
+                    else -> {}
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.ownerContact().collect { state ->
+                when (state) {
+                    is Resource.Success -> {
+                        binding.btnContactOwner.setOnClickListener {
+                            val phone = state.data.takeIf { !it.isNullOrEmpty() } ?: return@setOnClickListener
+                            val message = "Hi Admin KaosLab"
+                            val url = "https://wa.me/$phone?text=${Uri.encode(message)}"
+                            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                        }
+                    }
+                    is Resource.Error -> toast(state.error)
+                    else -> {}
+                }
             }
         }
     }
@@ -72,8 +94,8 @@ class AccountFragment : Fragment() {
         btnBecomeDesigner.apply {
             text = if (data.role == DESIGNER) "Seller Centre" else "Become a Seller"
             setOnClickListener {
-                if (data.role == DESIGNER)
-                    startActivity(Intent(requireContext(), DesignerActivity::class.java))
+                if (data.role == DESIGNER) findNavController().navigate(R.id.action_AccountFragment_to_sellerCentreFragment2)
+                else startActivity(Intent(requireContext(), BecomeSellerActivity::class.java))
             }
             show()
         }
@@ -112,6 +134,11 @@ class AccountFragment : Fragment() {
         btnUserSecurity.setOnClickListener {
             findNavController().navigate(R.id.action_AccountFragment_to_editProfileFragment2)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observeUser()
     }
 
     override fun onDestroyView() {

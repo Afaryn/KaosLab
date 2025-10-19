@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import com.afaryn.kaoslab.R
 import com.afaryn.kaoslab.databinding.ActivityDesignCheckOutBinding
 import com.afaryn.kaoslab.domain.model.Design
+import com.afaryn.kaoslab.domain.model.DesignOrder
+import com.afaryn.kaoslab.domain.model.DesignOrderStatus
 import com.afaryn.kaoslab.domain.model.License
 import com.afaryn.kaoslab.domain.model.SnapResponse
 import com.afaryn.kaoslab.presentation.ui_customer.MainActivity
@@ -37,7 +39,9 @@ class DesignCheckOutActivity : AppCompatActivity() {
     private val binding get() = _binding!!
     private val vm by viewModels<DesignCheckOutViewModel>()
     private var design: Design? = null
+    private var order: DesignOrder? = null
     private var license: License? = null
+    private var snapToken: String? = null
 
     @Inject
     lateinit var uiKitApi: UiKitApi
@@ -50,8 +54,8 @@ class DesignCheckOutActivity : AppCompatActivity() {
                 val transactionResult = it.getParcelable<TransactionResult>(KEY_TRANSACTION_RESULT)
 
                 when (transactionResult?.status) {
-                    STATUS_PENDING -> addDesign(design!!, true)
-                    STATUS_SUCCESS, STATUS_SETTLEMENT -> addDesign(design!!, false)
+                    STATUS_PENDING -> addDesign(true, snapToken)
+                    STATUS_SUCCESS, STATUS_SETTLEMENT -> addDesign(false, snapToken)
                     STATUS_FAILED -> toast("Payment Failed: ${transactionResult.status}")
                     else -> toast("Payment canceled or design is owned")
                 }
@@ -79,7 +83,12 @@ class DesignCheckOutActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            getSnapToken(design!!)
+            val designOrder = DesignOrder(
+                design = design!!,
+                status = DesignOrderStatus.Pending.value
+            )
+
+            getSnapToken(designOrder)
         }
     }
 
@@ -108,7 +117,7 @@ class DesignCheckOutActivity : AppCompatActivity() {
         lvFeatures.adapter = adapter
     }
 
-    private fun getSnapToken(design: Design) = lifecycleScope.launch {
+    private fun getSnapToken(design: DesignOrder) = lifecycleScope.launch {
         vm.getSnapToken(design).collect {
             when (it) {
                 is Resource.Loading -> setLoading(true)
@@ -119,7 +128,10 @@ class DesignCheckOutActivity : AppCompatActivity() {
 
                 is Resource.Success -> {
                     setLoading(false)
-                    it.data?.let { r -> showMidtransUi(r) }
+                    it.data?.let { r ->
+                        order = design
+                        showMidtransUi(r)
+                    }
                 }
             }
         }
@@ -127,6 +139,8 @@ class DesignCheckOutActivity : AppCompatActivity() {
 
     private fun showMidtransUi(response: SnapResponse) {
         try {
+            snapToken = response.token
+
             uiKitApi.startPaymentUiFlow(
                 activity = this,
                 launcher = paymentLauncher,
@@ -143,8 +157,13 @@ class DesignCheckOutActivity : AppCompatActivity() {
         binding.btnPayment.text = if (isLoading) "Loading..." else "Payment"
     }
 
-    private fun addDesign(design: Design, isPending: Boolean) = lifecycleScope.launch {
-        vm.addDesign(design, isPending).collect {
+    private fun addDesign(isPending: Boolean, token: String?) = lifecycleScope.launch {
+        val designOrder = order!!.copy(
+            snapToken = token,
+            status = if (isPending) DesignOrderStatus.Pending.value else DesignOrderStatus.Owned.value
+        )
+
+        vm.addDesign(designOrder).collect {
             when(it) {
                 is Resource.Error -> toast(it.error)
                 is Resource.Success -> {

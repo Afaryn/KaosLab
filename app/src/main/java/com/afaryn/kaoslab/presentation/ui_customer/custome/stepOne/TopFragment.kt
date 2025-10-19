@@ -16,6 +16,7 @@ import com.afaryn.kaoslab.presentation.ui_customer.custome.viewModel.CustomViewM
 import com.afaryn.kaoslab.utils.UiState
 import dagger.hilt.android.AndroidEntryPoint
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class TopFragment : Fragment() {
 
