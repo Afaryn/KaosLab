@@ -16,6 +16,7 @@ import com.afaryn.kaoslab.domain.model.Portfolio
 import com.afaryn.kaoslab.domain.model.SnapRequest
 import com.afaryn.kaoslab.domain.model.SnapResponse
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.repository.NotificationRepository
 import com.afaryn.kaoslab.domain.repository.UserRepository
 import com.afaryn.kaoslab.utils.Constants.COLL_ADDRESS
 import com.afaryn.kaoslab.utils.Constants.COLL_CART
@@ -46,7 +47,8 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
-    private val midtransApi: MidtransApi
+    private val midtransApi: MidtransApi,
+    private val notificationRepository: NotificationRepository
 ) : UserRepository {
     override fun getUserId(): String {
         return auth.currentUser?.uid.orEmpty()
@@ -389,6 +391,8 @@ class UserRepositoryImpl @Inject constructor(
                             .set(order.copy(status = DesignOrderStatus.Owned.value))
                             .await()
 
+                        notificationRepository.publishPaymentSuccess(productName = "${order.design.selectedLicense?.name} licensed design")
+
                         trySend(Resource.Success("Payment Successful" to true))
                         close()
                         return@callbackFlow
@@ -607,6 +611,14 @@ class UserRepositoryImpl @Inject constructor(
                             .document(order.orderId)
                             .set(order.copy(status = OrderStatus.Processing.value))
                             .await()
+
+                        notificationRepository.publishPaymentSuccess(
+                            productName = order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name?.let {
+                                "${order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name}${
+                                    if (order.cartProducts.size > 1) " and ${order.cartProducts.size - 1} more" else ""
+                                }"
+                            } ?: "Custom Product"
+                        )
 
                         trySend(Resource.Success("Payment Successful" to true))
                         close()

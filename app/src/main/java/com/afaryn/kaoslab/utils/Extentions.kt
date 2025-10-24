@@ -22,6 +22,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.afaryn.kaoslab.R
@@ -42,8 +43,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import java.util.UUID
-import androidx.core.net.toUri
 
 fun validateEmail(email: String): Validation {
     if (email.isEmpty()) {
@@ -595,4 +594,30 @@ fun Double?.toIdrFormat(): String {
     val numberFormat = NumberFormat.getCurrencyInstance(localeID)
     numberFormat.maximumFractionDigits = 0 // Remove decimal part, e.g., ",00"
     return numberFormat.format(this).replace("Rp", "Rp ") // Add a space after Rp for better readability
+}
+
+fun Long.formatElapsedTime(): String {
+    val diffMillis = System.currentTimeMillis() - this
+
+    val minutes = diffMillis / (1000 * 60)
+    val hours = minutes / 60
+    val days = hours / 24
+
+    return when {
+        days > 0 -> {
+            val remainingHours = hours % 24
+            if (remainingHours > 0) "${days}d ${remainingHours}h" else "${days}d"
+        }
+        hours > 0 -> "${hours}h"
+        minutes > 0 -> "${minutes}m"
+        else -> "Just now"
+    }
+}
+
+fun Long.isToday(): Boolean {
+    val currentCal = Calendar.getInstance()
+    val targetCal = Calendar.getInstance().apply { timeInMillis = this@isToday }
+
+    return currentCal.get(Calendar.YEAR) == targetCal.get(Calendar.YEAR) &&
+            currentCal.get(Calendar.DAY_OF_YEAR) == targetCal.get(Calendar.DAY_OF_YEAR)
 }

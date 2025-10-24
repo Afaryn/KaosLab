@@ -1,16 +1,28 @@
 package com.afaryn.kaoslab.presentation.authentication
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.afaryn.kaoslab.domain.repository.AuthRepository
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.repository.AuthRepository
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    val repository: AuthRepository
+    private val fcm: FirebaseMessaging,
+    private val repository: AuthRepository
 ) : ViewModel() {
+
+    init {
+        fcm.token.addOnSuccessListener {
+            fcm.subscribeToTopic("kl-notification").addOnFailureListener {
+                Log.e("AuthViewModel", "Error subscribing to FCM Topic: ", it)
+            }
+        }
+    }
+
     fun login(email: String, password: String) = repository.login(email, password).asLiveData()
 
     fun register(email: String, password: String, user: User) =

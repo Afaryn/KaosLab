@@ -155,6 +155,10 @@ dependencies {
 
     // MidTrans
     implementation("com.midtrans:uikit:2.4.0-SANDBOX")
+
+    // Google OAuth
+    implementation(libs.google.api.client)
+    implementation(libs.google.auth.library.oauth2.http)
 }
 kapt {
     correctErrorTypes = true

@@ -1,30 +1,23 @@
 package com.afaryn.kaoslab.data.repository
 
-import android.util.Log
+import com.afaryn.kaoslab.domain.model.BusinessInsights
+import com.afaryn.kaoslab.domain.model.ChartData
+import com.afaryn.kaoslab.domain.model.Kurir
+import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.domain.model.OrderStatusCounts
 import com.afaryn.kaoslab.domain.model.ProductTemplate
 import com.afaryn.kaoslab.domain.model.SizeOption
-import com.afaryn.kaoslab.domain.model.Order
-import com.afaryn.kaoslab.domain.model.BusinessInsights
-import com.afaryn.kaoslab.domain.model.CartProduct
-import com.afaryn.kaoslab.domain.model.ChartData
-import com.afaryn.kaoslab.domain.model.OrderStatusCounts
-import com.afaryn.kaoslab.domain.model.Kurir
 import com.afaryn.kaoslab.domain.model.Transaction
 import com.afaryn.kaoslab.domain.model.TransactionFilter
 import com.afaryn.kaoslab.domain.model.TransactionType
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.repository.NotificationRepository
 import com.afaryn.kaoslab.domain.repository.OwnerRepository
-import com.afaryn.kaoslab.utils.Constants.DELIVERED_STATUS
-import com.afaryn.kaoslab.utils.Constants.PENDING_STATUS
-import com.afaryn.kaoslab.utils.Constants.PROCESSING_STATUS
-import com.afaryn.kaoslab.utils.Constants.SHIPPED_STATUS
 import com.afaryn.kaoslab.utils.Response
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
@@ -33,14 +26,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class OwnerRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val notificationRepository: NotificationRepository
 ) : OwnerRepository {
     companion object {
         private const val COLLECTION_CUSTOM_PRODUCTS = "customproduct"
@@ -123,8 +117,9 @@ class OwnerRepositoryImpl @Inject constructor(
             val snapshot = firestore.collection(COLLECTION_EKSPEDISI)
                 .get()
                 .await()
-            if(snapshot != null) {
-                val kurirData = snapshot.toObjects(Kurir::class.java) ?: throw Exception("No courier data found")
+            if (snapshot != null) {
+                val kurirData = snapshot.toObjects(Kurir::class.java)
+                    ?: throw Exception("No courier data found")
                 emit(Response.Success(kurirData))
             } else {
                 emit(Response.Error("No courier data found"))
@@ -134,26 +129,27 @@ class OwnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addProductTemplate(productTemplate: ProductTemplate): Flow<Response<String>> = callbackFlow {
-        trySend(Response.Loading)
-        try {
-            firestore.collection(COLLECTION_CUSTOM_PRODUCTS)
-                .document(productTemplate.id)
-                .set(productTemplate)
-                .addOnSuccessListener {
-                    trySend(Response.Success(productTemplate.id))
-                    close()
-                }
-                .addOnFailureListener { e ->
-                    trySend(Response.Error(e.message ?: "Unknown error"))
-                    close()
-                }
-        } catch (e: Exception) {
-            trySend(Response.Error(e.message ?: "Unknown error"))
-            close()
+    override fun addProductTemplate(productTemplate: ProductTemplate): Flow<Response<String>> =
+        callbackFlow {
+            trySend(Response.Loading)
+            try {
+                firestore.collection(COLLECTION_CUSTOM_PRODUCTS)
+                    .document(productTemplate.id)
+                    .set(productTemplate)
+                    .addOnSuccessListener {
+                        trySend(Response.Success(productTemplate.id))
+                        close()
+                    }
+                    .addOnFailureListener { e ->
+                        trySend(Response.Error(e.message ?: "Unknown error"))
+                        close()
+                    }
+            } catch (e: Exception) {
+                trySend(Response.Error(e.message ?: "Unknown error"))
+                close()
+            }
+            awaitClose { }
         }
-        awaitClose { }
-    }
 
     override suspend fun updateProductTemplate(productTemplate: ProductTemplate): Result<Unit> {
         return try {
@@ -237,55 +233,56 @@ class OwnerRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override fun getSellingProductData(period: String): Flow<Response<List<ChartData>>> = callbackFlow {
-        trySend(Response.Loading)
-        try {
-            val calendar = Calendar.getInstance()
-            val endDate = calendar.time
+    override fun getSellingProductData(period: String): Flow<Response<List<ChartData>>> =
+        callbackFlow {
+            trySend(Response.Loading)
+            try {
+                val calendar = Calendar.getInstance()
+                val endDate = calendar.time
 
-            // Calculate start date based on period
-            when (period) {
-                "week" -> calendar.add(Calendar.DAY_OF_YEAR, -7)
-                "month" -> calendar.add(Calendar.MONTH, -1)
-                "year" -> calendar.add(Calendar.YEAR, -1)
+                // Calculate start date based on period
+                when (period) {
+                    "week" -> calendar.add(Calendar.DAY_OF_YEAR, -7)
+                    "month" -> calendar.add(Calendar.MONTH, -1)
+                    "year" -> calendar.add(Calendar.YEAR, -1)
+                }
+                val startDate = calendar.time
+
+                val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
+                    .whereGreaterThanOrEqualTo("createdAt", Timestamp(startDate))
+                    .whereLessThanOrEqualTo("createdAt", Timestamp(endDate))
+                    .get()
+                    .await()
+
+                // Group orders by day/month based on period and calculate sales
+                val chartData = mutableListOf<ChartData>()
+
+                if (period == "week") {
+                    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                    val salesByDay = mutableMapOf<String, Double>()
+
+                    daysOfWeek.forEach { day ->
+                        salesByDay[day] = (1000..8000).random().toDouble() // Mock data for demo
+                    }
+
+                    daysOfWeek.forEach { day ->
+                        chartData.add(ChartData(day, salesByDay[day]?.toFloat() ?: 0f))
+                    }
+                } else {
+                    val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
+                    months.forEach { month ->
+                        chartData.add(ChartData(month, (2000..6000).random().toFloat()))
+                    }
+                }
+
+                trySend(Response.Success(chartData))
+                close()
+            } catch (e: Exception) {
+                trySend(Response.Error(e.message ?: "Failed to fetch selling data"))
+                close()
             }
-            val startDate = calendar.time
-
-            val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
-                .whereGreaterThanOrEqualTo("createdAt", Timestamp(startDate))
-                .whereLessThanOrEqualTo("createdAt", Timestamp(endDate))
-                .get()
-                .await()
-
-            // Group orders by day/month based on period and calculate sales
-            val chartData = mutableListOf<ChartData>()
-
-            if (period == "week") {
-                val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                val salesByDay = mutableMapOf<String, Double>()
-
-                daysOfWeek.forEach { day ->
-                    salesByDay[day] = (1000..8000).random().toDouble() // Mock data for demo
-                }
-
-                daysOfWeek.forEach { day ->
-                    chartData.add(ChartData(day, salesByDay[day]?.toFloat() ?: 0f))
-                }
-            } else {
-                val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-                months.forEach { month ->
-                    chartData.add(ChartData(month, (2000..6000).random().toFloat()))
-                }
-            }
-
-            trySend(Response.Success(chartData))
-            close()
-        } catch (e: Exception) {
-            trySend(Response.Error(e.message ?: "Failed to fetch selling data"))
-            close()
+            awaitClose { }
         }
-        awaitClose { }
-    }
 
     override fun getSalesRevenue(): Flow<Response<Double>> = callbackFlow {
         trySend(Response.Loading)
@@ -436,7 +433,12 @@ class OwnerRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override fun updateOrderStatus(orderId: String, status: String, courierId: String?, noResi: String?): Flow<Response<String>> = flow {
+    override fun updateOrderStatus(
+        orderId: String,
+        status: String,
+        courierId: String?,
+        noResi: String?
+    ): Flow<Response<String>> = flow {
         try {
             emit(Response.Loading)
 
@@ -451,6 +453,25 @@ class OwnerRepositoryImpl @Inject constructor(
                 .document(orderId)
                 .update(updateData)
                 .await()
+
+            val order = firestore.collection(COLLECTION_ORDERS)
+                .document(orderId).get().await().toObject(Order::class.java)
+
+            val productName =
+                order?.cartProducts?.firstOrNull()?.orderItem?.designType?.product?.name?.let {
+                    "${order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name}${
+                        if (order.cartProducts.size > 1) " and ${order.cartProducts.size - 1} more" else ""
+                    }"
+                } ?: "Custom Product"
+
+            when (status) {
+                "shipped" -> notificationRepository.publishOrderShipped(
+                    order?.customerId ?: throw Exception("Customer ID not found"), productName
+                )
+                "delivered" -> notificationRepository.publishOrderDelivered(
+                    order?.customerId ?: throw Exception("Customer ID not found"), productName
+                )
+            }
 
             emit(Response.Success("Order status updated successfully"))
         } catch (e: Exception) {
@@ -480,12 +501,12 @@ class OwnerRepositoryImpl @Inject constructor(
 
             val enrichedOrder = coroutineScope {
                 val customerDeferred = async { fetchCustomerData(baseOrder.customerId) }
-                val courierDeferred  = async { fetchCourierData(baseOrder.courierId) }
-                val designDeferred   = async { fetchDesignData(baseOrder.designId) }
+                val courierDeferred = async { fetchCourierData(baseOrder.courierId) }
+                val designDeferred = async { fetchDesignData(baseOrder.designId) }
 
                 val (customerName, customerAvatar) = customerDeferred.await()
-                val (courierName, courierLogo)     = courierDeferred.await()
-                val (designImage, designTitle)     = designDeferred.await()
+                val (courierName, courierLogo) = courierDeferred.await()
+                val (designImage, designTitle) = designDeferred.await()
 
                 baseOrder.copy(
                     customerName = customerName,
@@ -528,132 +549,136 @@ class OwnerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getTransactionHistory(filter: TransactionFilter?): Flow<Response<List<Transaction>>> = callbackFlow {
-        trySend(Response.Loading)
-        try {
-            // Get completed orders to create payment transactions
-            firestore.collection(COLLECTION_ORDERS)
-                .whereIn("status", listOf("completed", "paid", "processing"))
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener { ordersSnapshot ->
-                    val transactions = mutableListOf<Transaction>()
+    override fun getTransactionHistory(filter: TransactionFilter?): Flow<Response<List<Transaction>>> =
+        callbackFlow {
+            trySend(Response.Loading)
+            try {
+                // Get completed orders to create payment transactions
+                firestore.collection(COLLECTION_ORDERS)
+                    .whereIn("status", listOf("completed", "paid", "processing"))
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get()
+                    .addOnSuccessListener { ordersSnapshot ->
+                        val transactions = mutableListOf<Transaction>()
 
-                    // Create payment transactions from orders
-                    var processedCount = 0
-                    val totalDocuments = ordersSnapshot.documents.size
+                        // Create payment transactions from orders
+                        var processedCount = 0
+                        val totalDocuments = ordersSnapshot.documents.size
 
 
-                    for (document in ordersSnapshot.documents) {
-                        val data = document.data
-                        if (data == null) {
-                            processedCount++
-                            if (processedCount == totalDocuments) {
-                                val filteredTransactions = applyTransactionFilters(transactions, filter)
-                                trySend(Response.Success(filteredTransactions))
-                                close()
+                        for (document in ordersSnapshot.documents) {
+                            val data = document.data
+                            if (data == null) {
+                                processedCount++
+                                if (processedCount == totalDocuments) {
+                                    val filteredTransactions =
+                                        applyTransactionFilters(transactions, filter)
+                                    trySend(Response.Success(filteredTransactions))
+                                    close()
+                                }
+                                continue
                             }
-                            continue
+
+                            val customerId = data["customerId"] as? String ?: ""
+                            val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
+                            val createdAt = data["createdAt"] as? Timestamp
+
+                            // Get customer name
+                            firestore.collection(COLLECTION_USERS)
+                                .document(customerId)
+                                .get()
+                                .addOnSuccessListener { userSnapshot ->
+                                    val userData = userSnapshot.data
+                                    val customerName = userData?.get("fullName") as? String
+                                        ?: userData?.get("name") as? String
+                                        ?: "Unknown Customer"
+
+                                    val transaction = Transaction(
+                                        id = document.id,
+                                        type = TransactionType.PAYMENT,
+                                        amount = totalAmount,
+                                        customerName = customerName,
+                                        customerId = customerId,
+                                        orderId = document.id,
+                                        description = "Payment by $customerName",
+                                        createdAt = createdAt
+                                    )
+
+                                    transactions.add(transaction)
+                                    processedCount++
+
+                                    if (processedCount == totalDocuments) {
+                                        // Add mock withdrawal transactions for demo
+                                        transactions.add(
+                                            Transaction(
+                                                id = "withdrawal_1",
+                                                type = TransactionType.WITHDRAWAL,
+                                                amount = 200000.0,
+                                                customerName = "",
+                                                customerId = "",
+                                                orderId = null,
+                                                description = "Withdrawal",
+                                                createdAt = Timestamp.now()
+                                            )
+                                        )
+
+                                        // Apply filters and send result
+                                        val filteredTransactions =
+                                            applyTransactionFilters(transactions, filter)
+                                        trySend(Response.Success(filteredTransactions))
+                                        close()
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    // Use default name if user fetch fails
+                                    val transaction = Transaction(
+                                        id = document.id,
+                                        type = TransactionType.PAYMENT,
+                                        amount = totalAmount,
+                                        customerName = "Unknown Customer",
+                                        customerId = customerId,
+                                        orderId = document.id,
+                                        description = "Payment by Unknown Customer",
+                                        createdAt = createdAt
+                                    )
+
+                                    transactions.add(transaction)
+                                    processedCount++
+
+                                    if (processedCount == totalDocuments) {
+                                        // Add mock withdrawal transactions for demo
+                                        transactions.add(
+                                            Transaction(
+                                                id = "withdrawal_1",
+                                                type = TransactionType.WITHDRAWAL,
+                                                amount = 200000.0,
+                                                customerName = "",
+                                                customerId = "",
+                                                orderId = null,
+                                                description = "Withdrawal",
+                                                createdAt = Timestamp.now()
+                                            )
+                                        )
+
+                                        // Apply filters and send result
+                                        val filteredTransactions =
+                                            applyTransactionFilters(transactions, filter)
+                                        trySend(Response.Success(filteredTransactions))
+                                        close()
+                                    }
+                                }
                         }
-
-                        val customerId = data["customerId"] as? String ?: ""
-                        val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
-                        val createdAt = data["createdAt"] as? Timestamp
-
-                        // Get customer name
-                        firestore.collection(COLLECTION_USERS)
-                            .document(customerId)
-                            .get()
-                            .addOnSuccessListener { userSnapshot ->
-                                val userData = userSnapshot.data
-                                val customerName = userData?.get("fullName") as? String
-                                    ?: userData?.get("name") as? String
-                                    ?: "Unknown Customer"
-
-                                val transaction = Transaction(
-                                    id = document.id,
-                                    type = TransactionType.PAYMENT,
-                                    amount = totalAmount,
-                                    customerName = customerName,
-                                    customerId = customerId,
-                                    orderId = document.id,
-                                    description = "Payment by $customerName",
-                                    createdAt = createdAt
-                                )
-
-                                transactions.add(transaction)
-                                processedCount++
-
-                                if (processedCount == totalDocuments) {
-                                    // Add mock withdrawal transactions for demo
-                                    transactions.add(
-                                        Transaction(
-                                            id = "withdrawal_1",
-                                            type = TransactionType.WITHDRAWAL,
-                                            amount = 200000.0,
-                                            customerName = "",
-                                            customerId = "",
-                                            orderId = null,
-                                            description = "Withdrawal",
-                                            createdAt = Timestamp.now()
-                                        )
-                                    )
-
-                                    // Apply filters and send result
-                                    val filteredTransactions = applyTransactionFilters(transactions, filter)
-                                    trySend(Response.Success(filteredTransactions))
-                                    close()
-                                }
-                            }
-                            .addOnFailureListener {
-                                // Use default name if user fetch fails
-                                val transaction = Transaction(
-                                    id = document.id,
-                                    type = TransactionType.PAYMENT,
-                                    amount = totalAmount,
-                                    customerName = "Unknown Customer",
-                                    customerId = customerId,
-                                    orderId = document.id,
-                                    description = "Payment by Unknown Customer",
-                                    createdAt = createdAt
-                                )
-
-                                transactions.add(transaction)
-                                processedCount++
-
-                                if (processedCount == totalDocuments) {
-                                    // Add mock withdrawal transactions for demo
-                                    transactions.add(
-                                        Transaction(
-                                            id = "withdrawal_1",
-                                            type = TransactionType.WITHDRAWAL,
-                                            amount = 200000.0,
-                                            customerName = "",
-                                            customerId = "",
-                                            orderId = null,
-                                            description = "Withdrawal",
-                                            createdAt = Timestamp.now()
-                                        )
-                                    )
-
-                                    // Apply filters and send result
-                                    val filteredTransactions = applyTransactionFilters(transactions, filter)
-                                    trySend(Response.Success(filteredTransactions))
-                                    close()
-                                }
-                            }
                     }
-                }
-                .addOnFailureListener { e ->
-                    trySend(Response.Error(e.message ?: "Failed to fetch transaction history"))
-                    close()
-                }
-        } catch (e: Exception) {
-            trySend(Response.Error(e.message ?: "Failed to fetch transaction history"))
-            close()
+                    .addOnFailureListener { e ->
+                        trySend(Response.Error(e.message ?: "Failed to fetch transaction history"))
+                        close()
+                    }
+            } catch (e: Exception) {
+                trySend(Response.Error(e.message ?: "Failed to fetch transaction history"))
+                close()
+            }
+            awaitClose { }
         }
-        awaitClose { }
-    }
 
     private fun applyTransactionFilters(
         transactions: List<Transaction>,
@@ -740,8 +765,8 @@ class OwnerRepositoryImpl @Inject constructor(
             val filteredCustomers = if (searchQuery.isNotEmpty()) {
                 customers.filter { customer ->
                     customer.name?.contains(searchQuery, ignoreCase = true) == true ||
-                    customer.email?.contains(searchQuery, ignoreCase = true) == true ||
-                    customer.phone.contains(searchQuery, ignoreCase = true)
+                            customer.email?.contains(searchQuery, ignoreCase = true) == true ||
+                            customer.phone.contains(searchQuery, ignoreCase = true)
                 }
             } else {
                 customers

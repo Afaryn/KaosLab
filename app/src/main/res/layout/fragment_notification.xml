@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background">
 
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/CustomToolbarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="10dp">
+        android:elevation="10dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/toolbar_title"
@@ -25,12 +25,16 @@
             android:textStyle="bold"
             android:fontFamily="@font/pjs_bold"/>
     </androidx.appcompat.widget.Toolbar>
+
     <!-- Konten -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
+            android:id="@+id/ll_notifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -52,9 +56,10 @@
                     android:textColor="#4D4D4D" />
 
                 <TextView
+                    android:id="@+id/tv_clear_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="read all"
+                    android:text="clear all"
                     android:textColor="@color/choco"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -78,16 +83,9 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="YESTERDAY"
+                    android:text="PAST NOTIFICATIONS"
                     android:textStyle="bold"
                     android:textColor="#4D4D4D" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="read all"
-                    android:textColor="@color/choco"
-                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Yesterday Items -->
@@ -99,4 +97,18 @@
                 android:layout_marginTop="8dp" />
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_no_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pjs_bold"
+        android:text="There is no any notification"
+        android:textSize="@dimen/text_md"
+        android:textStyle="italic"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

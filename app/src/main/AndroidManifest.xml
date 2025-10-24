@@ -126,6 +126,19 @@
         <activity
             android:name=".presentation.ui_customer.MainActivity"
             android:exported="false" />
+
+        <service
+            android:name=".data.service.NotificationMessagingService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/logo_sablonku" />
     </application>
 
 </manifest>

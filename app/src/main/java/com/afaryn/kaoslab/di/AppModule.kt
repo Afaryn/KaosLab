@@ -2,9 +2,16 @@ package com.afaryn.kaoslab.di
 
 import android.content.Context
 import com.afaryn.kaoslab.BuildConfig
+import com.afaryn.kaoslab.data.local.room.NotificationDao
+import com.afaryn.kaoslab.data.local.room.NotificationDatabase
 import com.afaryn.kaoslab.data.remote.MidtransApi
+import com.afaryn.kaoslab.data.remote.NotificationService
+import com.afaryn.kaoslab.data.repository.NotificationRepositoryImpl
+import com.afaryn.kaoslab.domain.repository.NotificationRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.ktx.storage
 import com.midtrans.sdk.uikit.external.UiKitApi
 import dagger.Module
@@ -29,6 +36,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseStorage() = Firebase.storage
+
+    @Provides
+    @Singleton
+    fun provideFcm() = FirebaseMessaging.getInstance()
 
     @Provides
     @Singleton
@@ -66,5 +77,35 @@ object AppModule {
             .withMerchantUrl(BuildConfig.MIDTRANS_BASE_URL)
             .enableLog(true)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationService(retrofit: Retrofit) = retrofit.create(NotificationService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNotificationDatabase(
+        @ApplicationContext context: Context,
+    ): NotificationDatabase {
+        return NotificationDatabase.getInstance(context)
+    }
+
+    @Provides
+    fun provideNotificationDao(
+        db: NotificationDatabase
+    ): NotificationDao {
+        return db.notificationDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(
+        @ApplicationContext context: Context,
+        firebaseAuth: FirebaseAuth,
+        notificationService: NotificationService,
+        notificationDao: NotificationDao
+    ): NotificationRepository {
+        return NotificationRepositoryImpl(context, firebaseAuth, notificationService, notificationDao)
     }
 }

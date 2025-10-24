@@ -39,6 +39,8 @@ navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 gridlayout = "1.1.0"
 recyclerview = "1.4.0"
+googleApiClient = "1.32.1"
+googleAuthLibraryOauth2Http = "1.19.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -83,6 +85,8 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", version.ref = "gridlayout" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "googleApiClient" }
+google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "googleAuthLibraryOauth2Http" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
