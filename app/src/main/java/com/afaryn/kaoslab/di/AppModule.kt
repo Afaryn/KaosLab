@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -66,6 +67,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    @Named("FirebaseRetrofit")
+    fun provideFirebaseRetrofit(okHttpClient: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://fcm.googleapis.com/") // ✅ FCM endpoint
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+
+    @Provides
+    @Singleton
     fun provideMidtransApi(retrofit: Retrofit) = retrofit.create(MidtransApi::class.java)
 
     @Provides
@@ -81,7 +92,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNotificationService(retrofit: Retrofit) = retrofit.create(NotificationService::class.java)
+    fun provideNotificationService(@Named("FirebaseRetrofit") retrofit: Retrofit) = retrofit.create(NotificationService::class.java)
 
     @Provides
     @Singleton

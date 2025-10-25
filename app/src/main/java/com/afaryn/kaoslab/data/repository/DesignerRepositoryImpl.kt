@@ -210,7 +210,7 @@ class DesignerRepositoryImpl @Inject constructor(
             }
 
             val listener = firestore.collectionGroup(COLL_USER_DESIGN)
-                .whereEqualTo("designerId", uid)
+                .whereEqualTo("design.designerId", uid)
                 .whereEqualTo("status", status.value)
                 .addSnapshotListener { value, error ->
                     error?.let {

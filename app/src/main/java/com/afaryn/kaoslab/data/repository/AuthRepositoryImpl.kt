@@ -109,7 +109,7 @@ class AuthRepositoryImpl @Inject constructor(
     override fun userUid(): String = auth.currentUser?.uid ?: ""
 
     override fun isLoggedIn(): Flow<Boolean> = flow {
-        emit(auth.currentUser != null)
+        emit(auth.uid != null)
     }
 
     override fun getCurrentUser(): Flow<Response<User>> = flow {
