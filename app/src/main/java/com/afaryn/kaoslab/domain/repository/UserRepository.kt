@@ -56,5 +56,5 @@ interface UserRepository {
     fun getAllProducts(): Flow<Resource<List<CustomProduct>>>
 
     // Become Seller
-    fun becomeSeller(accountNo: String): Flow<Resource<Unit>>
+    fun becomeSeller(accountNo: String, type: String): Flow<Resource<Unit>>
 }

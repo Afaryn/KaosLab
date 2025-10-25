@@ -683,7 +683,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { listener.remove() }
     }
 
-    override fun becomeSeller(accountNo: String): Flow<Resource<Unit>> =
+    override fun becomeSeller(accountNo: String, type: String): Flow<Resource<Unit>> =
         callbackFlow {
             trySend(Resource.Loading)
 
@@ -699,7 +699,7 @@ class UserRepositoryImpl @Inject constructor(
                     .get().await()
                     .toObject(User::class.java) ?: throw Exception("Failed getting user data")
 
-                coll.set(user.copy(role = "designer", accountNo = accountNo))
+                coll.set(user.copy(role = "designer", accountNo = accountNo, bankType = type))
                 trySend(Resource.Success(Unit))
             } catch (e: Exception) {
                 trySend(Resource.Error(e.message ?: "There is trouble getting data"))

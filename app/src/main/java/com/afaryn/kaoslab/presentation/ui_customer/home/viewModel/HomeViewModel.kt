@@ -31,8 +31,8 @@ class HomeViewModel @Inject constructor(
             .whereNotEqualTo("designerId", uid)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    Log.e("HomeViewModel", "Error fetching products: ${error.message}")
-                    trySend(Resource.Error(error.message ?: "Unknown error occurred"))
+//                    Log.e("HomeViewModel", "Error fetching products: ${error.message}")
+//                    trySend(Resource.Error(error.message ?: "Unknown error occurred"))
                     close()
                     return@addSnapshotListener
                 }

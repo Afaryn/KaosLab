@@ -10,5 +10,5 @@ class BecomeSellerViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
-    fun becomeSeller(accountNo: String) = userRepository.becomeSeller(accountNo)
+    fun becomeSeller(accountNo: String, type: String) = userRepository.becomeSeller(accountNo, type)
 }

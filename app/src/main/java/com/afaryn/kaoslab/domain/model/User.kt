@@ -15,5 +15,6 @@ data class User(
     val role: String = CUSTOMER,
     val phone: String = "",
     val accountNo: String = "",
+    val bankType: String = "",
     val createdAt: Timestamp = Timestamp.now()
 ) : Parcelable

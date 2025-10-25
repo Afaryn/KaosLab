@@ -1,11 +1,13 @@
 package com.afaryn.kaoslab.presentation.ui_designer.seller_centre
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -86,6 +88,23 @@ class SellerCentreFragment : Fragment() {
                     is Response.Success -> {
                         canceledCount.text = it.data.size.orZero().toString()
                     }
+                    else -> {}
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            vm.ownerContact.collect { state ->
+                when (state) {
+                    is Resource.Success -> {
+                        binding.btnContactOwner.setOnClickListener {
+                            val phone = state.data.takeIf { !it.isNullOrEmpty() } ?: return@setOnClickListener
+                            val message = "Hi Admin KaosLab"
+                            val url = "https://wa.me/$phone?text=${Uri.encode(message)}"
+                            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                        }
+                    }
+                    is Resource.Error -> toast(state.error)
                     else -> {}
                 }
             }

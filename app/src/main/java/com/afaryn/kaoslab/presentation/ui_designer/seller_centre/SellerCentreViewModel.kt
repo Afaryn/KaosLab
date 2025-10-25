@@ -4,16 +4,19 @@ import androidx.lifecycle.ViewModel
 import com.afaryn.kaoslab.domain.model.DesignOrderStatus
 import com.afaryn.kaoslab.domain.repository.AuthRepository
 import com.afaryn.kaoslab.domain.repository.DesignerRepository
+import com.afaryn.kaoslab.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SellerCentreViewModel @Inject constructor(
     designerRepository: DesignerRepository,
-    authRepository: AuthRepository
+    authRepository: AuthRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
 
     val user = authRepository.getCurrentUser()
     val sales = designerRepository.getDesignSales(DesignOrderStatus.Owned)
     val designs = designerRepository.getDesigns()
+    val ownerContact = userRepository.getOwnerContact()
 }
