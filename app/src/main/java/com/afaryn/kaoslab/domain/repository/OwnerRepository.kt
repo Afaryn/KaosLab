@@ -9,6 +9,7 @@ import com.afaryn.kaoslab.domain.model.OrderStatusCounts
 import com.afaryn.kaoslab.domain.model.Transaction
 import com.afaryn.kaoslab.domain.model.TransactionFilter
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.model.MonthlySales
 import com.afaryn.kaoslab.utils.Response
 import kotlinx.coroutines.flow.Flow
 
@@ -41,4 +42,8 @@ interface OwnerRepository {
     // Transaction methods
     fun getTransactionHistory(filter: TransactionFilter? = null): Flow<Response<List<Transaction>>>
     fun getTotalBalance(): Flow<Response<Double>>
+
+    // Shop Performance methods
+    fun getMonthlySales(): Flow<Response<List<MonthlySales>>>
+    fun getOrdersByMonth(month: String, year: Int): Flow<Response<List<Order>>>
 }

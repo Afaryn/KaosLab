@@ -57,6 +57,9 @@
         <action
             android:id="@+id/action_myShopOwnerFragment_to_listCustomersFragment"
             app:destination="@id/listCustomersFragment" />
+        <action
+            android:id="@+id/action_myShopOwnerFragment_to_shopPerformanceFragment"
+            app:destination="@id/shopPerformanceFragment" />
     </fragment>
 
     <fragment
@@ -154,6 +157,28 @@
         <action
             android:id="@+id/action_orderDetailsFragment_to_chooseCourierFragment"
             app:destination="@id/chooseCourierFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shopPerformanceFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.shop_performance.ShopPerformanceFragment"
+        android:label="fragment_shop_performance"
+        tools:layout="@layout/fragment_shop_performance" >
+        <action
+            android:id="@+id/action_shopPerformanceFragment_to_monthDetailFragment"
+            app:destination="@id/monthDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/monthDetailFragment"
+        android:name="com.afaryn.kaoslab.presentation.ui_owner.shop_performance.month_detail.MonthDetailFragment"
+        android:label="fragment_month_detail"
+        tools:layout="@layout/fragment_month_detail" >
+        <argument
+            android:name="month"
+            app:argType="string" />
+        <argument
+            android:name="year"
+            app:argType="integer" />
     </fragment>
 
 </navigation>

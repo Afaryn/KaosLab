@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.databinding.ItemCardLastorderBinding
 import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.utils.glide
 import com.bumptech.glide.Glide
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -43,25 +44,31 @@ class LastOrderAdapter(
             binding.apply {
                 // Set order data
                 tvOrderId.text = "Order #${order.orderId.take(8)}"
-                tvOrderTitle.text = order.title
                 tvOrderSize.text = "Size: ${order.cartProducts.joinToString { it.orderItem?.size.toString() }}"
                 tvTotalPieces.text = "${order.totalPieces} pcs"
                 tvTotalAmount.text = currencyFormat.format(order.totalAmount).replace("IDR", "Rp")
 
+                val product = order.cartProducts.first()
+
+                product.orderItem?.designType?.overlay?.let {
+                    designOverlay.glide(it)
+                }
+
+                product.orderItem?.designType?.product?.imageUrl?.let {
+                    productImage.glide(it)
+                }
+
+                product.orderItem?.designType?.text?.let {
+                    tvOverlay.text = it
+                }
+
+                tvOrderTitle.text = product.orderItem?.designType?.product?.name
                 // Format date
                 order.createdAt?.let { timestamp ->
                     tvOrderDate.text = dateFormat.format(timestamp.toDate())
                 } ?: run {
                     tvOrderDate.text = "No date"
                 }
-
-                Log.i("TESS", "bind: KONTOL ${order}")
-                order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
-                    Glide.with(binding.root.context)
-                        .load(it)
-                        .centerCrop()
-                        .into(ivDesignImage)
-                } ?: ivDesignImage.setImageResource(com.afaryn.kaoslab.R.drawable.ic_image_placeholder)
 
 //                // Set status styling
 //                tvOrderStatus.text = order.status.replaceFirstChar {

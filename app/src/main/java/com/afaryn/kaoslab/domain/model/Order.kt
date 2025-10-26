@@ -61,3 +61,10 @@ data class ChartData(
     val label: String = "",
     val value: Float = 0f
 )
+
+data class MonthlySales(
+    val month: String = "",
+    val year: Int = 0,
+    val totalSales: Double = 0.0,
+    val orderCount: Int = 0
+)

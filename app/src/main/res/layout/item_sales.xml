@@ -59,14 +59,49 @@
         <!-- Product Info -->
         <ImageView
             android:id="@+id/productImage"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_gradient_top"
             android:scaleType="centerCrop"
-            android:contentDescription="Product Image"
+            android:src="@drawable/img"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/userAvatar"
-            tools:src="@tools:sample/backgrounds/scenic" />
+            app:layout_constraintTop_toBottomOf="@id/userAvatar" />
+
+        <ImageView
+            android:id="@+id/designOverlay"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="Overlay Design"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="@id/productImage"
+            app:layout_constraintStart_toStartOf="@id/productImage"
+            app:layout_constraintTop_toTopOf="@id/productImage" />
+
+        <TextView
+            android:id="@+id/tv_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:ellipsize="none"
+            android:fontFamily="@font/pjs_regular"
+            android:textSize="11sp"
+            app:autoSizeMaxTextSize="11sp"
+            app:autoSizeMinTextSize="6sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="@id/productImage"
+            app:layout_constraintEnd_toEndOf="@id/productImage"
+            app:layout_constraintStart_toStartOf="@id/productImage"
+            app:layout_constraintTop_toTopOf="@id/productImage" />
 
         <TextView
             android:id="@+id/productName"

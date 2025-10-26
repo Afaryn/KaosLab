@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afaryn.kaoslab.R.*
 import com.afaryn.kaoslab.databinding.ItemSalesBinding
 import com.afaryn.kaoslab.domain.model.Order
+import com.afaryn.kaoslab.utils.glide
 import com.bumptech.glide.Glide
 import java.text.NumberFormat
 import java.util.*
@@ -49,15 +50,23 @@ class SalesAdapter(
                 salesStatusTag.text = getStatusDisplayText(order.status)
 
                 // Product info
-                productName.text = order.title
                 productDetails.text = "Size: ${order.cartProducts.joinToString { it.orderItem?.size.toString() }}"
                 productQuantity.text = "x${order.totalPieces}"
 
-                order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
-                    Glide.with(itemView.context)
-                        .load(it)
-                        .into(productImage)
-                } ?: productImage.setImageResource(drawable.ic_image_placeholder)
+                val product = order.cartProducts.first()
+                productName.text = product.orderItem?.designType?.product?.name
+
+                product.orderItem?.designType?.overlay?.let {
+                    designOverlay.glide(it)
+                }
+
+                product.orderItem?.designType?.product?.imageUrl?.let {
+                    productImage.glide(it)
+                }
+
+                product.orderItem?.designType?.text?.let {
+                    tvOverlay.text = it
+                }
 
                 // Total amount
                 val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))

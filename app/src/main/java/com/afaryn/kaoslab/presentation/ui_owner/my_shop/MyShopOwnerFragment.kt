@@ -61,6 +61,10 @@ class MyShopOwnerFragment : Fragment() {
         binding.btnCustomer.setOnClickListener {
             findNavController().navigate(R.id.action_myShopOwnerFragment_to_listCustomersFragment)
         }
+
+        binding.btnShopPerformance.setOnClickListener {
+            findNavController().navigate(R.id.action_myShopOwnerFragment_to_shopPerformanceFragment)
+        }
     }
 
     private fun observers() {

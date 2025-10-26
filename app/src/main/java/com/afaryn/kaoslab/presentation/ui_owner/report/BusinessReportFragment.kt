@@ -14,6 +14,7 @@ import com.afaryn.kaoslab.domain.model.BusinessInsights
 import com.afaryn.kaoslab.domain.model.ChartData
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.showBottomNavOwner
+import com.afaryn.kaoslab.utils.toCurrencyFormat
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -48,9 +49,6 @@ class BusinessReportFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.backArrow.setOnClickListener {
-            findNavController().navigateUp()
-        }
 
         binding.thisWeekDropdown.setOnClickListener {
             // TODO: Implement period selection dropdown
@@ -122,13 +120,13 @@ class BusinessReportFragment : Fragment() {
 
         // Update card values using the new IDs
         binding.tvOrdersValue.text = numberFormat.format(insights.totalOrders)
-        binding.tvSalesValue.text = "Rp\n${numberFormat.format(insights.totalSales)}"
+        binding.tvSalesValue.text = "Rp" + insights.totalSales.toInt().toCurrencyFormat()
         binding.tvVisitorsValue.text = numberFormat.format(insights.totalVisitors)
         binding.tvBuyersValue.text = numberFormat.format(insights.totalBuyers)
         binding.tvTotalStockValue.text = numberFormat.format(insights.totalStock)
 
         // Update selling product amount
-        binding.sellingProductAmount.text = "Rp ${numberFormat.format(insights.totalSales)}"
+        binding.sellingProductAmount.text = "Rp" + insights.totalSales.toInt().toCurrencyFormat()
     }
 
     private fun updateChart(chartData: List<ChartData>) {

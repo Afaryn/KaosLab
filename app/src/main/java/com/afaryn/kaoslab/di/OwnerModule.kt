@@ -2,6 +2,7 @@ package com.afaryn.kaoslab.di
 
 import com.afaryn.kaoslab.domain.repository.OwnerRepository
 import com.afaryn.kaoslab.data.repository.OwnerRepositoryImpl
+import com.afaryn.kaoslab.domain.repository.NotificationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -18,8 +19,9 @@ object OwnerModule {
     @Singleton
     fun provideOwnerRepository(
         auth: FirebaseAuth,
-        firestore: FirebaseFirestore
+        firestore: FirebaseFirestore,
+        notificationRepository: NotificationRepository
     ): OwnerRepository {
-        return OwnerRepositoryImpl(auth, firestore)
+        return OwnerRepositoryImpl(auth, firestore, notificationRepository)
     }
 }
