@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.domain.repository
 
+import android.net.Uri
 import com.afaryn.kaoslab.domain.model.ProductTemplate
 import com.afaryn.kaoslab.domain.model.BusinessInsights
 import com.afaryn.kaoslab.domain.model.ChartData
@@ -33,6 +34,10 @@ interface OwnerRepository {
     fun getOrderStatusCounts(): Flow<Response<OrderStatusCounts>>
     fun getLastOrders(limit: Int = 5): Flow<Response<List<Order>>>
     fun getOrdersByStatus(status: String): Flow<Response<List<Order>>>
+
+    fun updateUserProfile(user: User): Flow<Response<String>>
+    suspend fun uploadProfileImage(imageUri: Uri, userId: String): String
+    suspend fun deleteImageFromStorage(imageUrl: String)
 
     // Arrange Shipment methods
     fun updateOrderStatus(orderId: String, status: String, courierId: String? = null, noResi: String? = null): Flow<Response<String>>

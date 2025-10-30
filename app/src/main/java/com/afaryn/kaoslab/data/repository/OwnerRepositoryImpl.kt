@@ -1,5 +1,7 @@
 package com.afaryn.kaoslab.data.repository
 
+import android.net.Uri
+import android.util.Log
 import com.afaryn.kaoslab.domain.model.BusinessInsights
 import com.afaryn.kaoslab.domain.model.ChartData
 import com.afaryn.kaoslab.domain.model.Kurir
@@ -19,6 +21,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
@@ -35,6 +38,7 @@ import javax.inject.Singleton
 class OwnerRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
+    val storage: FirebaseStorage,
     private val notificationRepository: NotificationRepository
 ) : OwnerRepository {
     companion object {
@@ -67,6 +71,50 @@ class OwnerRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             emit(Response.Error(e.message ?: "Failed to get user profile"))
+        }
+    }
+
+    override fun updateUserProfile(user: User): Flow<Response<String>> = flow {
+        try {
+            emit(Response.Loading)
+            val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+
+            if (user.id != currentUserId) {
+                throw Exception("Unauthorized to update this profile")
+            }
+
+            firestore.collection("users")
+                .document(currentUserId)
+                .set(user)
+                .await()
+
+            emit(Response.Success("Profile updated successfully"))
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: "Failed to update profile"))
+        }
+    }
+
+    override suspend fun deleteImageFromStorage(imageUrl: String) {
+        try {
+            if (imageUrl.isNotEmpty() && imageUrl.contains("firebase")) {
+                storage.getReferenceFromUrl(imageUrl).delete().await()
+            }
+        } catch (e: Exception) {
+            // Log error but don't fail the operation
+            Log.w("OwnerRepository", "Failed to delete image from storage: ${e.message}")
+        }
+    }
+
+    override suspend fun uploadProfileImage(imageUri: Uri, userId: String): String {
+        val timestamp = System.currentTimeMillis()
+        val imageName = "profile_${userId}_$timestamp.jpg"
+        val imageRef = storage.reference.child("profiles/$imageName")
+
+        return try {
+            imageRef.putFile(imageUri).await()
+            imageRef.downloadUrl.await().toString()
+        } catch (e: Exception) {
+            throw Exception("Failed to upload profile image: ${e.message}")
         }
     }
 
