@@ -49,6 +49,7 @@ class DetailDesainActivity : AppCompatActivity() {
         tvPrice.text = "from ${data.minPrice.toInt().formatRupiah()}"
         tvTitle.text = data.title
         tvDescription.text = data.description
+        ratingBar.rating = design?.rating?.toFloat() ?: 0.0f
 
         checkFavorite(data)
     }

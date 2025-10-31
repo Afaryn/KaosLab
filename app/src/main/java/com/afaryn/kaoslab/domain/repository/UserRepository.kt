@@ -39,6 +39,7 @@ interface UserRepository {
     fun modifyFavorite(design: Design): Flow<Resource<Unit>>
     fun checkFavorite(designId: String): Flow<Resource<Boolean>>
     fun getFavorites(): Flow<Resource<List<Design>>>
+    fun rateDesign(designOrder: DesignOrder, designId: String, rating: Float): Flow<Resource<Unit>>
 
     // Feed
 //    fun postFeed(feed: Feed, imgUri: Uri): Flow<Resource<Unit>>

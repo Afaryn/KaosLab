@@ -10,9 +10,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MyDesignViewModel @Inject constructor(
     private val userRepository: UserRepository
-): ViewModel() {
+) : ViewModel() {
 
     fun getDesigns(status: DesignOrderStatus) = userRepository.getOwnedDesigns(status)
     fun updateStatus(order: DesignOrder) = userRepository.updateDesignPaymentStatus(order)
     fun setDownloaded(order: DesignOrder) = userRepository.downloadDesign(order)
+
+    fun rateDesign(designOrder: DesignOrder, designId: String, rate: Float) =
+        userRepository.rateDesign(designOrder, designId, rate)
 }

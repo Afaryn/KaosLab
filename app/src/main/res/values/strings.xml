@@ -14,4 +14,6 @@
     <string name="image_selected">Image selected</string>
     <string name="uploading">Uploading...</string>
     <string name="upload">Upload</string>
+    <string name="rate_this_design">Rate this design</string>
+    <string name="give_rating">Give Rating</string>
 </resources>

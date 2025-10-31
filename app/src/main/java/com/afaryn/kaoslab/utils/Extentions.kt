@@ -26,6 +26,7 @@ import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.afaryn.kaoslab.R
+import com.afaryn.kaoslab.databinding.DialogRateBinding
 import com.afaryn.kaoslab.presentation.ui_designer.DesignerActivity
 import com.afaryn.kaoslab.presentation.ui_owner.OwnerActivity
 import com.bumptech.glide.Glide
@@ -33,6 +34,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Timestamp
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -620,4 +622,21 @@ fun Long.isToday(): Boolean {
 
     return currentCal.get(Calendar.YEAR) == targetCal.get(Calendar.YEAR) &&
             currentCal.get(Calendar.DAY_OF_YEAR) == targetCal.get(Calendar.DAY_OF_YEAR)
+}
+
+fun Activity.showRatingDialog(onRate: (Float) -> Unit) {
+    val dialogBinding = DialogRateBinding.inflate(layoutInflater)
+
+    val dialog = MaterialAlertDialogBuilder(this)
+        .setView(dialogBinding.root)
+        .setCancelable(true)
+        .create()
+
+    dialogBinding.btnRate.setOnClickListener {
+        val rating = dialogBinding.ratingBar.rating
+        onRate(rating)
+        dialog.dismiss()
+    }
+
+    dialog.show()
 }

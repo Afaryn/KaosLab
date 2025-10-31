@@ -13,6 +13,7 @@ data class DesignOrder(
     val snapToken: String? = null,
     val status: String = DesignOrderStatus.Pending.value,
     val downloaded: Int = 0,
+    val rated: Boolean? = false,
     val createdAt: Date = Date()
 ): Parcelable
 
@@ -33,10 +34,25 @@ data class Design(
     val maxPrice: Double = 0.0, // Highest price from all licenses
     val downloads: Int = 0,
     val rating: Double = 0.0,
+    val ratingCount: Int = 0,
+    val ratingTotal: Double = 0.0,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val isActive: Boolean = true
-): Parcelable
+): Parcelable {
+    fun calculateRating(newRating: Float): Design {
+        val newTotal = ratingTotal + newRating
+        val newCount = ratingCount + 1
+        val newAverage = newTotal / newCount
+
+        return this.copy(
+            ratingTotal = newTotal,
+            ratingCount = newCount,
+            rating = newAverage,
+            updatedAt = System.currentTimeMillis()
+        )
+    }
+}
 
 @Parcelize
 data class License(

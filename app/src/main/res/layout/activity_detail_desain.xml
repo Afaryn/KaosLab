@@ -58,44 +58,21 @@
                 app:layout_constraintTop_toTopOf="@id/iv_designer"
                 tools:text="Nama" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/fl_ratings"
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:isIndicator="true"
+                android:rating="0.0"
                 android:layout_marginTop="5dp"
+                android:progressTint="@color/amber_500"
+                android:secondaryProgressTint="@color/amber_500"
+                android:indeterminateTint="@color/amber_500"
                 app:layout_constraintStart_toStartOf="@id/tv_designer"
-                app:layout_constraintTop_toBottomOf="@id/tv_designer">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@android:color/darker_gray" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@android:color/darker_gray" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@android:color/darker_gray" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@android:color/darker_gray" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@android:color/darker_gray" />
-            </com.google.android.flexbox.FlexboxLayout>
+                app:layout_constraintTop_toBottomOf="@id/tv_designer" />
 
             <TextView
                 android:id="@+id/tv_price"
@@ -108,7 +85,7 @@
                 android:textSize="@dimen/text_lg"
                 app:layout_constraintBottom_toBottomOf="@id/iv_designer"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/fl_ratings"
+                app:layout_constraintStart_toEndOf="@id/ratingBar"
                 app:layout_constraintTop_toTopOf="@id/iv_designer"
                 tools:text="Rp. 35.000" />
 

@@ -26,6 +26,7 @@ import com.afaryn.kaoslab.utils.Constants.COLL_PORTFOLIOS
 import com.afaryn.kaoslab.utils.Constants.COLL_USER
 import com.afaryn.kaoslab.utils.Constants.COLL_USER_DESIGN
 import com.afaryn.kaoslab.utils.Constants.CUSTOM_PRODUCT_COLLECTION
+import com.afaryn.kaoslab.utils.Constants.DESIGN_COLLECTION
 import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_PENDING
 import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_SETTLEMENT
 import com.afaryn.kaoslab.utils.PaymentConstants.STATUS_SUCCESS
@@ -72,11 +73,8 @@ class UserRepositoryImpl @Inject constructor(
                     ref.downloadUrl.await().toString()
                 } ?: designType?.overlay
 
-            firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_CART)
-                .document(cartProduct.id)
-                .set(
+            firestore.collection(COLL_USER).document(uid).collection(COLL_CART)
+                .document(cartProduct.id).set(
                     cartProduct.copy(
                         orderItem = cartProduct.orderItem?.copy(
                             designType = designType?.copy(overlay = url)
@@ -127,10 +125,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         try {
-            firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_CART)
-                .document(id)
+            firestore.collection(COLL_USER).document(uid).collection(COLL_CART).document(id)
                 .delete().await()
 
             trySend(Resource.Success(Unit))
@@ -151,12 +146,9 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         try {
-            val address = firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_ADDRESS)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(1)
-                .get().await().toObjects(Address::class.java)
+            val address = firestore.collection(COLL_USER).document(uid).collection(COLL_ADDRESS)
+                .orderBy("createdAt", Query.Direction.DESCENDING).limit(1).get().await()
+                .toObjects(Address::class.java)
 
             address.firstOrNull()?.let { trySend(Resource.Success(it)) }
         } catch (e: Exception) {
@@ -175,8 +167,7 @@ class UserRepositoryImpl @Inject constructor(
             return@callbackFlow
         }
 
-        val listener = firestore.collection(COLL_USER).document(uid)
-            .collection(COLL_ADDRESS)
+        val listener = firestore.collection(COLL_USER).document(uid).collection(COLL_ADDRESS)
             .addSnapshotListener { value, error ->
                 error?.let {
                     trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
@@ -202,11 +193,8 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         try {
-            firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_ADDRESS)
-                .document(address.id)
-                .set(address).await()
+            firestore.collection(COLL_USER).document(uid).collection(COLL_ADDRESS)
+                .document(address.id).set(address).await()
 
             trySend(Resource.Success(Unit))
         } catch (e: Exception) {
@@ -226,10 +214,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         try {
-            firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_ADDRESS)
-                .document(id)
+            firestore.collection(COLL_USER).document(uid).collection(COLL_ADDRESS).document(id)
                 .delete().await()
 
             trySend(Resource.Success(Unit))
@@ -241,8 +226,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSnapToken(
-        order: Order?,
-        design: DesignOrder?
+        order: Order?, design: DesignOrder?
     ): Flow<Resource<SnapResponse>> = callbackFlow {
         trySend(Resource.Loading)
 
@@ -253,13 +237,13 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         try {
-            val user = firestore.collection(COLL_USER)
-                .document(uid).get().await().toObject(User::class.java)
-                ?: throw Exception("Gagal mendapatkan data user")
+            val user = firestore.collection(COLL_USER).document(uid).get().await()
+                .toObject(User::class.java) ?: throw Exception("Gagal mendapatkan data user")
 
             val (name, email) = (user.name
-                ?: throw Exception("Failed getting user's name")) to (user.email
-                ?: throw Exception("Failed getting user's email"))
+                ?: throw Exception("Failed getting user's name")) to (user.email ?: throw Exception(
+                "Failed getting user's email"
+            ))
 
             val request = order?.let {
                 SnapRequest(
@@ -301,9 +285,7 @@ class UserRepositoryImpl @Inject constructor(
             val cartIds = order.cartProducts.map { it.id }
             val batch = firestore.batch()
 
-            val cartCollection = firestore.collection(COLL_USER)
-                .document(uid)
-                .collection(COLL_CART)
+            val cartCollection = firestore.collection(COLL_USER).document(uid).collection(COLL_CART)
 
             val orderRef = firestore.collection(COLL_ORDERS).document(order.orderId)
             batch.set(orderRef, order.copy(snapToken = snapToken, customerId = uid))
@@ -322,7 +304,28 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { }
     }
 
-    override fun addDesign(design: DesignOrder): Flow<Resource<Unit>> =
+    override fun addDesign(design: DesignOrder): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            firestore.collection(COLL_USER).document(uid).collection(COLL_USER_DESIGN)
+                .document(design.id).set(design.copy(userId = uid)).await()
+
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
+
+    override fun getOwnedDesigns(status: DesignOrderStatus): Flow<Resource<List<DesignOrder>>> =
         callbackFlow {
             trySend(Resource.Loading)
 
@@ -332,48 +335,22 @@ class UserRepositoryImpl @Inject constructor(
                 return@callbackFlow
             }
 
-            try {
-                firestore.collection(COLL_USER)
-                    .document(uid)
-                    .collection(COLL_USER_DESIGN)
-                    .document(design.id)
-                    .set(design.copy(userId = uid))
-                    .await()
+            val listener =
+                firestore.collection(COLL_USER).document(uid).collection(COLL_USER_DESIGN)
+                    .whereEqualTo("status", status.value).addSnapshotListener { value, error ->
+                        error?.let {
+                            trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                            close()
+                            return@addSnapshotListener
+                        }
 
-                trySend(Resource.Success(Unit))
-            } catch (e: Exception) {
-                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-            }
+                        value?.toObjects(DesignOrder::class.java)?.let {
+                            trySend(Resource.Success(it))
+                        }
+                    }
 
-            awaitClose { }
+            awaitClose { listener.remove() }
         }
-
-    override fun getOwnedDesigns(status: DesignOrderStatus): Flow<Resource<List<DesignOrder>>> = callbackFlow {
-        trySend(Resource.Loading)
-
-        val uid = auth.uid ?: run {
-            trySend(Resource.Error("Gagal mendapatkan data user"))
-            close()
-            return@callbackFlow
-        }
-
-        val listener = firestore.collection(COLL_USER).document(uid)
-            .collection(COLL_USER_DESIGN)
-            .whereEqualTo("status", status.value)
-            .addSnapshotListener { value, error ->
-                error?.let {
-                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
-                    close()
-                    return@addSnapshotListener
-                }
-
-                value?.toObjects(DesignOrder::class.java)?.let {
-                    trySend(Resource.Success(it))
-                }
-            }
-
-        awaitClose { listener.remove() }
-    }
 
     override fun updateDesignPaymentStatus(order: DesignOrder): Flow<Resource<Pair<String, Boolean>>> =
         callbackFlow {
@@ -384,12 +361,9 @@ class UserRepositoryImpl @Inject constructor(
 
                 when (response.transactionStatus) {
                     in listOf(STATUS_SUCCESS, STATUS_SETTLEMENT) -> {
-                        firestore.collection(COLL_USER)
-                            .document(order.userId.orEmpty())
-                            .collection(COLL_USER_DESIGN)
-                            .document(order.id)
-                            .set(order.copy(status = DesignOrderStatus.Owned.value))
-                            .await()
+                        firestore.collection(COLL_USER).document(order.userId.orEmpty())
+                            .collection(COLL_USER_DESIGN).document(order.id)
+                            .set(order.copy(status = DesignOrderStatus.Owned.value)).await()
 
                         notificationRepository.publishPaymentSuccess(productName = "${order.design.selectedLicense?.name} licensed design")
 
@@ -417,84 +391,72 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose { }
         }
 
-    override fun downloadDesign(order: DesignOrder): Flow<Resource<Unit>> =
-        callbackFlow {
-            trySend(Resource.Loading)
+    override fun downloadDesign(order: DesignOrder): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
 
-            val uid = auth.uid ?: run {
-                trySend(Resource.Error("Gagal mendapatkan data user"))
-                close()
-                return@callbackFlow
-            }
-
-            try {
-                firestore.collection(COLL_USER)
-                    .document(uid)
-                    .collection(COLL_USER_DESIGN)
-                    .document(order.id)
-                    .set(order.copy(downloaded = order.downloaded + 1))
-                    .await()
-
-                trySend(Resource.Success(Unit))
-            } catch (e: Exception) {
-                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-            }
-
-            awaitClose { }
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
         }
 
-    override fun modifyFavorite(design: Design): Flow<Resource<Unit>> =
-        callbackFlow {
-            trySend(Resource.Loading)
+        try {
+            firestore.collection(COLL_USER).document(uid).collection(COLL_USER_DESIGN)
+                .document(order.id).set(order.copy(downloaded = order.downloaded + 1)).await()
 
-            val uid = auth.uid ?: run {
-                trySend(Resource.Error("Gagal mendapatkan data user"))
-                close()
-                return@callbackFlow
-            }
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
 
-            try {
-                val snapshot = firestore.collection(COLL_USER)
-                    .document(uid)
-                    .collection(COLL_FAV_DESIGNS)
+        awaitClose { }
+    }
+
+    override fun modifyFavorite(design: Design): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val snapshot =
+                firestore.collection(COLL_USER).document(uid).collection(COLL_FAV_DESIGNS)
                     .document(design.id)
 
-                if (snapshot.get().await().exists()) snapshot.delete().await()
-                else snapshot.set(design).await()
+            if (snapshot.get().await().exists()) snapshot.delete().await()
+            else snapshot.set(design).await()
 
-                trySend(Resource.Success(Unit))
-            } catch (e: Exception) {
-                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-            }
-
-            awaitClose { }
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
         }
 
-    override fun checkFavorite(designId: String): Flow<Resource<Boolean>> =
-        callbackFlow {
-            trySend(Resource.Loading)
+        awaitClose { }
+    }
 
-            val uid = auth.uid ?: run {
-                trySend(Resource.Error("Gagal mendapatkan data user"))
-                close()
-                return@callbackFlow
-            }
+    override fun checkFavorite(designId: String): Flow<Resource<Boolean>> = callbackFlow {
+        trySend(Resource.Loading)
 
-            try {
-                val design = firestore.collection(COLL_USER)
-                    .document(uid)
-                    .collection(COLL_FAV_DESIGNS)
-                    .document(designId)
-                    .get()
-                    .await()
-
-                trySend(Resource.Success(design.exists()))
-            } catch (e: Exception) {
-                trySend(Resource.Error(e.message ?: "There is trouble getting data"))
-            }
-
-            awaitClose { }
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
         }
+
+        try {
+            val design = firestore.collection(COLL_USER).document(uid).collection(COLL_FAV_DESIGNS)
+                .document(designId).get().await()
+
+            trySend(Resource.Success(design.exists()))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
 
     override fun getFavorites(): Flow<Resource<List<Design>>> = callbackFlow {
         trySend(Resource.Loading)
@@ -505,8 +467,7 @@ class UserRepositoryImpl @Inject constructor(
             return@callbackFlow
         }
 
-        val listener = firestore.collection(COLL_USER).document(uid)
-            .collection(COLL_FAV_DESIGNS)
+        val listener = firestore.collection(COLL_USER).document(uid).collection(COLL_FAV_DESIGNS)
             .addSnapshotListener { value, error ->
                 error?.let {
                     trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
@@ -522,11 +483,43 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose { listener.remove() }
     }
 
+    override fun rateDesign(
+        designOrder: DesignOrder, designId: String, rating: Float
+    ): Flow<Resource<Unit>> = callbackFlow {
+        trySend(Resource.Loading)
+
+        val uid = auth.uid ?: run {
+            trySend(Resource.Error("Gagal mendapatkan data user"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            val designColl = firestore.collection(DESIGN_COLLECTION).document(designId)
+            val design = designColl.get().await().toObject(Design::class.java)
+                ?: throw Exception("Failed getting design data")
+            val ratedDesign = design.calculateRating(rating)
+            designColl.set(ratedDesign)
+
+            val orderColl =
+                firestore.collection(COLL_USER).document(uid).collection(COLL_USER_DESIGN)
+                    .document(designOrder.id)
+            val order = orderColl.get().await().toObject(DesignOrder::class.java)
+                ?: throw Exception("Failed getting order data")
+            orderColl.set(order.copy(rated = true))
+
+            trySend(Resource.Success(Unit))
+        } catch (e: Exception) {
+            trySend(Resource.Error(e.message ?: "There is trouble getting data"))
+        }
+
+        awaitClose { }
+    }
+
     override fun getFeeds(): Flow<Resource<List<Portfolio>>> = callbackFlow {
         trySend(Resource.Loading)
 
-        val listener = firestore.collection(COLL_PORTFOLIOS)
-            .addSnapshotListener { value, error ->
+        val listener = firestore.collection(COLL_PORTFOLIOS).addSnapshotListener { value, error ->
                 error?.let {
                     trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
                     close()
@@ -558,9 +551,7 @@ class UserRepositoryImpl @Inject constructor(
             if (isLiking) likes.add(Likes(userId = uid))
             else likes.remove(likes.find { it.userId == uid })
 
-            firestore.collection(COLL_PORTFOLIOS)
-                .document(feed.id)
-                .set(feed.copy(likes = likes))
+            firestore.collection(COLL_PORTFOLIOS).document(feed.id).set(feed.copy(likes = likes))
                 .await()
 
             trySend(Resource.Success(Unit))
@@ -580,10 +571,8 @@ class UserRepositoryImpl @Inject constructor(
             return@callbackFlow
         }
 
-        val listener = firestore.collection(COLL_ORDERS)
-            .whereEqualTo("customerId", uid)
-            .whereEqualTo("status", status)
-            .addSnapshotListener { value, error ->
+        val listener = firestore.collection(COLL_ORDERS).whereEqualTo("customerId", uid)
+            .whereEqualTo("status", status).addSnapshotListener { value, error ->
                 error?.let {
                     trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
                     close()
@@ -607,18 +596,14 @@ class UserRepositoryImpl @Inject constructor(
 
                 when (response.transactionStatus) {
                     in listOf(STATUS_SUCCESS, STATUS_SETTLEMENT) -> {
-                        firestore.collection(COLL_ORDERS)
-                            .document(order.orderId)
-                            .set(order.copy(status = OrderStatus.Processing.value))
-                            .await()
+                        firestore.collection(COLL_ORDERS).document(order.orderId)
+                            .set(order.copy(status = OrderStatus.Processing.value)).await()
 
-                        notificationRepository.publishPaymentSuccess(
-                            productName = order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name?.let {
-                                "${order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name}${
-                                    if (order.cartProducts.size > 1) " and ${order.cartProducts.size - 1} more" else ""
-                                }"
-                            } ?: "Custom Product"
-                        )
+                        notificationRepository.publishPaymentSuccess(productName = order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name?.let {
+                            "${order.cartProducts.firstOrNull()?.orderItem?.designType?.product?.name}${
+                                if (order.cartProducts.size > 1) " and ${order.cartProducts.size - 1} more" else ""
+                            }"
+                        } ?: "Custom Product")
 
                         trySend(Resource.Success("Payment Successful" to true))
                         close()
@@ -647,8 +632,7 @@ class UserRepositoryImpl @Inject constructor(
     override fun getOwnerContact(): Flow<Resource<String>> = callbackFlow {
         trySend(Resource.Loading)
 
-        val listener = firestore.collection(COLL_USER)
-            .whereEqualTo("role", "owner")
+        val listener = firestore.collection(COLL_USER).whereEqualTo("role", "owner")
             .addSnapshotListener { value, error ->
                 error?.let {
                     trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
@@ -667,18 +651,18 @@ class UserRepositoryImpl @Inject constructor(
     override fun getAllProducts(): Flow<Resource<List<CustomProduct>>> = callbackFlow {
         trySend(Resource.Loading)
 
-        val listener = firestore.collection(CUSTOM_PRODUCT_COLLECTION)
-            .addSnapshotListener { value, error ->
-                error?.let {
-                    trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
-                    close()
-                    return@addSnapshotListener
-                }
+        val listener =
+            firestore.collection(CUSTOM_PRODUCT_COLLECTION).addSnapshotListener { value, error ->
+                    error?.let {
+                        trySend(Resource.Error(it.message ?: "Terjadi kesalahan"))
+                        close()
+                        return@addSnapshotListener
+                    }
 
-                value?.toObjects(CustomProduct::class.java)?.let {
-                    trySend(Resource.Success(it))
+                    value?.toObjects(CustomProduct::class.java)?.let {
+                        trySend(Resource.Success(it))
+                    }
                 }
-            }
 
         awaitClose { listener.remove() }
     }
@@ -695,9 +679,8 @@ class UserRepositoryImpl @Inject constructor(
 
             try {
                 val coll = firestore.collection(COLL_USER).document(uid)
-                val user = coll
-                    .get().await()
-                    .toObject(User::class.java) ?: throw Exception("Failed getting user data")
+                val user = coll.get().await().toObject(User::class.java)
+                    ?: throw Exception("Failed getting user data")
 
                 coll.set(user.copy(role = "designer", accountNo = accountNo, bankType = type))
                 trySend(Resource.Success(Unit))

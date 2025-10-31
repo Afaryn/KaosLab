@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afaryn.kaoslab.data.adapter.DesignAdapter
-import com.afaryn.kaoslab.data.adapter.OrderAdapter.OrderViewHolder
 import com.afaryn.kaoslab.databinding.FragmentPendingPaymentBinding
 import com.afaryn.kaoslab.domain.model.DesignOrder
 import com.afaryn.kaoslab.domain.model.DesignOrderStatus
@@ -25,6 +24,7 @@ import com.afaryn.kaoslab.utils.Resource
 import com.afaryn.kaoslab.utils.downloadDesign
 import com.afaryn.kaoslab.utils.getParcelable
 import com.afaryn.kaoslab.utils.setLoading
+import com.afaryn.kaoslab.utils.showRatingDialog
 import com.afaryn.kaoslab.utils.toast
 import com.midtrans.sdk.uikit.api.model.TransactionResult
 import com.midtrans.sdk.uikit.external.UiKitApi
@@ -109,6 +109,11 @@ abstract class MyDesignBaseFragment : Fragment() {
             onLimit = {
                 toast("You have downloaded this design before, buy the exclusive package for unlimited downloads")
             }
+            onRateDesign = { order, designId, position ->
+                requireActivity().showRatingDialog { rate ->
+                    rateDesign(order, designId, rate, position)
+                }
+            }
         }
 
     }
@@ -170,14 +175,36 @@ abstract class MyDesignBaseFragment : Fragment() {
         }
     }
 
+    private fun rateDesign(order: DesignOrder, designId: String, rate: Float, position: Int) = lifecycleScope.launch {
+        vm.rateDesign(order, designId, rate).collect {
+            when (it) {
+                is Resource.Loading -> setBtnRateLoading(position, true, "Rate")
+
+                is Resource.Error -> {
+                    setBtnRateLoading(position, false, "Rate")
+                    toast(it.error)
+                }
+
+                is Resource.Success -> {
+                    toast("You rated the design successfully")
+                }
+            }
+        }
+    }
+
     private fun setupView(data: List<DesignOrder>) {
         binding.tvNoData.isVisible = data.isEmpty()
         designAdapter.differ.submitList(data)
     }
 
     fun setBtnLoading(position: Int, isLoading: Boolean, placeholder: String) {
-        val holder = binding.rvMyDesign.findViewHolderForAdapterPosition(position) as? OrderViewHolder
-        holder?.binding?.btnContactSeller?.setLoading(isLoading, placeholder)
+        val holder = binding.rvMyDesign.findViewHolderForAdapterPosition(position) as? DesignAdapter.DesignViewHolder
+        holder?.binding?.btnUse?.setLoading(isLoading, placeholder)
+    }
+
+    fun setBtnRateLoading(position: Int, isLoading: Boolean, placeholder: String) {
+        val holder = binding.rvMyDesign.findViewHolderForAdapterPosition(position) as? DesignAdapter.DesignViewHolder
+        holder?.binding?.btnRate?.setLoading(isLoading, placeholder)
     }
 
     override fun onDestroyView() {

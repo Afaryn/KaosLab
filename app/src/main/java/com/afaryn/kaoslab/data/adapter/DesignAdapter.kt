@@ -3,6 +3,7 @@ package com.afaryn.kaoslab.data.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -70,10 +71,16 @@ class DesignAdapter(): RecyclerView.Adapter<DesignAdapter.DesignViewHolder>() {
                     else -> onUseDesign?.invoke(order, position)
                 }
             }
+
+            btnRate.apply {
+                isVisible = order.status == DesignOrderStatus.Owned.value && order.rated != true
+                setOnClickListener { onRateDesign?.invoke(order, order.design.id, position) }
+            }
         }
     }
 
     var onUpdateStatus: ((DesignOrder, Int) -> Unit)? = null
     var onUseDesign: ((DesignOrder, Int) -> Unit)? = null
+    var onRateDesign: ((DesignOrder, String, Int) -> Unit)? = null
     var onLimit: (() -> Unit)? = null
 }
