@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <!-- Toolbar -->
     <LinearLayout
@@ -111,57 +112,81 @@
 
             </LinearLayout>
 
-            <!-- Product Image and Info -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- T-Shirt Preview -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/tshirtContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white"
-                android:layout_marginBottom="16dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-                <LinearLayout
+                <FrameLayout
+                    android:id="@+id/mockupContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_gravity="center">
 
                     <ImageView
-                        android:id="@+id/productImage"
+                        android:id="@+id/tshirtBackground"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitCenter"
-                        android:contentDescription="Product Image"
-                        tools:src="@tools:sample/backgrounds/scenic" />
+                        android:src="@drawable/bg_gradient_top" />
 
-                    <!-- Color Variations (small thumbnails) -->
-                    <LinearLayout
-                        android:id="@+id/ll_colors"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="8dp">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
+                        <!-- Shirt base -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:background="@color/lightGray"
-                            android:layout_marginEnd="8dp"
-                            android:contentDescription="Color variant" />
+                            android:id="@+id/imageCustomProduct"
+                            android:layout_width="wrap_content"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/img"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
+                        <!-- Overlay design -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:background="@color/lightGray"
-                            android:contentDescription="Color variant" />
+                            android:id="@+id/designOverlay"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:layout_marginTop="30dp"
+                            android:scaleType="fitCenter"
+                            app:layout_constraintBottom_toBottomOf="@id/imageCustomProduct"
+                            app:layout_constraintEnd_toEndOf="@id/imageCustomProduct"
+                            app:layout_constraintStart_toStartOf="@id/imageCustomProduct"
+                            app:layout_constraintTop_toTopOf="@id/imageCustomProduct" />
 
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:id="@+id/tv_overlay"
+                            android:layout_width="70dp"
+                            android:layout_height="0dp"
+                            android:layout_marginTop="90dp"
+                            android:layout_marginBottom="10dp"
+                            android:background="@android:color/transparent"
+                            android:ellipsize="none"
+                            android:fontFamily="@font/pjs_regular"
+                            android:textSize="11sp"
+                            app:autoSizeMaxTextSize="11sp"
+                            app:autoSizeMinTextSize="6sp"
+                            app:autoSizeStepGranularity="1sp"
+                            app:autoSizeTextType="uniform"
+                            app:layout_constraintBottom_toBottomOf="@id/imageCustomProduct"
+                            app:layout_constraintEnd_toEndOf="@id/imageCustomProduct"
+                            app:layout_constraintStart_toStartOf="@id/imageCustomProduct"
+                            app:layout_constraintTop_toTopOf="@id/imageCustomProduct" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Product Details -->
             <TextView
@@ -476,9 +501,10 @@
             android:layout_weight="1"
             android:text="Arrange Shipment"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:cornerRadius="8dp"
+            android:maxLines="1"
             android:backgroundTint="@color/darkBlue"
             android:textColor="@android:color/white"
             android:layout_marginEnd="8dp" />
@@ -490,7 +516,7 @@
             android:layout_weight="1"
             android:text="Download"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:cornerRadius="8dp"
             android:backgroundTint="@android:color/transparent"
@@ -498,7 +524,7 @@
             app:strokeColor="@color/darkBlue"
             app:strokeWidth="1dp"
             android:layout_marginStart="8dp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 

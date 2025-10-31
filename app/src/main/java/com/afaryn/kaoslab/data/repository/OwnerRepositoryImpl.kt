@@ -1,8 +1,11 @@
 package com.afaryn.kaoslab.data.repository
 
+import android.net.Uri
+import android.util.Log
 import com.afaryn.kaoslab.domain.model.BusinessInsights
 import com.afaryn.kaoslab.domain.model.ChartData
 import com.afaryn.kaoslab.domain.model.Kurir
+import com.afaryn.kaoslab.domain.model.MonthlySales
 import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.domain.model.OrderStatusCounts
 import com.afaryn.kaoslab.domain.model.ProductTemplate
@@ -18,6 +21,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
@@ -34,6 +38,7 @@ import javax.inject.Singleton
 class OwnerRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
+    val storage: FirebaseStorage,
     private val notificationRepository: NotificationRepository
 ) : OwnerRepository {
     companion object {
@@ -66,6 +71,50 @@ class OwnerRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             emit(Response.Error(e.message ?: "Failed to get user profile"))
+        }
+    }
+
+    override fun updateUserProfile(user: User): Flow<Response<String>> = flow {
+        try {
+            emit(Response.Loading)
+            val currentUserId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+
+            if (user.id != currentUserId) {
+                throw Exception("Unauthorized to update this profile")
+            }
+
+            firestore.collection("users")
+                .document(currentUserId)
+                .set(user)
+                .await()
+
+            emit(Response.Success("Profile updated successfully"))
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: "Failed to update profile"))
+        }
+    }
+
+    override suspend fun deleteImageFromStorage(imageUrl: String) {
+        try {
+            if (imageUrl.isNotEmpty() && imageUrl.contains("firebase")) {
+                storage.getReferenceFromUrl(imageUrl).delete().await()
+            }
+        } catch (e: Exception) {
+            // Log error but don't fail the operation
+            Log.w("OwnerRepository", "Failed to delete image from storage: ${e.message}")
+        }
+    }
+
+    override suspend fun uploadProfileImage(imageUri: Uri, userId: String): String {
+        val timestamp = System.currentTimeMillis()
+        val imageName = "profile_${userId}_$timestamp.jpg"
+        val imageRef = storage.reference.child("profiles/$imageName")
+
+        return try {
+            imageRef.putFile(imageUri).await()
+            imageRef.downloadUrl.await().toString()
+        } catch (e: Exception) {
+            throw Exception("Failed to upload profile image: ${e.message}")
         }
     }
 
@@ -244,34 +293,93 @@ class OwnerRepositoryImpl @Inject constructor(
                 when (period) {
                     "week" -> calendar.add(Calendar.DAY_OF_YEAR, -7)
                     "month" -> calendar.add(Calendar.MONTH, -1)
-                    "year" -> calendar.add(Calendar.YEAR, -1)
+                    else -> calendar.add(Calendar.DAY_OF_YEAR, -7)
                 }
                 val startDate = calendar.time
 
+                // Fetch orders within the date range
                 val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
                     .whereGreaterThanOrEqualTo("createdAt", Timestamp(startDate))
                     .whereLessThanOrEqualTo("createdAt", Timestamp(endDate))
                     .get()
                     .await()
 
-                // Group orders by day/month based on period and calculate sales
                 val chartData = mutableListOf<ChartData>()
 
                 if (period == "week") {
+                    // Group by day of week (last 7 days)
                     val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-                    val salesByDay = mutableMapOf<String, Double>()
+                    val salesByDay = mutableMapOf<Int, Double>()
 
-                    daysOfWeek.forEach { day ->
-                        salesByDay[day] = (1000..8000).random().toDouble() // Mock data for demo
+                    // Initialize all days with 0
+                    for (i in 0..6) {
+                        salesByDay[i] = 0.0
                     }
 
-                    daysOfWeek.forEach { day ->
-                        chartData.add(ChartData(day, salesByDay[day]?.toFloat() ?: 0f))
+                    // Group orders by day
+                    ordersSnapshot.documents.forEach { doc ->
+                        val data = doc.data ?: return@forEach
+                        val createdAt = data["createdAt"] as? Timestamp ?: return@forEach
+                        val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
+
+                        val orderCalendar = Calendar.getInstance()
+                        orderCalendar.time = createdAt.toDate()
+
+                        // Get day of week (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+                        val dayOfWeek = orderCalendar.get(Calendar.DAY_OF_WEEK)
+
+                        // Convert to index (0 = Monday, 6 = Sunday)
+                        val dayIndex = when (dayOfWeek) {
+                            Calendar.MONDAY -> 0
+                            Calendar.TUESDAY -> 1
+                            Calendar.WEDNESDAY -> 2
+                            Calendar.THURSDAY -> 3
+                            Calendar.FRIDAY -> 4
+                            Calendar.SATURDAY -> 5
+                            Calendar.SUNDAY -> 6
+                            else -> 0
+                        }
+
+                        salesByDay[dayIndex] = (salesByDay[dayIndex] ?: 0.0) + totalAmount
                     }
-                } else {
-                    val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-                    months.forEach { month ->
-                        chartData.add(ChartData(month, (2000..6000).random().toFloat()))
+
+                    // Create chart data for each day
+                    for (i in 0..6) {
+                        chartData.add(ChartData(daysOfWeek[i], salesByDay[i]?.toFloat() ?: 0f))
+                    }
+
+                } else if (period == "month") {
+                    // Group by week (last 4 weeks)
+                    val weeks = listOf("Week 1", "Week 2", "Week 3", "Week 4")
+                    val salesByWeek = mutableMapOf<Int, Double>()
+
+                    // Initialize all weeks with 0
+                    for (i in 0..3) {
+                        salesByWeek[i] = 0.0
+                    }
+
+                    // Group orders by week
+                    ordersSnapshot.documents.forEach { doc ->
+                        val data = doc.data ?: return@forEach
+                        val createdAt = data["createdAt"] as? Timestamp ?: return@forEach
+                        val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
+
+                        val orderCalendar = Calendar.getInstance()
+                        orderCalendar.time = createdAt.toDate()
+
+                        val startCalendar = Calendar.getInstance()
+                        startCalendar.time = startDate
+
+                        // Calculate which week (0-3) the order belongs to
+                        val daysDiff = ((orderCalendar.timeInMillis - startCalendar.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+                        val weekIndex = (daysDiff / 7).coerceIn(0, 3)
+
+                        salesByWeek[weekIndex] = (salesByWeek[weekIndex] ?: 0.0) + totalAmount
+                    }
+
+                    // Create chart data for each week
+                    for (i in 0..3) {
+                        chartData.add(ChartData(weeks[i], salesByWeek[i]?.toFloat() ?: 0f))
                     }
                 }
 
@@ -288,7 +396,6 @@ class OwnerRepositoryImpl @Inject constructor(
         trySend(Response.Loading)
         try {
             val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
-                .whereIn("status", listOf("delivered"))
                 .get()
                 .await()
 
@@ -502,19 +609,15 @@ class OwnerRepositoryImpl @Inject constructor(
             val enrichedOrder = coroutineScope {
                 val customerDeferred = async { fetchCustomerData(baseOrder.customerId) }
                 val courierDeferred = async { fetchCourierData(baseOrder.courierId) }
-                val designDeferred = async { fetchDesignData(baseOrder.designId) }
 
                 val (customerName, customerAvatar) = customerDeferred.await()
                 val (courierName, courierLogo) = courierDeferred.await()
-                val (designImage, designTitle) = designDeferred.await()
 
                 baseOrder.copy(
                     customerName = customerName,
                     customerAvatarUrl = customerAvatar,
                     courierInfo = courierName,
                     courierLogo = courierLogo,
-                    designImageUrl = designImage,
-                    title = designTitle
                 )
             }
 
@@ -829,11 +932,190 @@ class OwnerRepositoryImpl @Inject constructor(
                 .await()
 
             val data = snapshot.data ?: return "" to "Custom Order"
-            val imageUrl = data["imageUrl"] as? String ?: ""
+            val imageUrl = data["fileUrl"] as? String ?: ""
             val title = data["title"] as? String ?: "Custom Design"
             imageUrl to title
         } catch (e: Exception) {
             "" to "Custom Order"
         }
+    }
+
+    override fun getMonthlySales(): Flow<Response<List<MonthlySales>>> = callbackFlow {
+        trySend(Response.Loading)
+        try {
+            val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
+                .get()
+                .await()
+
+            // Group orders by month and year
+            val salesByMonth = mutableMapOf<String, MutableMap<String, Any>>()
+            var monthData = mutableMapOf<String, Any>()
+
+            ordersSnapshot.documents.forEach { doc ->
+                val data = doc.data ?: return@forEach
+                val createdAt = data["createdAt"] as? Timestamp ?: return@forEach
+                val totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0
+
+                val calendar = Calendar.getInstance()
+                calendar.time = createdAt.toDate()
+
+                val year = calendar.get(Calendar.YEAR)
+                val month = calendar.get(Calendar.MONTH) // 0-11
+
+                // Create key: "YYYY-MM"
+                val key = "$year-${month.toString().padStart(2, '0')}"
+
+                if (!salesByMonth.containsKey(key)) {
+                    salesByMonth[key] = mutableMapOf(
+                        "year" to year,
+                        "month" to month,
+                        "totalSales" to 0.0,
+                        "orderCount" to 0
+                    )
+                }
+
+                monthData = salesByMonth[key]!!
+                monthData["totalSales"] = (monthData["totalSales"] as Double) + totalAmount
+                monthData["orderCount"] = (monthData["orderCount"] as Int) + 1
+            }
+
+            // Convert to MonthlySales list and sort by date (most recent first)
+            val monthlySalesList = salesByMonth.entries
+                .filter { (monthData["totalSales"] as? Double ?: 0.0) > 0 } // Only include months with sales
+                .map { entry ->
+                    val monthData = entry.value
+                    val year = monthData["year"] as Int
+                    val monthIndex = monthData["month"] as Int
+
+                    // Get month name
+                    val monthName = when (monthIndex) {
+                        0 -> "January"
+                        1 -> "February"
+                        2 -> "March"
+                        3 -> "April"
+                        4 -> "May"
+                        5 -> "June"
+                        6 -> "July"
+                        7 -> "August"
+                        8 -> "September"
+                        9 -> "October"
+                        10 -> "November"
+                        11 -> "December"
+                        else -> "Unknown"
+                    }
+
+                    MonthlySales(
+                        month = monthName,
+                        year = year,
+                        totalSales = monthData["totalSales"] as Double,
+                        orderCount = monthData["orderCount"] as Int
+                    )
+                }
+                .sortedByDescending { it.year * 100 + getMonthNumber(it.month) }
+
+            trySend(Response.Success(monthlySalesList))
+            close()
+        } catch (e: Exception) {
+            trySend(Response.Error(e.message ?: "Failed to fetch monthly sales"))
+            close()
+        }
+        awaitClose { }
+    }
+
+    private fun getMonthNumber(monthName: String): Int {
+        return when (monthName) {
+            "January" -> 1
+            "February" -> 2
+            "March" -> 3
+            "April" -> 4
+            "May" -> 5
+            "June" -> 6
+            "July" -> 7
+            "August" -> 8
+            "September" -> 9
+            "October" -> 10
+            "November" -> 11
+            "December" -> 12
+            else -> 0
+        }
+    }
+
+    override fun getOrdersByMonth(month: String, year: Int): Flow<Response<List<Order>>> = callbackFlow {
+        trySend(Response.Loading)
+        try {
+            val monthNumber = getMonthNumber(month) - 1 // Calendar uses 0-based months
+
+            // Create start and end dates for the month
+            val startCalendar = Calendar.getInstance().apply {
+                set(Calendar.YEAR, year)
+                set(Calendar.MONTH, monthNumber)
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val endCalendar = Calendar.getInstance().apply {
+                set(Calendar.YEAR, year)
+                set(Calendar.MONTH, monthNumber)
+                set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
+            }
+
+            val startTimestamp = Timestamp(startCalendar.time)
+            val endTimestamp = Timestamp(endCalendar.time)
+
+            val ordersSnapshot = firestore.collection(COLLECTION_ORDERS)
+                .whereGreaterThanOrEqualTo("createdAt", startTimestamp)
+                .whereLessThanOrEqualTo("createdAt", endTimestamp)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            val orders = ordersSnapshot.documents.mapNotNull { doc ->
+                doc.toObject(Order::class.java)?.copy(orderId = doc.id)
+            }
+
+            // Enrich orders with customer and design data
+            val enrichedOrders = coroutineScope {
+                orders.map { order ->
+                    async {
+                        try {
+                            // Get customer data
+                            val customerDoc = firestore.collection(COLLECTION_USERS)
+                                .document(order.customerId)
+                                .get()
+                                .await()
+                            val customer = customerDoc.toObject(User::class.java)
+
+                            // Get design image from first cart product
+                            val firstCartProduct = order.cartProducts.firstOrNull()
+                            val designImageUrl = firstCartProduct?.orderItem?.designType?.product?.imageUrl ?: ""
+                            val title = firstCartProduct?.orderItem?.title ?: "Custom Product"
+
+                            order.copy(
+                                customerName = customer?.name ?: "Unknown Customer",
+                                customerAvatarUrl = customer?.profilePicture ?: "",
+                                designImageUrl = designImageUrl,
+                                title = title
+                            )
+                        } catch (e: Exception) {
+                            order
+                        }
+                    }
+                }.awaitAll()
+            }
+
+            trySend(Response.Success(enrichedOrders))
+            close()
+        } catch (e: Exception) {
+            trySend(Response.Error(e.message ?: "Failed to fetch orders"))
+            close()
+        }
+        awaitClose { }
     }
 }

@@ -8,6 +8,7 @@
     android:orientation="vertical"
     app:statusBarBackground="@color/darkBlue"
     android:fitsSystemWindows="true"
+    android:paddingBottom="70dp"
     tools:context=".ui_owner.home.HomeOwnerFragment">
 
     <ScrollView

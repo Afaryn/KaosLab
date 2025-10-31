@@ -1,5 +1,6 @@
 package com.afaryn.kaoslab.domain.repository
 
+import android.net.Uri
 import com.afaryn.kaoslab.domain.model.ProductTemplate
 import com.afaryn.kaoslab.domain.model.BusinessInsights
 import com.afaryn.kaoslab.domain.model.ChartData
@@ -9,6 +10,7 @@ import com.afaryn.kaoslab.domain.model.OrderStatusCounts
 import com.afaryn.kaoslab.domain.model.Transaction
 import com.afaryn.kaoslab.domain.model.TransactionFilter
 import com.afaryn.kaoslab.domain.model.User
+import com.afaryn.kaoslab.domain.model.MonthlySales
 import com.afaryn.kaoslab.utils.Response
 import kotlinx.coroutines.flow.Flow
 
@@ -33,6 +35,10 @@ interface OwnerRepository {
     fun getLastOrders(limit: Int = 5): Flow<Response<List<Order>>>
     fun getOrdersByStatus(status: String): Flow<Response<List<Order>>>
 
+    fun updateUserProfile(user: User): Flow<Response<String>>
+    suspend fun uploadProfileImage(imageUri: Uri, userId: String): String
+    suspend fun deleteImageFromStorage(imageUrl: String)
+
     // Arrange Shipment methods
     fun updateOrderStatus(orderId: String, status: String, courierId: String? = null, noResi: String? = null): Flow<Response<String>>
     fun getOrderById(orderId: String): Flow<Response<Order>>
@@ -41,4 +47,8 @@ interface OwnerRepository {
     // Transaction methods
     fun getTransactionHistory(filter: TransactionFilter? = null): Flow<Response<List<Transaction>>>
     fun getTotalBalance(): Flow<Response<Double>>
+
+    // Shop Performance methods
+    fun getMonthlySales(): Flow<Response<List<MonthlySales>>>
+    fun getOrdersByMonth(month: String, year: Int): Flow<Response<List<Order>>>
 }

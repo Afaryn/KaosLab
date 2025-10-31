@@ -1,13 +1,22 @@
 package com.afaryn.kaoslab.presentation.ui_owner.sales.order_details
 
+import android.Manifest
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +28,7 @@ import com.afaryn.kaoslab.databinding.FragmentOrderDetailsBinding
 import com.afaryn.kaoslab.domain.model.Order
 import com.afaryn.kaoslab.utils.Response
 import com.afaryn.kaoslab.utils.dp
+import com.afaryn.kaoslab.utils.glide
 import com.afaryn.kaoslab.utils.hideBottomNavOwner
 import com.afaryn.kaoslab.utils.toast
 import com.bumptech.glide.Glide
@@ -37,6 +47,17 @@ class OrderDetailsFragment : Fragment() {
 
     private var currentOrder: Order? = null
     private var customerPhone: String = ""
+    private var designImageUrl: String = ""
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            downloadDesignImage()
+        } else {
+            toast("Permission denied. Cannot download image.")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -145,12 +166,22 @@ class OrderDetailsFragment : Fragment() {
             }
 
             // Product info
-            productTitle.text = order.title
-            order.cartProducts.firstOrNull()?.orderItem?.designType?.overlay?.let {
-                Glide.with(requireContext())
-                    .load(it)
-                    .into(productImage)
-            } ?: productImage.setImageResource(drawable.ic_image_placeholder)
+
+            val product = order.cartProducts.first()
+
+            product.orderItem?.designType?.overlay?.let {
+                designOverlay.glide(it)
+            }
+
+            product.orderItem?.designType?.product?.imageUrl?.let {
+                imageCustomProduct.glide(it)
+            }
+
+            product.orderItem?.designType?.text?.let {
+                tvOverlay.text = it
+            }
+
+            productTitle.text = product.orderItem?.designType?.product?.name
 
             // Order details
             colorValue.text = order.cartProducts.joinToString(", ") { it.selectedColor.toString() }
@@ -175,40 +206,23 @@ class OrderDetailsFragment : Fragment() {
                 courierInfoSection.visibility = View.GONE
             }
 
-            llColors.removeAllViews()
-            order.cartProducts.mapNotNull { it.selectedColor }.forEach {
-                try {
-                    val color = it.toColorInt()
 
-                    val imageView = ImageView(requireContext()).apply {
-                        layoutParams = LinearLayout.LayoutParams(25.dp, 25.dp).apply {
-                            marginEnd = 8.dp
-                        }
-                        setBackgroundColor(color)
-                        contentDescription = "Color variant"
-                    }
-
-                    llColors.addView(imageView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
         }
     }
 
     private fun setupStatusIndicator(status: String) {
         binding.apply {
             // Reset all status indicators and progress lines to inactive state
-            unpaidStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            unpaidStatus.backgroundTintList = ColorStateList.valueOf(
                 "#CCCCCC".toColorInt()
             )
-            processingStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            processingStatus.backgroundTintList = ColorStateList.valueOf(
                 "#CCCCCC".toColorInt()
             )
-            shippedStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            shippedStatus.backgroundTintList = ColorStateList.valueOf(
                 "#CCCCCC".toColorInt()
             )
-            deliveredStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            deliveredStatus.backgroundTintList = ColorStateList.valueOf(
                 "#CCCCCC".toColorInt()
             )
 
@@ -317,7 +331,7 @@ class OrderDetailsFragment : Fragment() {
                 "pending" -> {
                     primaryButton.text = "Contact Customer"
                     primaryButton.visibility = View.VISIBLE
-                    secondaryButton.visibility = View.GONE
+                    secondaryButton.visibility = View.VISIBLE
                     primaryButton.setOnClickListener { contactCustomer() }
                 }
 
@@ -333,14 +347,13 @@ class OrderDetailsFragment : Fragment() {
                 "shipped" -> {
                     primaryButton.text = "Set to Delivered"
                     primaryButton.visibility = View.VISIBLE
-                    secondaryButton.visibility = View.GONE
+                    secondaryButton.visibility = View.VISIBLE
                     primaryButton.setOnClickListener { setToDelivered() }
                 }
 
                 "delivered" -> {
                     primaryButton.visibility = View.GONE
-                    secondaryButton.visibility = View.GONE
-                    primaryButton.setOnClickListener { giveReview() }
+                    secondaryButton.visibility = View.VISIBLE
                 }
             }
         }
@@ -365,7 +378,45 @@ class OrderDetailsFragment : Fragment() {
     }
 
     private fun downloadOrder() {
-        toast("Download functionality will be implemented")
+        // On Android 10 (API 29) and above, WRITE_EXTERNAL_STORAGE is not needed for DownloadManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            downloadDesignImage()
+        } else {
+            // Only check permission for Android 9 and below
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                downloadDesignImage()
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
+    }
+
+    private fun downloadDesignImage() {
+        designImageUrl = currentOrder?.cartProducts?.firstOrNull()?.orderItem?.designType?.overlay ?: ""
+        if (designImageUrl.isNotEmpty()) {
+            try {
+                val request = DownloadManager.Request(Uri.parse(designImageUrl))
+                    .setTitle("Design Image Download")
+                    .setDescription("Downloading design image for order ${args.orderId}")
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "design_${args.orderId}.png")
+                    .setAllowedOverMetered(true)
+                    .setAllowedOverRoaming(true)
+
+                val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                downloadManager.enqueue(request)
+
+                toast("Downloading design image...")
+            } catch (e: Exception) {
+                toast("Failed to download: ${e.message}")
+            }
+        } else {
+            toast("No design image available")
+        }
     }
 
     private fun setToDelivered() {
