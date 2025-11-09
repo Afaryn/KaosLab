@@ -96,9 +96,11 @@ class FeedFragment : Fragment() {
         }
     }
 
-    private fun setupView(feeds: List<Portfolio>) = binding?.run {
-        tvNoData.isVisible = feeds.isEmpty()
-        feedAdapter.differ.submitList(feeds)
+    private fun setupView(feeds: List<Portfolio>) = binding.run {
+        try {
+            tvNoData.isVisible = feeds.isEmpty()
+            feedAdapter.differ.submitList(feeds)
+        } catch (_: Exception) {}
     }
 
     override fun onDestroyView() {
